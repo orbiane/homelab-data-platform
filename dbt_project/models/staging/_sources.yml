@@ -1,0 +1,18 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: main
+    tables:
+      - name: account_master
+        meta:
+          external_location: "read_csv_auto('../data_generation/output/account_master.csv')"
+      - name: subscription_log
+        meta:
+          external_location: "read_csv_auto('../data_generation/output/subscription_log.csv')"
+      - name: message_event
+        meta:
+          external_location: "read_csv_auto('../data_generation/output/message_event.csv')"
+      - name: revenue_monthly
+        meta:
+          external_location: "read_csv_auto('../data_generation/output/revenue_monthly.csv')"
