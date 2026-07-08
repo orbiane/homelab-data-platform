@@ -1,0 +1,56 @@
+version: 2
+
+models:
+  - name: dim_account
+    description: "アカウントディメンション。account_id = 1行、20行"
+    columns:
+      - name: account_id
+        description: "アカウント識別子（主キー）"
+        data_tests:
+          - unique
+          - not_null
+
+  - name: fct_message_event
+    description: "配信イベントファクト（縦持ち：message_id × contact_id × event_type）"
+    columns:
+      - name: account_id
+        description: "配信元アカウント。dim_accountを参照"
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_account')
+                field: account_id
+              config:
+                severity: warn
+
+  - name: fct_subscription
+    description: "友だち追加イベントファクト"
+    columns:
+      - name: account_id
+        description: "追加先アカウント。dim_accountを参照"
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_account')
+                field: account_id
+              config:
+                severity: warn
+
+  - name: fct_revenue
+    description: "月次売上ファクト（snapshot粒度保持）"
+    columns:
+      - name: currency
+        description: "通貨。JPY/USDのみ"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['JPY', 'USD']
+      - name: account_id
+        description: "アカウント。dim_accountを参照"
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_account')
+                field: account_id
+              config:
+                severity: warn
