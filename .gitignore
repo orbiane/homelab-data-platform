@@ -22,3 +22,8 @@ airflow/plugins/
 
 # Data files (generated, not tracked)
 data_generation/output/
+
+# Airflow
+airflow/.env
+airflow/logs/
+airflow/config/
