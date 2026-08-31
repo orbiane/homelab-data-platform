@@ -1,0 +1,39 @@
+metrics:
+  - name: subscription_count
+    description: "友だち追加数（全量。無効MIDを含む実データそのまま）"
+    type: simple
+    label: "友だち追加数"
+    type_params:
+      measure: subscription_count
+
+  - name: delivered_count
+    description: "配信数"
+    type: simple
+    label: "配信数"
+    type_params:
+      measure: delivered_count
+
+  - name: clicked_count
+    description: "クリック数"
+    type: simple
+    label: "クリック数"
+    type_params:
+      measure: clicked_count
+
+  - name: ctr
+    description: "クリック率 = クリック数 ÷ 配信数"
+    type: ratio
+    label: "CTR"
+    type_params:
+      numerator: clicked_count
+      denominator: delivered_count
+
+  - name: revenue_amount
+    description: |
+      売上額（確定スナップショットのみ）。
+      ★通貨混在：JPY と USD を無変換で合算しているため、
+      currency で絞らない全体値は意味を持たない。
+    type: simple
+    label: "売上額"
+    type_params:
+      measure: revenue_amount

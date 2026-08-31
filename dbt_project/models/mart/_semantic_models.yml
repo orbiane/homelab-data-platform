@@ -1,0 +1,112 @@
+semantic_models:
+  - name: bot
+    description: "アカウントディメンション。全ファクトの結合先"
+    model: ref('dim_account')
+    entities:
+      - name: bot
+        type: primary
+        expr: account_id
+    dimensions:
+      - name: industry
+        type: categorical
+      - name: plan_type
+        type: categorical
+      - name: region
+        type: categorical
+      - name: status
+        type: categorical
+
+  - name: subscription
+    description: "友だち追加イベント。粒度=event_id"
+    model: ref('fct_subscription')
+    defaults:
+      agg_time_dimension: dt
+    entities:
+      - name: subscription_event
+        type: primary
+        expr: event_id
+      - name: bot
+        type: foreign
+        expr: account_id
+    dimensions:
+      - name: dt
+        type: time
+        type_params:
+          time_granularity: day
+      - name: route
+        type: categorical
+      - name: referrer
+        type: categorical
+    measures:
+      - name: subscription_count
+        description: "友だち追加イベント数（全量。品質フラグでの除外なし）"
+        agg: count
+        expr: event_id
+
+  - name: message_event
+    description: "配信イベント（縦持ち：message_id × contact_id × event_type）"
+    model: ref('fct_message_event')
+    defaults:
+      agg_time_dimension: dt
+    entities:
+      - name: message_event
+        type: primary
+        expr: event_id
+      - name: bot
+        type: foreign
+        expr: account_id
+    dimensions:
+      - name: dt
+        type: time
+        type_params:
+          time_granularity: day
+      - name: event_type
+        type: categorical
+      - name: message_type
+        type: categorical
+    measures:
+      - name: delivered_count
+        description: "配信数。event_type=delivered の行数"
+        agg: sum
+        expr: case when event_type = 'delivered' then 1 else 0 end
+      - name: clicked_count
+        description: "クリック数。event_type=clicked の行数"
+        agg: sum
+        expr: case when event_type = 'clicked' then 1 else 0 end
+      - name: opened_count
+        description: "開封数。event_type=opened の行数"
+        agg: sum
+        expr: case when event_type = 'opened' then 1 else 0 end
+
+  - name: revenue
+    description: |
+      月次売上。snapshot履歴を保持するテーブルだが、
+      measure側で is_latest_snapshot に限定して多重計上を防ぐ（ADR-001）。
+      snapshot_date は意図的に dimension として公開しない。
+      履歴分析が必要な場合は別モデルを立てること。
+    model: ref('fct_revenue')
+    primary_entity: revenue_record
+    defaults:
+      agg_time_dimension: revenue_month
+    entities:
+      - name: bot
+        type: foreign
+        expr: account_id
+    dimensions:
+      - name: revenue_month
+        type: time
+        type_params:
+          time_granularity: month
+      - name: currency
+        type: categorical
+      - name: is_finalized
+        type: categorical
+    measures:
+      - name: revenue_amount
+        description: "確定売上額。latest snapshot のみ。通貨混在に注意（JPY/USD）"
+        agg: sum
+        expr: case when is_latest_snapshot then revenue_amount else 0 end
+      - name: message_count
+        description: "配信数（請求ベース）。latest snapshot のみ"
+        agg: sum
+        expr: case when is_latest_snapshot then message_count else 0 end
