@@ -1,9 +1,9 @@
 semantic_models:
-  - name: bot
+  - name: account
     description: "アカウントディメンション。全ファクトの結合先"
     model: ref('dim_account')
     entities:
-      - name: bot
+      - name: account
         type: primary
         expr: account_id
     dimensions:
@@ -25,7 +25,7 @@ semantic_models:
       - name: subscription_event
         type: primary
         expr: event_id
-      - name: bot
+      - name: account
         type: foreign
         expr: account_id
     dimensions:
@@ -52,7 +52,7 @@ semantic_models:
       - name: message_event
         type: primary
         expr: event_id
-      - name: bot
+      - name: account
         type: foreign
         expr: account_id
     dimensions:
@@ -89,7 +89,7 @@ semantic_models:
     defaults:
       agg_time_dimension: revenue_month
     entities:
-      - name: bot
+      - name: account
         type: foreign
         expr: account_id
     dimensions:
