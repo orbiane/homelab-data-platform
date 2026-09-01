@@ -5,7 +5,7 @@ dbt + DuckDB + Airflow + MetricFlow semantic layer, with intentionally
 dirty synthetic data to study how metric definitions fail in practice.
 
 The goal is not "it runs" but "why it was designed this way" - every
-significant decision is recorded as an ADR under `docs/decisions/`.
+significant decision is recorded as an ADR under [docs/decisions/](docs/decisions/).
 
 ## Architecture
 
@@ -64,7 +64,7 @@ unit semantics cannot - it requires external information the definition
 does not have. This is a concrete counterexample to "a solid definition
 makes metrics safe."
 
-See `docs/decisions/` for the full reasoning.
+See [docs/decisions/](docs/decisions/) for the full reasoning.
 
 ## Reproduce
 
