@@ -9,25 +9,26 @@ significant decision is recorded as an ADR under `docs/decisions/`.
 
 ## Architecture
 
+```text
 CSV (synthetic, seeded)
-|
-v
-dbt sources external_location, not seeds
-| (enables source freshness checks)
-v
-staging (view) quality issues are FLAGGED, never removed
-| is_valid_id / is_late_arrival / is_latest_snapshot
-v
-mart (table) thin mart: no aggregation, no joins
-| dim_account + fct_subscription / fct_message_event / fct_revenue
-v
-semantic layer MetricFlow: entities, dimensions, measures
-| joins are declared here, not in mart
-v
-mf query deterministic SQL generation
+      |
+      v
+  dbt sources          external_location, not seeds
+      |                (enables source freshness checks)
+      v
+  staging (view)       quality issues are FLAGGED, never removed
+      |                is_valid_id / is_late_arrival / is_latest_snapshot
+      v
+  mart (table)         thin mart: no aggregation, no joins
+      |                dim_account + fct_subscription / fct_message_event / fct_revenue
+      v
+  semantic layer       MetricFlow: entities, dimensions, measures
+      |                joins are declared here, not in mart
+      v
+  mf query             deterministic SQL generation
+```
 
-Airflow (Docker, LocalExecutor) runs dbt build daily at 03:00 JST.
-
+Airflow (Docker, LocalExecutor) runs `dbt build` daily at 03:00 JST.
 
 ## Design principles
 
