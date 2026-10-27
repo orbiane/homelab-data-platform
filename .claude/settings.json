@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(mf *)",
+      "Bash(duckdb -readonly *)",
+      "Bash(dbt parse *)",
+      "Bash(dbt ls *)",
+      "Bash(dbt compile *)",
+      "Bash(git add *)",
+      "Bash(git commit *)"
+    ],
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git restore *)",
+      "Bash(git checkout -- *)",
+      "Bash(uv run *)",
+      "Bash(uv tool *)",
+      "Bash(docker compose down *)",
+      "Edit(**/_metrics.yml)",
+      "Edit(**/_semantic_models.yml)"
+    ],
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git filter-repo *)",
+      "Bash(git rebase *)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean *)",
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(docker volume rm *)",
+      "Bash(docker system prune *)"
+    ]
+  }
+}
