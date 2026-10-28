@@ -27,7 +27,7 @@ models:
     description: "登録イベントファクト"
     columns:
       - name: account_id
-        description: "追加先アカウント。dim_accountを参照"
+        description: "登録先アカウント。dim_accountを参照"
         data_tests:
           - relationships:
               arguments:
