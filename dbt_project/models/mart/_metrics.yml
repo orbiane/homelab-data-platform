@@ -1,8 +1,8 @@
 metrics:
   - name: subscription_count
-    description: "友だち追加数（全量。無効MIDを含む実データそのまま）"
+    description: "登録数（全量。U プレフィックスが欠けた contact_id を含む実データそのまま）"
     type: simple
-    label: "友だち追加数"
+    label: "登録数"
     type_params:
       measure: subscription_count
 
@@ -30,7 +30,7 @@ metrics:
 
   - name: revenue_amount
     description: |
-      売上額（確定スナップショットのみ）。
+      売上額（最新スナップショットの値。未確定の月を含む）。
       ★通貨混在：JPY と USD を無変換で合算しているため、
       currency で絞らない全体値は意味を持たない。
     type: simple

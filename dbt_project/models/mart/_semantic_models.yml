@@ -17,7 +17,7 @@ semantic_models:
         type: categorical
 
   - name: subscription
-    description: "友だち追加イベント。粒度=event_id"
+    description: "登録イベント。粒度=event_id"
     model: ref('fct_subscription')
     defaults:
       agg_time_dimension: dt
@@ -39,7 +39,7 @@ semantic_models:
         type: categorical
     measures:
       - name: subscription_count
-        description: "友だち追加イベント数（全量。品質フラグでの除外なし）"
+        description: "登録イベント数（全量。品質フラグでの除外なし）"
         agg: count
         expr: event_id
 
@@ -103,7 +103,7 @@ semantic_models:
         type: categorical
     measures:
       - name: revenue_amount
-        description: "確定売上額。latest snapshot のみ。通貨混在に注意（JPY/USD）"
+        description: "最新 snapshot の売上額（未確定の月を含む）。通貨混在に注意（JPY/USD）"
         agg: sum
         expr: case when is_latest_snapshot then revenue_amount else 0 end
       - name: message_count

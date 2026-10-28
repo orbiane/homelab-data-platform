@@ -16,9 +16,9 @@
 
 1. **仕込んだ汚れを消さない。** staging / mart で汚れを除外・補正・重複排除する変更をしない。品質フラグは汚れを「見えるようにする」ためのもので、集計から除外しない（理由は `docs/decisions/`）
    - 全テーブル共通: contact_id の約 1 割で U プレフィックスが欠落
-   - message_event: 遅延到着 / 完全重複 / 孤児 / 順序矛盾 / enum 不正・null / click_url 整合違反
-   - revenue: snapshot drift / 未締め / ゼロと欠損の混同 / USD 混入（2 アカウント）
-   - subscription: 孤児（dim_account に無い account_id。結合すると industry が NULL）
+   - message_event: 遅延到着 / 完全重複 / 孤児（dim_account に無い account_id、189 行）/ 順序矛盾 / enum 不正・null / click_url 整合違反
+   - revenue: snapshot drift / 未締め / ゼロと欠損の混同 / USD 混入（2 アカウント）/ 孤児（1 行）
+   - subscription: 孤児は無い（2,035 行中 0 件）。dim_account で業種が空のアカウントが 2 つあり、結合すると 440 行の industry が NULL になる
    - `dbt build` の WARN は意図的な汚れ検知。ERROR=0 が正常
 2. **メトリクス定義を勝手に変えない。** `_metrics.yml` と `_semantic_models.yml` は、差分を提案して承認を待つ
 3. **ツールのバージョンを上げない。** 比較実験の再現性のため固定（dbt-core 1.11.8 / dbt-duckdb 1.10.1 / dbt-metricflow 0.14.0）。`mf` が表示する `pip install --upgrade` の案内には従わない
@@ -43,6 +43,7 @@
 
 - ファイル名・カラム名・数値を記憶で書かない。実物を見てから書く
 - 数値を報告するときは、実行したコマンドと出力を添える
+- チェックの結果を報告するときは、検査した対象の件数も添える（「0件」が「何も無い」のか「何も見ていない」のかを区別するため）
 - 分からないことを推測で埋めない。確かめるコマンドを走らせる
 - 設計判断の根拠は `docs/decisions/`（ADR-001〜005）にある。関係する変更の前に読む
 - 計画を出すときは、各ステップで何を確かめれば成功と言えるかを書く
