@@ -25,11 +25,6 @@ generator は乱数の種（seed）を固定して、何度動かしても同じ
 ところが `data_generation/generators/revenue_monthly.py` の 66 行目だけは、
 金額の元になる値を Python の `hash()` で作っている。
 
-> 2026-10-28 訂正：上の「何度動かしても同じ CSV ができる」は、`subscription.py` と `message_event.py` には当てはまらない。
-> この2本は event_id を `uuid.uuid4()` で作っている（`subscription.py` の 93・110・121・128 行目、`message_event.py` の 76 行目）。
-> uuid4 は OS の乱数を使うので `random.seed` が効かず、generator を動かすたびに event_id が変わる。
-> 段階3で generator を直すときは、`hash()` に加えて event_id の作り方も直す必要がある。
-
 ```python
 66      seed = hash((account_id, month.isoformat())) % 1000
 ```
@@ -42,6 +37,11 @@ generator は乱数の種（seed）を固定して、何度動かしても同じ
 
 確定済みの行の金額は、この値そのものになる（97 行目 `amount = base`）。
 新旧の値がすべて 100 の倍数なのはこのためである。
+
+> 2026-10-28 訂正：上の「何度動かしても同じ CSV ができる」は、`subscription.py` と `message_event.py` には当てはまらない。
+> この2本は event_id を `uuid.uuid4()` で作っている（`subscription.py` の 93・110・121・128 行目、`message_event.py` の 76 行目）。
+> uuid4 は OS の乱数を使うので `random.seed` が効かず、generator を動かすたびに event_id が変わる。
+> 段階3で generator を直すときは、`hash()` に加えて event_id の作り方も直す必要がある。
 
 差の内訳は次の通り。差は特定の月やアカウントに偏らず、
 全 6 か月・20 アカウントの最新スナップショット 92 行に散らばっている。
