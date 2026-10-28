@@ -44,6 +44,8 @@ the consuming layer, not a silent default.
 
 **Reproducible synthetic data.** All generators use fixed seeds, so
 anyone can reproduce byte-identical CSVs and observe the same failures.
+Exception: `revenue_monthly` uses Python's `hash()` and is *not* reproducible across runs.
+Check the data version with `data_generation/output.sha256` ([ADR-006](docs/decisions/ADR-006-generated-data-version.md)).
 
 ## What this project demonstrates
 

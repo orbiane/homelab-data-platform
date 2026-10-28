@@ -36,6 +36,8 @@
 - DuckDB を読むだけなら `duckdb -readonly dbt_project/warehouse.duckdb`
 - Airflow は `airflow/` の Docker Compose。UI はホスト側ポート 8081（8080 は Docker が占有）。DAG は毎日 JST 03:00 に `dbt build` を実行する
 - Docker Desktop は macOS の再起動後に自動起動しない（`open -a Docker`）
+- 生成データの版は `data_generation/output.sha256` で照合する（`cd data_generation/output && shasum -a 256 -c ../output.sha256`）。数値を出す前や比較実験の前に照合し、合わなければ止めて報告する
+- `revenue_monthly.py` は `hash()` を使っているため、再実行すると金額が変わる（ADR-006）
 
 ## 作業の進め方
 

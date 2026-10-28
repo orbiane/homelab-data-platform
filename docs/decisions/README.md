@@ -7,5 +7,6 @@
 | [003](ADR-003-time-dimension.md) | Semantic layer time axis is dt (processing date) | 2026-08-31 |
 | [004](ADR-004-latest-snapshot-filter.md) | Latest snapshot filter lives in the semantic model | 2026-08-31 |
 | [005](ADR-005-quality-flags-and-currency.md) | No quality-flag exclusion; currency mixing left unresolved | 2026-08-31 |
+| [006](ADR-006-generated-data-version.md) | Pin generated data by sha256; current CSVs are the baseline | 2026-10-28 |
 
 ADR-005 is the one worth reading if you only read one.
