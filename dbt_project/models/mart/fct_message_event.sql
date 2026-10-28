@@ -15,5 +15,5 @@ select
     is_valid_event_type,
     is_valid_click,
     is_late_arrival,
-    is_valid_mid
+    is_valid_contact_id
 from stg

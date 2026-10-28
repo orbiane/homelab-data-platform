@@ -8,7 +8,7 @@ cleaned as (
         account_id,
         contact_id,
         -- U欠落を除去せずフラグで可視化（5-7演習の素材を残す）
-        contact_id like 'U%' as is_valid_mid,
+        contact_id like 'U%' as is_valid_contact_id,
         cast(added_at as timestamp) as added_at,
         cast(dt as date) as dt,
         route,

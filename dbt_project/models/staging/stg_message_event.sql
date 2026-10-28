@@ -30,7 +30,7 @@ cleaned as (
             as is_late_arrival,
 
         -- contact_id の U欠落（他テーブルと同じ流儀）
-        contact_id like 'U%' as is_valid_mid
+        contact_id like 'U%' as is_valid_contact_id
     from source
 )
 
