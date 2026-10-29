@@ -1,0 +1,22 @@
+## メトリクス（名前：説明）
+- subscription_count：登録数（全量。U プレフィックスが欠けた contact_id を含む実データそのまま）
+- delivered_count：配信数
+- clicked_count：クリック数
+- ctr：クリック率 = クリック数 ÷ 配信数
+- revenue_amount：売上額（最新スナップショットの値。未確定の月を含む）。★通貨混在：JPY と USD を無変換で合算しているため、currency で絞らない全体値は意味を持たない。
+
+## メトリクスごとに使えるディメンション
+- subscription_count：account__industry, account__plan_type, account__region, account__status, metric_time, subscription_event__dt, subscription_event__referrer, subscription_event__route
+- delivered_count：account__industry, account__plan_type, account__region, account__status, message_event__dt, message_event__event_type, message_event__message_type, metric_time
+- clicked_count：account__industry, account__plan_type, account__region, account__status, message_event__dt, message_event__event_type, message_event__message_type, metric_time
+- ctr：account__industry, account__plan_type, account__region, account__status, message_event__dt, message_event__event_type, message_event__message_type, metric_time
+- revenue_amount：account__industry, account__plan_type, account__region, account__status, metric_time, revenue_record__currency, revenue_record__is_finalized, revenue_record__revenue_month
+
+## mf query の書き方（mf query --help より）
+- --metrics：メトリクスをカンマ区切りで指定（例 --metrics bookings,messages）
+- --group-by：ディメンションをカンマ区切りで指定（例 --group-by ds,org）
+- --where：絞り込み。"{{ Dimension('order_id__revenue') }} > 100" のように Dimension() で囲む。時間は {{ TimeDimension('metric_time', 'day') }} のように粒度を付けて書ける
+- --start-time / --end-time：iso8601 の日時で期間を絞る（両端を含む）
+- --order：並べ替え。- を付けると降順（例 --order -metric_time）
+- --limit：行数の上限
+- --decimals：小数の桁数

@@ -1,0 +1,44 @@
+#!/bin/zsh
+# ask-local: ローカル LLM（Ollama）に仕事を投げ、答えだけを標準出力に返す。
+# ファイルの中身はこのスクリプトが読み、Ollama（この Mac の中）にだけ渡す。
+#
+# 使い方:
+#   ask-local "指示" [ファイル ...]
+#   ask-local -m qwen3.5:122b "指示" [ファイル ...]
+#   コマンド出力 | ask-local "指示"
+#
+# 環境変数 ASK_LOCAL_MODEL で既定のモデルを変えられる（既定: gpt-oss:120b）。
+
+set -euo pipefail
+
+model="${ASK_LOCAL_MODEL:-gpt-oss:120b}"
+if [[ "${1:-}" == "-m" ]]; then
+  model="$2"
+  shift 2
+fi
+
+if [[ $# -lt 1 ]]; then
+  echo "usage: ask-local [-m model] \"指示\" [ファイル ...]" >&2
+  exit 2
+fi
+
+instruction="$1"
+shift
+
+material=""
+for f in "$@"; do
+  if [[ ! -r "$f" ]]; then
+    echo "ask-local: 読めないファイル: $f" >&2
+    exit 1
+  fi
+  material+=$'\n\n----- FILE: '"${f:t}"$' -----\n'"$(<"$f")"
+done
+if [[ ! -t 0 ]]; then
+  material+=$'\n\n----- STDIN -----\n'"$(cat)"
+fi
+
+prompt="${instruction}${material}"
+
+curl -sS --fail http://127.0.0.1:11434/api/generate \
+  -d "$(jq -n --arg m "$model" --arg p "$prompt" '{model:$m, prompt:$p, stream:false}')" \
+  | jq -r '.response'

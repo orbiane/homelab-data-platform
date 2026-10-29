@@ -1,0 +1,5 @@
+## スキーマ（DuckDB。スキーマ名 main_mart）
+- main_mart.dim_account: account_id VARCHAR, account_seq VARCHAR, handle VARCHAR, account_name VARCHAR, industry VARCHAR, plan_type VARCHAR, region VARCHAR, status VARCHAR, created_at TIMESTAMP, as_of_date DATE
+- main_mart.fct_message_event: event_id VARCHAR, dt DATE, message_id VARCHAR, account_id VARCHAR, contact_id VARCHAR, message_type VARCHAR, event_type VARCHAR, event_timestamp TIMESTAMP, click_url VARCHAR, is_valid_event_type BOOLEAN, is_valid_click BOOLEAN, is_late_arrival BOOLEAN, is_valid_contact_id BOOLEAN
+- main_mart.fct_revenue: account_id VARCHAR, revenue_month DATE, snapshot_date DATE, revenue_amount BIGINT, currency VARCHAR, message_count BIGINT, is_finalized BOOLEAN, is_zero_revenue BOOLEAN, is_latest_snapshot BOOLEAN
+- main_mart.fct_subscription: event_id VARCHAR, account_id VARCHAR, contact_id VARCHAR, is_valid_contact_id BOOLEAN, added_at TIMESTAMP, dt DATE, route VARCHAR, referrer VARCHAR, is_valid_timestamp BOOLEAN
