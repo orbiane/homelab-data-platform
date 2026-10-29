@@ -1,0 +1,14 @@
+{
+  "side": "t2s",
+  "id": "B4",
+  "question": "業種ごとの配信数",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    a.industry,\n    COUNT(*) AS delivery_count\nFROM main_mart.fct_message_event AS e\nJOIN main_mart.dim_account AS a\n    ON e.account_id = a.account_id\nWHERE e.event_type = 'delivered'      -- 配信（delivery）を表すイベント\n  AND e.is_valid_event_type          -- 有効なイベントのみ対象\nGROUP BY a.industry\nORDER BY delivery_count DESC;\n```",
+      "query": "SELECT\n    a.industry,\n    COUNT(*) AS delivery_count\nFROM main_mart.fct_message_event AS e\nJOIN main_mart.dim_account AS a\n    ON e.account_id = a.account_id\nWHERE e.event_type = 'delivered'      -- 配信（delivery）を表すイベント\n  AND e.is_valid_event_type          -- 有効なイベントのみ対象\nGROUP BY a.industry\nORDER BY delivery_count DESC;",
+      "ok": true,
+      "result": "┌───────────────────┬────────────────┐\n│     industry      │ delivery_count │\n│      varchar      │     int64      │\n├───────────────────┼────────────────┤\n│ NULL              │           2446 │\n│ entertainment     │           1481 │\n│ healthcare        │           1463 │\n│ real_estate       │            867 │\n│ education         │            745 │\n│ food_and_beverage │            588 │\n│ retail            │            492 │\n│ beauty            │            227 │\n└───────────────────┴────────────────┘"
+    }
+  ],
+  "final_answer": "以下は「配信（delivery）イベント」だけを対象にした、業種別の配信回数です。\n\n| 業種                | 配信回数 | 全体に占める割合 |\n|---------------------|----------|-------------------|\n| **NULL**（業種未設定） | 2,446    | 約 29.4% |\n| entertainment       | 1,481    | 約 17.8% |\n| healthcare          | 1,463    | 約 17.6% |\n| real_estate         |   867    | 約 10.4% |\n| education           |   745    | 約 9.0% |\n| food_and_beverage   |   588    | 約 7.1% |\n| retail              |   492    | 約 5.9% |\n| beauty              |   227    | 約 2.7% |\n| **合計**            | 8,309    | 100% |\n\n### 見て取れるポイント\n\n1. **業種未設定（NULL）の配信が最も多く、全体の約3割を占めています。**  \n   - データ品質の観点から、`dim_account.industry` が欠損しているアカウントの把握・補完を検討すると、分析の精度が向上します。\n\n2. **エンターテインメントとヘルスケアがほぼ同数で続き、合わせて全体の約35% を占めています。**  \n   - これらの業種は配信効果が高い可能性があるため、今後のキャンペーンやコンテンツの重点対象として検討できます。\n\n3. **不動産・教育・飲食業界も一定のシェア（合計約26%）を持っています。**  \n   - それぞれの業種特性に合わせたメッセージングやタイミングの最適化が期待できます。\n\n4. **小規模業種（美容）は全体の約3% と低めですが、ニッチ市場へのアプローチとしては有効です。**\n\n### 次のアクション例\n\n- **NULL の原因調査**  \n  - アカウント作成時の必須項目設定や、データインポートプロセスの見直しを行い、業種情報の取得率を上げる。\n\n- **業種別パフォーマンスの比較**  \n  - 配信数だけでなく、開封率・クリック率・コンバージョン率といった指標も併せて集計し、どの業種が最も効果的かを評価する。\n\n- **ターゲティング戦略の最適化**  \n  - エンタメ・ヘルスケア向けのクリエイティブやオファーを強化し、配信数をさらに増やすと同時にエンゲージメント向上を狙う。\n\n- **レポートの自動化**  \n  - 本クエリを定期実行（例：週次）し、業種別配信数の推移をモニタリングできるダッシュボードを作成する。\n\n以上が、現在取得できる「業種ごとの配信数」の概要と、考えられる分析・施策の方向性です。ご不明点や追加で見たい指標がありましたら、お知らせください。"
+}

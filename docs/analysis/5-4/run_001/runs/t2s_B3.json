@@ -1,0 +1,14 @@
+{
+  "side": "t2s",
+  "id": "B3",
+  "question": "クリック率はどのくらい？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    ROUND(\n        100.0 * SUM(CASE WHEN is_valid_click THEN 1 ELSE 0 END) /\n        NULLIF(SUM(CASE WHEN is_valid_event_type THEN 1 ELSE 0 END), 0)\n    , 2) AS click_through_rate_percent\nFROM main_mart.fct_message_event;\n```",
+      "query": "SELECT\n    ROUND(\n        100.0 * SUM(CASE WHEN is_valid_click THEN 1 ELSE 0 END) /\n        NULLIF(SUM(CASE WHEN is_valid_event_type THEN 1 ELSE 0 END), 0)\n    , 2) AS click_through_rate_percent\nFROM main_mart.fct_message_event;",
+      "ok": true,
+      "result": "┌────────────────────────────┐\n│ click_through_rate_percent │\n│           double           │\n├────────────────────────────┤\n│                      99.36 │\n└────────────────────────────┘"
+    }
+  ],
+  "final_answer": "クリック率（CTR）は **99.36 %** です。\n\n※計算は、`is_valid_click` が TRUE のイベント数を、全有効イベント（`is_valid_event_type` が TRUE のイベント）数で割り、100 を掛けてパーセンテージに換算したものです。結果は小数点以下2桁に丸められています。  \n\nこの数値は非常に高いクリック率であることを示しています。もし期待値と大きく乖離している場合は、イベント定義やデータ取得ロジックを再確認すると良いでしょう。"
+}

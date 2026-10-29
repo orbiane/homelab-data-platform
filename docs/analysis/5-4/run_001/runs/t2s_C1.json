@@ -1,0 +1,14 @@
+{
+  "side": "t2s",
+  "id": "C1",
+  "question": "売上の合計はいくら？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT SUM(revenue_amount) AS total_revenue\nFROM main_mart.fct_revenue\nWHERE is_latest_snapshot = TRUE;\n```",
+      "query": "SELECT SUM(revenue_amount) AS total_revenue\nFROM main_mart.fct_revenue\nWHERE is_latest_snapshot = TRUE;",
+      "ok": true,
+      "result": "┌───────────────┐\n│ total_revenue │\n│    int128     │\n├───────────────┤\n│      49621900 │\n└───────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「売上の合計」は、クエリの実行結果から次の通りです。\n\n**売上合計：49,621,900**\n\n（単位はデータベースに格納されている通貨単位に従います）"
+}

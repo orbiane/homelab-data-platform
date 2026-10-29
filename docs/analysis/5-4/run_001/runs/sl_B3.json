@@ -1,0 +1,14 @@
+{
+  "side": "sl",
+  "id": "B3",
+  "question": "クリック率はどのくらい？",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics ctr --limit 1\n```",
+      "query": "mf query --metrics ctr --limit 1",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\n     ctr\n--------\n0.134196"
+    }
+  ],
+  "final_answer": "クリック率（CTR）は **0.134196** です。  \nパーセンテージに換算すると約 **13.42 %** となります。これは、対象となったインプレッション（表示）に対して約13.4 %のクリックが発生したことを示しています。"
+}

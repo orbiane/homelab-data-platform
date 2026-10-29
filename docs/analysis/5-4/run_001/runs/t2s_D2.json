@@ -1,0 +1,14 @@
+{
+  "side": "t2s",
+  "id": "D2",
+  "question": "登録した人は何人？（重複なし）",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT COUNT(DISTINCT account_id) AS registered_people\nFROM main_mart.dim_account;\n```",
+      "query": "SELECT COUNT(DISTINCT account_id) AS registered_people\nFROM main_mart.dim_account;",
+      "ok": true,
+      "result": "┌───────────────────┐\n│ registered_people │\n│       int64       │\n├───────────────────┤\n│                20 │\n└───────────────────┘"
+    }
+  ],
+  "final_answer": "登録した人の数（重複を除いたユニークな account_id の数）は **20 人** です。"
+}

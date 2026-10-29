@@ -1,0 +1,14 @@
+{
+  "side": "t2s",
+  "id": "B2",
+  "question": "配信数は全部でいくつ？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT COUNT(*) AS total_deliveries\nFROM main_mart.fct_message_event\nWHERE event_type = 'delivered';\n```",
+      "query": "SELECT COUNT(*) AS total_deliveries\nFROM main_mart.fct_message_event\nWHERE event_type = 'delivered';",
+      "ok": true,
+      "result": "┌──────────────────┐\n│ total_deliveries │\n│      int64       │\n├──────────────────┤\n│             8428 │\n└──────────────────┘"
+    }
+  ],
+  "final_answer": "配信数は **8,428 件** です。クエリでは `event_type = 'delivered'` のレコード数をカウントしており、その結果が 8,428 件となっています。"
+}

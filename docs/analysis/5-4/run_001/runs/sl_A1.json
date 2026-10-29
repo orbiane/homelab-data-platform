@@ -1,0 +1,14 @@
+{
+  "side": "sl",
+  "id": "A1",
+  "question": "メッセージの種類ごとのクリック数を出して",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics clicked_count --group-by message_event__message_type\n```",
+      "query": "mf query --metrics clicked_count --group-by message_event__message_type",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.05 seconds\nmessage_event__message_type      clicked_count\n-----------------------------  ---------------\nflex                                       168\nimage                                      215\nvideo                                      251\nimagemap                                   272\ntext                                       225"
+    }
+  ],
+  "final_answer": "以下は、メッセージの種類ごとのクリック数です。\n\n| メッセージ種別 | クリック数 |\n|----------------|------------|\n| flex           | 168 |\n| image          | 215 |\n| video          | 251 |\n| imagemap       | 272 |\n| text           | 225 |\n\n**合計クリック数**は **1,131 件** です。\n\n### 主なポイント\n- **最もクリック数が多い**のは **imagemap（272 件）** です。  \n- 次いで **video（251 件）**、**text（225 件）**、**image（215 件）**、**flex（168 件）** の順です。\n\nこの結果から、imagemap メッセージがユーザーの関心を最も引いていることが分かります。もし、クリック率（クリック数 ÷ 配信数）や、時間帯別の傾向など、さらに詳しい分析が必要であればお知らせください。"
+}

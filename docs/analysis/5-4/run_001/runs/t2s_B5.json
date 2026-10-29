@@ -1,0 +1,14 @@
+{
+  "side": "t2s",
+  "id": "B5",
+  "question": "2月の確定した売上（円）はいくら？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS feb_finalized_revenue_jpy\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND EXTRACT(MONTH FROM revenue_month) = 2\n    AND currency = 'JPY';\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS feb_finalized_revenue_jpy\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND EXTRACT(MONTH FROM revenue_month) = 2\n    AND currency = 'JPY';",
+      "ok": true,
+      "result": "┌───────────────────────────┐\n│ feb_finalized_revenue_jpy │\n│          int128           │\n├───────────────────────────┤\n│                  10448341 │\n└───────────────────────────┘"
+    }
+  ],
+  "final_answer": "2月に確定した売上（円）は **10,448,341円** です。これは、`is_finalized = TRUE` かつ `revenue_month` が2月で、通貨がJPY（日本円）のレコードの `revenue_amount` をすべて合計した金額です。"
+}

@@ -1,0 +1,20 @@
+{
+  "side": "sl",
+  "id": "D5",
+  "question": "売上の最初の見積もりと確定値は、どれくらい違った？",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query \\\n  --metrics revenue_amount \\\n  --group-by revenue_record__revenue_month,revenue_record__is_finalized \\\n  --where \"{{ Dimension('revenue_record__is_finalized') }} in (true, false)\" \\\n  --start-time 2024-01-01T00:00:00Z \\\n  --end-time 2026-10-28T23:59:59Z \\\n  --order revenue_record__revenue_month \\\n  --limit 1000\n```",
+      "query": "mf query \\\n  --metrics revenue_amount \\\n  --group-by revenue_record__revenue_month,revenue_record__is_finalized \\\n  --where \"{{ Dimension('revenue_record__is_finalized') }} in (true, false)\" \\\n  --start-time 2024-01-01T00:00:00Z \\\n  --end-time 2026-10-28T23:59:59Z \\\n  --order revenue_record__revenue_month \\\n  --limit 1000",
+      "ok": false,
+      "result": "ERROR: can't compare offset-naive and offset-aware datetimes\n\nLog File:: ~/homelab-data-platform/dbt_project/logs/metricflow.log\nArtifact Path: ~/homelab-data-platform/dbt_project/target/semantic_manifest.json\nArtifact Modified Time: 2026-10-29T03:00:02.634256\n\nIf you think you found a bug, please report it here:\n    https://github.com/dbt-labs/metricflow/issues"
+    },
+    {
+      "llm": "```bash\nmf query \\\n  --metrics revenue_amount \\\n  --group-by revenue_record__revenue_month,revenue_record__is_finalized \\\n  --where \"{{ Dimension('revenue_record__is_finalized') }} in (true, false)\" \\\n  --start-time 2024-01-01T00:00:00 \\\n  --end-time 2026-10-28T23:59:59 \\\n  --order revenue_record__revenue_month \\\n  --limit 1000\n```",
+      "query": "mf query \\\n  --metrics revenue_amount \\\n  --group-by revenue_record__revenue_month,revenue_record__is_finalized \\\n  --where \"{{ Dimension('revenue_record__is_finalized') }} in (true, false)\" \\\n  --start-time 2024-01-01T00:00:00 \\\n  --end-time 2026-10-28T23:59:59 \\\n  --order revenue_record__revenue_month \\\n  --limit 1000",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.05 seconds\nrevenue_record__revenue_month__month    revenue_record__is_finalized      revenue_amount\n--------------------------------------  ------------------------------  ----------------\n2025-11-01T00:00:00                     True                                    10197300\n2025-12-01T00:00:00                     True                                     8982400\n2026-01-01T00:00:00                     True                                     8068400\n2026-02-01T00:00:00                     True                                     5915000\n2026-03-01T00:00:00                     True                                     7649300\n2026-04-01T00:00:00                     False                                    8809500"
+    }
+  ],
+  "final_answer": "**結論**  \n- 2026年4月の「見積もり」売上は **8,809,500** 円です。  \n- 2025年11月から2026年3月までの「確定」売上（True）の合計は **40,812,400** 円です。  \n- したがって、確定売上の総額は見積もり額より **32,002,900 円** 多く、約 **4.6 倍** 大きいことが分かります。\n\n**詳細な計算**\n\n| 月（開始日）            | 確定 (True) | 見積もり (False) |\n|------------------------|-------------|------------------|\n| 2025‑11‑01             | 10,197,300   | –                |\n| 2025‑12‑01             | 8,982,400    | –                |\n| 2026‑01‑01             | 8,068,400    | –                |\n| 2026‑02‑01             | 5,915,000    | –                |\n| 2026‑03‑01             | 7,649,300    | –                |\n| 2026‑04‑01             | –            | 8,809,500        |\n\n- **確定売上合計**  \n  10,197,300 + 8,982,400 + 8,068,400 + 5,915,000 + 7,649,300 = **40,812,400** 円\n\n- **見積もり売上合計**  \n  8,809,500 円（2026年4月のみ）\n\n- **差額**  \n  40,812,400 − 8,809,500 = **32,002,900** 円\n\n**解釈**  \n見積もり段階（2026年4月）と、これまでに確定した売上の総額を比べると、確定額は見積もり額の約4.6倍（32,002,900円多い）となります。これは、見積もりが行われた時点ではまだ全体像が把握できておらず、後続の月での売上が大きく加算された結果と考えられます。  \n\n※現時点では、2026年4月の確定売上データがまだ取得できていないため、同月同時点での「見積もり vs 確定」の直接比較はできません。今後、4月分の確定データが入手でき次第、月単位での差異も評価可能です。"
+}

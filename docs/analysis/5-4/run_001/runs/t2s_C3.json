@@ -1,0 +1,14 @@
+{
+  "side": "t2s",
+  "id": "C3",
+  "question": "4月の確定した売上（円）はいくら？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS total_revenue_yen\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND is_latest_snapshot = TRUE\n    AND EXTRACT(MONTH FROM revenue_month) = 4;\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS total_revenue_yen\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND is_latest_snapshot = TRUE\n    AND EXTRACT(MONTH FROM revenue_month) = 4;",
+      "ok": true,
+      "result": "┌───────────────────┐\n│ total_revenue_yen │\n│      int128       │\n├───────────────────┤\n│              NULL │\n└───────────────────┘"
+    }
+  ],
+  "final_answer": "クエリの実行結果は **NULL** でした。  \nこれは、条件に合致するレコードが1件も存在しなかった（または `revenue_amount` がすべて NULL）ことを意味します。\n\nしたがって、現在の `main_mart.fct_revenue` テーブル上では **4月に確定した売上（円）は記録されていません**。  \n\n※「売上が0円」と解釈することも可能ですが、データが未入力・未確定である可能性が高いため、以下の点を確認するとよいでしょう。\n\n1. **データの投入状況**  \n   - 4月分の売上データがまだロードされていないか、`is_finalized` が TRUE に設定されていない可能性があります。\n\n2. **スナップショットのフラグ**  \n   - `is_latest_snapshot = TRUE` が正しく設定されているか確認してください。過去のスナップショットだけが残っている場合があります。\n\n3. **日付項目の内容**  \n   - `revenue_month` が正しい日付型（例: `2026-04-01` など）で格納されているか、月抽出が期待通りに動作しているかをチェックします。\n\n必要に応じて、上記条件を緩めた検索（例：`is_finalized` だけで検索、または `is_latest_snapshot` を除外）を実行し、データが存在するかどうかを確認してください。"
+}

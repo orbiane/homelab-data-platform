@@ -1,0 +1,14 @@
+{
+  "side": "t2s",
+  "id": "A3",
+  "question": "流入経路ごとの登録数は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    route,\n    COUNT(DISTINCT account_id) AS registration_count\nFROM main_mart.fct_subscription\nWHERE is_valid_contact_id\nGROUP BY route\nORDER BY registration_count DESC;\n```",
+      "query": "SELECT\n    route,\n    COUNT(DISTINCT account_id) AS registration_count\nFROM main_mart.fct_subscription\nWHERE is_valid_contact_id\nGROUP BY route\nORDER BY registration_count DESC;",
+      "ok": true,
+      "result": "┌────────────┬────────────────────┐\n│   route    │ registration_count │\n│  varchar   │       int64        │\n├────────────┼────────────────────┤\n│ search     │                 20 │\n│ qr_code    │                 20 │\n│ link_share │                 19 │\n│ ad         │                 19 │\n│ other      │                 16 │\n└────────────┴────────────────────┘"
+    }
+  ],
+  "final_answer": "以下は、各流入経路（`route`）ごとの新規登録（`account_id` がユニークで、かつ有効なコンタクトID）件数です。\n\n| 流入経路 | 登録数 |\n|----------|--------|\n| search   | 20件 |\n| qr_code  | 20件 |\n| link_share | 19件 |\n| ad       | 19件 |\n| other    | 16件 |\n\n**ポイント**\n\n- **search** と **qr_code** が最も多く、各 20 件の登録があります。  \n- **link_share** と **ad** がそれに続き、各 19 件です。  \n- **other** が最も少なく、16 件でした。\n\n合計すると **94 件** の登録が確認できます（20 + 20 + 19 + 19 + 16 = 94）。\n\nこの結果は、`main_mart.fct_subscription` テーブルから有効なコンタクトID（`is_valid_contact_id = true`）を持つレコードを対象に、`route` 列でグループ化し、`account_id` のユニークカウントを取得したものです。  \n\nご参考になれば幸いです。"
+}

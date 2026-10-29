@@ -1,0 +1,14 @@
+{
+  "side": "sl",
+  "id": "A3",
+  "question": "流入経路ごとの登録数は？",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics subscription_count --group-by subscription_event__referrer --order -subscription_count\n```",
+      "query": "mf query --metrics subscription_count --group-by subscription_event__referrer --order -subscription_count",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\nsubscription_event__referrer      subscription_count\n------------------------------  --------------------\nofficial_directory                               325\nline_app_search                                  316\nreceipt                                          181\nposter                                           169\nevent_booth                                      160\nstore_front                                      145\nbusiness_card                                    141\nline_ads                                          87\nyahoo_ads                                         86\nemail_share                                       75\nmessaging_app                                     66\nsns_share                                         66\ngoogle_ads                                        65\nfacebook_ads                                      62\nimport_bulk                                       50\nunknown                                           41"
+    }
+  ],
+  "final_answer": "**流入経路別の登録数（subscription_count）**\n\n| 流入経路                 | 登録数 |\n|--------------------------|--------|\n| official_directory       | 325 |\n| line_app_search          | 316 |\n| receipt                  | 181 |\n| poster                   | 169 |\n| event_booth              | 160 |\n| store_front              | 145 |\n| business_card            | 141 |\n| line_ads                 | 87 |\n| yahoo_ads                | 86 |\n| email_share              | 75 |\n| messaging_app            | 66 |\n| sns_share                | 66 |\n| google_ads               | 65 |\n| facebook_ads             | 62 |\n| import_bulk              | 50 |\n| unknown                  | 41 |\n\n**合計登録数**: 2,035 件  \n\n**ポイント**\n\n- **上位3経路**は「official_directory」（325件）、「line_app_search」（316件）、「receipt」（181件）で、全体の約38%を占めています。  \n- 「unknown」は41件と、流入元が特定できなかったケースも一定数あります。  \n- 広告系（line_ads、yahoo_ads、google_ads、facebook_ads）は合わせて約280件（全体の13%）です。  \n\nこの結果から、公式ディレクトリやLINEアプリ内検索からの流入が特に効果的であることが分かります。広告やその他のシェア手段も一定の貢献をしていますが、全体のボリュームは上記2つの経路に比べてやや少なめです。今後の施策は、上位経路の最適化と、広告・シェア経路の改善・拡大をバランスよく進めると効果が期待できるでしょう。"
+}

@@ -1,0 +1,13 @@
+{
+  "side": "sl",
+  "id": "D1",
+  "question": "開封率は？",
+  "attempts": [
+    {
+      "llm": "開封率（open rate）に相当する指標は、定義されたメトリクスの中に存在しません。利用できるメトリクスは **subscription_count、delivered_count、clicked_count、ctr、revenue_amount** だけで、いずれも「開封数」を直接表すものではないため、MF クエリだけで開封率を算出することはできません。代わりに、開封数を示すメトリクスが追加で提供されれば、`opened_count / delivered_count` という計算で開封率を求められます。現状では回答できません。",
+      "query": null
+    }
+  ],
+  "final_answer": "開封率（open rate）に相当する指標は、定義されたメトリクスの中に存在しません。利用できるメトリクスは **subscription_count、delivered_count、clicked_count、ctr、revenue_amount** だけで、いずれも「開封数」を直接表すものではないため、MF クエリだけで開封率を算出することはできません。代わりに、開封数を示すメトリクスが追加で提供されれば、`opened_count / delivered_count` という計算で開封率を求められます。現状では回答できません。",
+  "no_query": true
+}

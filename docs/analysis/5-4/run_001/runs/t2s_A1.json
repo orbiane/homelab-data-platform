@@ -1,0 +1,14 @@
+{
+  "side": "t2s",
+  "id": "A1",
+  "question": "メッセージの種類ごとのクリック数を出して",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    message_type,\n    COUNT(*) AS click_count\nFROM main_mart.fct_message_event\nWHERE is_valid_click\nGROUP BY message_type\nORDER BY click_count DESC;\n```",
+      "query": "SELECT\n    message_type,\n    COUNT(*) AS click_count\nFROM main_mart.fct_message_event\nWHERE is_valid_click\nGROUP BY message_type\nORDER BY click_count DESC;",
+      "ok": true,
+      "result": "┌──────────────┬─────────────┐\n│ message_type │ click_count │\n│   varchar    │    int64    │\n├──────────────┼─────────────┤\n│ imagemap     │        3487 │\n│ video        │        3090 │\n│ text         │        2565 │\n│ image        │        2533 │\n│ flex         │        1972 │\n└──────────────┴─────────────┘"
+    }
+  ],
+  "final_answer": "以下は、メッセージの種類（`message_type`）ごとの有効なクリック数（`click_count`）です。クリック数が多い順に並べています。\n\n| メッセージ種別 | クリック数 |\n|---------------|------------|\n| imagemap      | 3,487      |\n| video         | 3,090      |\n| text          | 2,565      |\n| image         | 2,533      |\n| flex          | 1,972      |\n\n**ポイント**\n\n- 最もクリックが多かったのは `imagemap` メッセージで、3,487 件のクリックが記録されています。  \n- `video` メッセージが次に多く、3,090 件です。  \n- `text`、`image`、`flex` の順にクリック数が続いています。\n\nこの結果は、`main_mart.fct_message_event` テーブルから `is_valid_click` が true のレコードを対象に集計したものです。必要に応じて、他のメッセージ種別や期間で絞り込むことも可能です。"
+}

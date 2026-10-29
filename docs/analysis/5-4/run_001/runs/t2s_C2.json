@@ -1,0 +1,14 @@
+{
+  "side": "t2s",
+  "id": "C2",
+  "question": "契約プラン別に売上を比べたい",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    a.plan_type,\n    SUM(r.revenue_amount) AS total_revenue,\n    COUNT(DISTINCT r.account_id) AS accounts_count\nFROM main_mart.dim_account AS a\nJOIN main_mart.fct_revenue AS r\n    ON a.account_id = r.account_id\nWHERE\n    r.is_latest_snapshot = TRUE      -- keep only the most recent snapshot per account\n    AND r.is_finalized = TRUE        -- use only finalized revenue figures\nGROUP BY a.plan_type\nORDER BY total_revenue DESC;\n```",
+      "query": "SELECT\n    a.plan_type,\n    SUM(r.revenue_amount) AS total_revenue,\n    COUNT(DISTINCT r.account_id) AS accounts_count\nFROM main_mart.dim_account AS a\nJOIN main_mart.fct_revenue AS r\n    ON a.account_id = r.account_id\nWHERE\n    r.is_latest_snapshot = TRUE      -- keep only the most recent snapshot per account\n    AND r.is_finalized = TRUE        -- use only finalized revenue figures\nGROUP BY a.plan_type\nORDER BY total_revenue DESC;",
+      "ok": true,
+      "result": "┌───────────┬───────────────┬────────────────┐\n│ plan_type │ total_revenue │ accounts_count │\n│  varchar  │    int128     │     int64      │\n├───────────┼───────────────┼────────────────┤\n│ standard  │      28506600 │             14 │\n│ free      │       7668300 │              4 │\n│ light     │       4517500 │              2 │\n└───────────┴───────────────┴────────────────┘"
+    }
+  ],
+  "final_answer": "## 契約プラン別の売上比較結果\n\n| 契約プラン | 売上合計 (JPY) | 契約数 | 1 契約あたりの平均売上 |\n|-----------|--------------|--------|------------------------|\n| **standard** | 28,506,600 | 14 | 約 2,036,200 |\n| **free**      | 7,668,300  | 4  | 約 1,917,100 |\n| **light**     | 4,517,500  | 2  | 約 2,258,800 |\n\n### 主なポイント\n\n1. **売上規模は `standard` プランが圧倒的に大きい**  \n   - 全体売上 40,692,400 のうち約 70% を占めています。\n\n2. **平均売上はプラン間で大きな差がない**  \n   - `light` が最も高く（約 2,259,000）ですが、`standard`（約 2,036,000）・`free`（約 1,917,000）ともに同程度です。  \n   - したがって、プランごとの単価差はそれほど大きくなく、売上の違いは主に契約数の違いに起因しています。\n\n3. **契約数の分布**  \n   - `standard` が 14 件と最も多く、次いで `free` が 4 件、`light` が 2 件です。  \n   - `light` は少数ながら平均売上が最も高いことから、単価が高めの顧客層が含まれている可能性があります。\n\n### 次に検討できる分析例\n\n- **プラン別の顧客維持率・解約率** を見て、売上以外の指標でもプランの価値を評価する。  \n- **プランごとの顧客属性（業種、規模、地域）** を結びつけ、どのセグメントがどのプランを好むかを把握する。  \n- **アップセル/クロスセルの機会** を探るために、`free` から `standard` への移行率や、`light` から `standard` への昇格パターンを追跡する。\n\n以上の結果を踏まえて、プランごとの戦略やマーケティング施策を検討すると効果的です。ご質問や追加で見たい指標があればお知らせください。"
+}

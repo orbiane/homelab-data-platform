@@ -1,0 +1,14 @@
+{
+  "side": "sl",
+  "id": "B4",
+  "question": "業種ごとの配信数",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics delivered_count --group-by account__industry\n```",
+      "query": "mf query --metrics delivered_count --group-by account__industry",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.05 seconds\naccount__industry      delivered_count\n-------------------  -----------------\nentertainment                     1481\n                                  2565\nreal_estate                        867\nbeauty                             227\nretail                             492\nhealthcare                        1463\neducation                          745\nfood_and_beverage                  588"
+    }
+  ],
+  "final_answer": "以下は、業種（account__industry）ごとの配信数（delivered_count）の集計結果です。\n\n| 業種                | 配信数 |\n|---------------------|--------|\n| entertainment       | 1,481  |\n| （業種未指定）      | 2,565  |\n| real_estate         |   867  |\n| beauty              |   227  |\n| retail              |   492  |\n| healthcare          | 1,463  |\n| education           |   745  |\n| food_and_beverage   |   588  |\n\n**ポイント**\n\n* 「業種未指定」の行は、account__industry が NULL もしくは空文字列のレコードが 2,565 件あることを示しています。  \n* それ以外は、各業種ごとに配信された件数が合計されています。\n\nご質問の「業種ごとの配信数」は上記の表のとおりです。業種が未設定のデータが多く含まれている点に留意してください。必要であれば、未設定レコードを除外した集計や、別の属性での再分類も可能です。"
+}

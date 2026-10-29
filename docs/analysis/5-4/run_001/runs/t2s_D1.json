@@ -1,0 +1,14 @@
+{
+  "side": "t2s",
+  "id": "D1",
+  "question": "開封率は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    ROUND(\n        100.0 * SUM(CASE WHEN event_type = 'open' THEN 1 ELSE 0 END) \n        / NULLIF(COUNT(*), 0),\n        2\n    ) AS open_rate_percent\nFROM main_mart.fct_message_event\nWHERE is_valid_event_type;\n```",
+      "query": "SELECT\n    ROUND(\n        100.0 * SUM(CASE WHEN event_type = 'open' THEN 1 ELSE 0 END) \n        / NULLIF(COUNT(*), 0),\n        2\n    ) AS open_rate_percent\nFROM main_mart.fct_message_event\nWHERE is_valid_event_type;",
+      "ok": true,
+      "result": "┌───────────────────┐\n│ open_rate_percent │\n│      double       │\n├───────────────────┤\n│               0.0 │\n└───────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「開封率」は、実行したクエリの結果から **0.0 %** であることが分かります。\n\nこの数値は、対象期間・対象メッセージに対して「open」イベントが記録された件数が全イベント数に対して全くなかった（もしくは全体が 0 件で除算が回避された）ことを示しています。\n\n**考えられる要因**\n\n| 要因 | 説明 |\n|------|------|\n| データが未収集 | メッセージ配信後に開封情報がまだイベントテーブルに入っていない可能性があります。 |\n| フィルタ条件の影響 | `WHERE is_valid_event_type` の条件で、実際の開封イベントが除外されている可能性があります。 |\n| 配信対象が極端に少ない | 配信自体が行われていない、または配信数が極端に少なく、開封が発生しなかったケース。 |\n| 計測設定ミス | メールやプッシュ通知のトラッキングが正しく設定されていないと、開封が記録されません。 |\n\n**次のステップの提案**\n\n1. **期間・対象の確認**  \n   - クエリで対象としている日付範囲やキャンペーンが正しいか確認してください。\n\n2. **`is_valid_event_type` の条件を見直す**  \n   - 必要ならこのフラグが `TRUE` になるレコードを再確認し、開封イベントが除外されていないかチェックします。\n\n3. **イベントデータの有無を簡易確認**  \n   ```sql\n   SELECT event_type, COUNT(*) AS cnt\n   FROM main_mart.fct_message_event\n   WHERE is_valid_event_type\n   GROUP BY event_type;\n   ```\n   - これで `open` 以外のイベント数も把握できます。\n\n4. **計測設定の検証**  \n   - メールやプッシュ通知に埋め込んだトラッキングピクセルやリンクが正しく機能しているか、テスト送信で確認してください。\n\n現時点では **開封率は 0 %** であると回答できますが、上記の点を確認・改善することで実際の開封率を取得できるようになるはずです。"
+}
