@@ -1,0 +1,17 @@
+{
+  "side": "sl",
+  "id": "C1",
+  "question": "売上の合計はいくら？",
+  "attempts": [
+    {
+      "llm": "売上額は `revenue_amount` メトリクスで取得できますが、データは JPY と USD が変換なしで合算されているため、通貨を絞らない全体の合計は実際の金額としては意味を持ちません。したがって、全体の「売上の合計」を正確に回答することはできません。通貨ごと（例: `revenue_record__currency = 'JPY'` や `revenue_record__currency = 'USD'`）に絞って集計すれば、意味のある合計を取得できます。",
+      "query": null
+    }
+  ],
+  "final_answer": "売上額は `revenue_amount` メトリクスで取得できますが、データは JPY と USD が変換なしで合算されているため、通貨を絞らない全体の合計は実際の金額としては意味を持ちません。したがって、全体の「売上の合計」を正確に回答することはできません。通貨ごと（例: `revenue_record__currency = 'JPY'` や `revenue_record__currency = 'USD'`）に絞って集計すれば、意味のある合計を取得できます。",
+  "no_query": true,
+  "group": "sl",
+  "rep": 2,
+  "started_at": "2026-10-29T15:42:49+09:00",
+  "ended_at": "2026-10-29T15:42:53+09:00"
+}

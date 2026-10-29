@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "A1",
+  "question": "メッセージの種類ごとのクリック数を出して",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    message_type,\n    COUNT(*) AS click_count\nFROM main_mart.fct_message_event\nWHERE is_valid_click = TRUE\nGROUP BY message_type\nORDER BY click_count DESC;\n```",
+      "query": "SELECT\n    message_type,\n    COUNT(*) AS click_count\nFROM main_mart.fct_message_event\nWHERE is_valid_click = TRUE\nGROUP BY message_type\nORDER BY click_count DESC;",
+      "ok": true,
+      "result": "┌──────────────┬─────────────┐\n│ message_type │ click_count │\n│   varchar    │    int64    │\n├──────────────┼─────────────┤\n│ imagemap     │        3487 │\n│ video        │        3090 │\n│ text         │        2565 │\n│ image        │        2533 │\n│ flex         │        1972 │\n└──────────────┴─────────────┘"
+    }
+  ],
+  "final_answer": "以下は、有効なクリック（`is_valid_click = TRUE`）が記録されたメッセージの種類ごとのクリック数です。クリック数が多い順に並べています。\n\n| メッセージ種類 | クリック数 |\n|----------------|------------|\n| imagemap       | 3,487件 |\n| video          | 3,090件 |\n| text           | 2,565件 |\n| image          | 2,533件 |\n| flex           | 1,972件 |\n\n**ポイント**\n\n- **imagemap** が最もクリック数が多く、全体の約30% を占めています。インタラクティブな領域が多いことが影響している可能性があります。  \n- 次いで **video** が続き、視覚的・動的コンテンツがユーザーの関心を引きやすいことが伺えます。  \n- テキストメッセージや単純画像（image）も上位に入り、基本的なコンテンツでも一定のクリックが発生しています。  \n- **flex** メッセージは他のタイプに比べややクリック数が少ないですが、リッチなレイアウトを提供できる点で引き続き活用価値があります。\n\nこの結果を踏まえて、クリック数をさらに伸ばしたい場合は **imagemap** や **video** の要素を強化したメッセージ設計を検討すると効果的です。また、テキストや画像でもクリック率を上げるために、CTA（Call‑to‑Action）や魅力的なビジュアルを組み合わせると良いでしょう。",
+  "group": "t2s",
+  "rep": 3,
+  "started_at": "2026-10-29T15:44:20+09:00",
+  "ended_at": "2026-10-29T15:44:29+09:00"
+}

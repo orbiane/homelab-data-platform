@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D2",
+  "question": "登録した人は何人？（重複なし）",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT COUNT(DISTINCT contact_id) AS registration_unique_count\nFROM main_mart.fct_subscription;\n```",
+      "query": "SELECT COUNT(DISTINCT contact_id) AS registration_unique_count\nFROM main_mart.fct_subscription;",
+      "ok": true,
+      "result": "┌───────────────────────────┐\n│ registration_unique_count │\n│           int64           │\n├───────────────────────────┤\n│                      2000 │\n└───────────────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「登録した人は何人か（重複なし）」について、実行したクエリの結果は以下の通りです。\n\n- **登録者数（重複なし）**：**2,000 人**\n\nしたがって、現在までに **2,000 名** のユニークな contact_id が登録されていることが確認できました。",
+  "group": "t2s_desc",
+  "rep": 3,
+  "started_at": "2026-10-29T15:49:27+09:00",
+  "ended_at": "2026-10-29T15:49:33+09:00"
+}

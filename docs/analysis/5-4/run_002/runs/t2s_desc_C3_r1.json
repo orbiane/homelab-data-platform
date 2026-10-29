@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C3",
+  "question": "4月の確定した売上（円）はいくら？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS revenue_jpy_april\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND currency = 'JPY'\n    AND EXTRACT(MONTH FROM revenue_month) = 4;\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS revenue_jpy_april\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND currency = 'JPY'\n    AND EXTRACT(MONTH FROM revenue_month) = 4;",
+      "ok": true,
+      "result": "┌───────────────────┐\n│ revenue_jpy_april │\n│      int128       │\n├───────────────────┤\n│              NULL │\n└───────────────────┘"
+    }
+  ],
+  "final_answer": "クエリの実行結果を見ると、4 月に確定した JPY（円）での売上合計は **NULL** となっています。  \n\nこれは、次のいずれかの状況を示しています。\n\n1. **対象期間（4 月）に、確定フラグ `is_finalized = TRUE` が立っているレコードが存在しない**  \n2. データ自体がまだ投入されていない、または `currency = 'JPY'` の条件に合致するレコードがない  \n3. 売上金額がすべて `NULL` である（ただし通常は `0` が格納されることが多い）\n\nしたがって、現時点で「4 月の確定した売上（円）」は **0 円** もしくは **データが存在しない** ということになります。  \n\nもし本来売上があるはずなのに結果が NULL になる場合は、以下を確認してください。\n\n- `fct_revenue` テーブルに 4 月分のデータが入っているか  \n- `is_finalized` が正しく `TRUE` に設定されているか  \n- 通貨コードが正しく `JPY` と記録されているか  \n\n必要に応じて、上記条件を緩めて再度集計（例：`is_finalized` を除外、または通貨コードをチェック）すると、実際の売上金額が把握できる可能性があります。",
+  "group": "t2s_desc",
+  "rep": 1,
+  "started_at": "2026-10-29T15:31:06+09:00",
+  "ended_at": "2026-10-29T15:31:19+09:00"
+}

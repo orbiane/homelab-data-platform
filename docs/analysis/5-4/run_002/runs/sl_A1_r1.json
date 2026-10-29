@@ -1,0 +1,18 @@
+{
+  "side": "sl",
+  "id": "A1",
+  "question": "メッセージの種類ごとのクリック数を出して",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics clicked_count --group-by message_event__message_type\n```",
+      "query": "mf query --metrics clicked_count --group-by message_event__message_type",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.05 seconds\nmessage_event__message_type      clicked_count\n-----------------------------  ---------------\nflex                                       168\nimage                                      215\ntext                                       225\nimagemap                                   272\nvideo                                      251"
+    }
+  ],
+  "final_answer": "以下がメッセージの種類ごとのクリック数です。\n\n| メッセージタイプ | クリック数 |\n|-------------------|------------|\n| flex              | 168 |\n| image             | 215 |\n| text              | 225 |\n| imagemap          | 272 |\n| video             | 251 |\n\n**ポイントまとめ**\n\n- 最もクリック数が多いのは **imagemap**（272クリック）です。  \n- 次に多いのは **video**（251クリック）で、続いて **text**（225クリック）となっています。  \n- **flex** メッセージは最もクリック数が少なく、168クリックです。\n\n以上が「メッセージの種類ごとのクリック数」の結果です。ご参考になれば幸いです。",
+  "group": "sl",
+  "rep": 1,
+  "started_at": "2026-10-29T15:32:31+09:00",
+  "ended_at": "2026-10-29T15:32:39+09:00"
+}

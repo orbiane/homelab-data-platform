@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C3",
+  "question": "4月の確定した売上（円）はいくら？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS total_revenue_jpy\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND currency = 'JPY'\n    AND EXTRACT(YEAR FROM revenue_month) = 2026\n    AND EXTRACT(MONTH FROM revenue_month) = 4;\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS total_revenue_jpy\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND currency = 'JPY'\n    AND EXTRACT(YEAR FROM revenue_month) = 2026\n    AND EXTRACT(MONTH FROM revenue_month) = 4;",
+      "ok": true,
+      "result": "┌───────────────────┐\n│ total_revenue_jpy │\n│      int128       │\n├───────────────────┤\n│              NULL │\n└───────────────────┘"
+    }
+  ],
+  "final_answer": "ご提示いただいたクエリの実行結果は **NULL** となっており、2026 年 4 月分の「確定済み（`is_finalized = TRUE`）かつ通貨が JPY の売上データ」がテーブル `main_mart.fct_revenue` に存在しないことを示しています。\n\n- `SUM()` は対象行が 1 件も無い場合、結果として **NULL** を返します。  \n- したがって、現在のデータ上では **「2026 年 4 月の確定した売上（円）は 0 円」** と解釈できます。\n\n**考えられる原因・次のアクション**\n\n1. **データの取り込み状況を確認**  \n   - 4 月分の売上レコードがまだロードされていない、または `is_finalized` フラグが `FALSE` のままになっている可能性があります。\n\n2. **期間・条件の見直し**  \n   - `revenue_month` が日付型で「2026‑04‑01」～「2026‑04‑30」のレコードが正しく格納されているか確認してください。  \n   - `currency` が他のコード（例: `JPY` ではなく `JPY `（空白付き）や `JPY-J` など）になっていないかチェックします。\n\n3. **NULL ではなく 0 を取得したい場合**  \n   - クエリを以下のように書き換えると、行が無い場合でも 0 を返すようにできます。  \n     ```sql\n     SELECT\n         COALESCE(SUM(revenue_amount), 0) AS total_revenue_jpy\n     FROM\n         main_mart.fct_revenue\n     WHERE\n         is_finalized = TRUE\n         AND currency = 'JPY'\n         AND EXTRACT(YEAR FROM revenue_month) = 2026\n         AND EXTRACT(MONTH FROM revenue_month) = 4;\n     ```\n\n以上の点をご確認いただき、必要に応じてデータのロードやフラグの更新を行ってください。現時点では、**4 月の確定した売上（円）は 0 円** と回答できます。",
+  "group": "t2s",
+  "rep": 2,
+  "started_at": "2026-10-29T15:36:40+09:00",
+  "ended_at": "2026-10-29T15:36:57+09:00"
+}

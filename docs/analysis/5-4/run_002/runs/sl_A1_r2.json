@@ -1,0 +1,18 @@
+{
+  "side": "sl",
+  "id": "A1",
+  "question": "メッセージの種類ごとのクリック数を出して",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics clicked_count --group-by message_event__message_type\n```",
+      "query": "mf query --metrics clicked_count --group-by message_event__message_type",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\nmessage_event__message_type      clicked_count\n-----------------------------  ---------------\nflex                                       168\ntext                                       225\nvideo                                      251\nimagemap                                   272\nimage                                      215"
+    }
+  ],
+  "final_answer": "以下は、メッセージの種類（`message_event__message_type`）ごとのクリック数（`clicked_count`）です。\n\n| メッセージ種別 | クリック数 |\n|---------------|------------|\n| flex          | 168 |\n| text          | 225 |\n| video         | 251 |\n| imagemap      | 272 |\n| image         | 215 |\n\n**まとめ**  \n- クリック数が最も多いのは **imagemap**（272回）です。  \n- 次いで多いのは **video**（251回）となっています。  \n- 最も少ないのは **flex**（168回）です。  \n\nこの結果から、ユーザーは画像マップや動画コンテンツに対して比較的高い関心を示していることが分かります。必要に応じて、これらのメッセージタイプの最適化や配信比率の調整を検討すると良いでしょう。",
+  "group": "sl",
+  "rep": 2,
+  "started_at": "2026-10-29T15:41:16+09:00",
+  "ended_at": "2026-10-29T15:41:25+09:00"
+}

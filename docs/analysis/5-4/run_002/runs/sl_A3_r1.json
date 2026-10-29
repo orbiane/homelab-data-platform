@@ -1,0 +1,18 @@
+{
+  "side": "sl",
+  "id": "A3",
+  "question": "流入経路ごとの登録数は？",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics subscription_count --group-by subscription_event__route\n```",
+      "query": "mf query --metrics subscription_count --group-by subscription_event__route",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\nsubscription_event__route      subscription_count\n---------------------------  --------------------\nad                                            300\nother                                          91\nqr_code                                       796\nsearch                                        641\nlink_share                                    207"
+    }
+  ],
+  "final_answer": "以下が「流入経路（subscription_event__route）」別の登録数（subscription_count）です。\n\n| 流入経路 | 登録数 |\n|----------|--------|\n| ad       | 300件 |\n| other    | 91件 |\n| qr_code  | 796件 |\n| search   | 641件 |\n| link_share | 207件 |\n\n**合計**  \n全ての流入経路を合わせた登録数は **2,035件** です。\n\nご質問の「流入経路ごとの登録数」は上記の通りです。必要に応じて、特定の経路に絞った詳細分析や、期間別・キャンペーン別の比較なども追加で取得できますので、お気軽にお申し付けください。",
+  "group": "sl",
+  "rep": 1,
+  "started_at": "2026-10-29T15:32:39+09:00",
+  "ended_at": "2026-10-29T15:32:48+09:00"
+}

@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C2",
+  "question": "契約プラン別に売上を比べたい",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    da.plan_type,\n    SUM(fr.revenue_amount) AS total_revenue\nFROM main_mart.dim_account AS da\nJOIN main_mart.fct_revenue AS fr\n    ON da.account_id = fr.account_id\nWHERE fr.is_finalized = TRUE          -- 売上が確定したデータだけを対象\n  AND fr.is_latest_snapshot = TRUE   -- 最新スナップショットの金額を使用\nGROUP BY da.plan_type\nORDER BY total_revenue DESC;\n```",
+      "query": "SELECT\n    da.plan_type,\n    SUM(fr.revenue_amount) AS total_revenue\nFROM main_mart.dim_account AS da\nJOIN main_mart.fct_revenue AS fr\n    ON da.account_id = fr.account_id\nWHERE fr.is_finalized = TRUE          -- 売上が確定したデータだけを対象\n  AND fr.is_latest_snapshot = TRUE   -- 最新スナップショットの金額を使用\nGROUP BY da.plan_type\nORDER BY total_revenue DESC;",
+      "ok": true,
+      "result": "┌───────────┬───────────────┐\n│ plan_type │ total_revenue │\n│  varchar  │    int128     │\n├───────────┼───────────────┤\n│ standard  │      28506600 │\n│ free      │       7668300 │\n│ light     │       4517500 │\n└───────────┴───────────────┘"
+    }
+  ],
+  "final_answer": "**契約プラン別の売上比較（確定かつ最新スナップショットのデータ）**\n\n| 契約プラン | 売上合計 (円) | 全体に占める割合 |\n|------------|--------------|-------------------|\n| **standard** | 28,506,600 | 約 **70.1 %** |\n| **free**     | 7,668,300  | 約 **18.9 %** |\n| **light**    | 4,517,500  | 約 **11.0 %** |\n| **合計**     | **40,692,400** | 100 % |\n\n### 主なポイント\n\n1. **standard プランが圧倒的に大きい**  \n   - 全体売上の約 7 割を占めており、最も収益性の高いプランです。\n\n2. **free プランでもかなりの売上**  \n   - 本来は「無料」イメージですが、アドオンや有料機能の利用があるため、全体の約 19 % を貢献しています。  \n   - free ユーザーの有料化施策（例：プレミアム機能のトライアル）を強化すると、さらなる増収が見込めます。\n\n3. **light プランは最小規模**  \n   - 全体の約 11 % にとどまります。プランの機能や価格設定を見直すか、ターゲット層を拡大する施策が必要かもしれません。\n\n### 次に取るべき分析・アクション例\n\n| 分析テーマ | 目的・期待効果 |\n|------------|----------------|\n| **月次・四半期別の売上推移** | プランごとの季節変動や成長トレンドを把握し、キャンペーン時期を最適化 |\n| **顧客セグメント別 LTV（顧客生涯価値）** | 各プランの顧客がどれだけ長く、どれだけの収益をもたらすかを測定 |\n| **free → standard のコンバージョン率** | 無料ユーザーの有料化成功率を把握し、アップセル施策の効果測定 |\n| **プラン別解約率（チャーン）** | 収益減少リスクの高いプランを特定し、リテンション施策を設計 |\n| **プラン別の平均取引単価（ARPU）** | 収益効率の比較。特に light プランの価格設定見直しの根拠に |\n\n### ビジュアル化の提案\n\n- **棒グラフ**：プラン別売上金額を比較（見やすさ重視）\n- **円グラフ**：全体に対する各プランのシェアを直感的に表示\n- **時系列ライン**：月別・四半期別に同じ棒グラフやエリアチャートで変化を追跡\n\n---\n\n#### まとめ\n現在、**standard プランが売上の約 70 % を占め**ており、ビジネスの主軸となっています。一方で **free プランでも約 19 % の売上** があり、無料ユーザーからの有料化が収益に寄与していることが分かります。light プランは最小規模ですが、成長余地があるかどうかを判断するために、顧客属性や利用状況の詳細分析を進めるとよいでしょう。\n\n以上が、契約プラン別の売上比較結果と今後の分析・施策の提案です。ご質問や追加で見たい切り口があればお知らせください。",
+  "group": "t2s",
+  "rep": 1,
+  "started_at": "2026-10-29T15:27:29+09:00",
+  "ended_at": "2026-10-29T15:27:51+09:00"
+}

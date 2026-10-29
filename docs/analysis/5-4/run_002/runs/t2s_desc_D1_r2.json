@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D1",
+  "question": "開封率は？",
+  "attempts": [
+    {
+      "llm": "```sql\nWITH delivered AS (\n    SELECT COUNT(*) AS delivered_count\n    FROM main_mart.fct_message_event\n    WHERE event_type = 'delivered'\n      AND is_valid_event_type\n),\nopened AS (\n    SELECT COUNT(*) AS opened_count\n    FROM main_mart.fct_message_event\n    WHERE event_type = 'open'\n      AND is_valid_event_type\n)\nSELECT\n    opened_count,\n    delivered_count,\n    CASE \n        WHEN delivered_count = 0 THEN NULL\n        ELSE opened_count::DOUBLE / delivered_count\n    END AS open_rate\nFROM opened, delivered;\n```",
+      "query": "WITH delivered AS (\n    SELECT COUNT(*) AS delivered_count\n    FROM main_mart.fct_message_event\n    WHERE event_type = 'delivered'\n      AND is_valid_event_type\n),\nopened AS (\n    SELECT COUNT(*) AS opened_count\n    FROM main_mart.fct_message_event\n    WHERE event_type = 'open'\n      AND is_valid_event_type\n)\nSELECT\n    opened_count,\n    delivered_count,\n    CASE \n        WHEN delivered_count = 0 THEN NULL\n        ELSE opened_count::DOUBLE / delivered_count\n    END AS open_rate\nFROM opened, delivered;",
+      "ok": true,
+      "result": "┌──────────────┬─────────────────┬───────────┐\n│ opened_count │ delivered_count │ open_rate │\n│    int64     │      int64      │  double   │\n├──────────────┼─────────────────┼───────────┤\n│            0 │            8428 │       0.0 │\n└──────────────┴─────────────────┴───────────┘"
+    }
+  ],
+  "final_answer": "開封率（オープン率）は **0.0**、すなわち **0%** です。\n\n- 配信されたメッセージ数（delivered_count）: 8,428 件  \n- 開封されたメッセージ数（opened_count）: 0 件  \n\nこの結果から、対象期間または対象キャンペーンでは配信されたすべてのメッセージが開封されていないことが分かります。データの取得条件や計測ロジックに問題がないか、もしくは実際に配信先でメールが閲覧されていない可能性が考えられますので、必要に応じて以下の点を確認するとよいでしょう。\n\n1. **イベント取得条件**  \n   - `is_valid_event_type` が正しく設定されているか  \n   - `event_type = 'open'` が正しいイベント名か（システムによっては別名の場合も）\n\n2. **タイムゾーン・期間**  \n   - データ抽出期間が期待通りか（例: 直近のキャンペーンだけを対象にしたい場合）\n\n3. **トラッキングの実装**  \n   - メール本文に埋め込んだトラッキングピクセルやリンクが正しく機能しているか\n\n4. **配信リストの品質**  \n   - 実際に開封可能な受信者が含まれているか（無効アドレスやスパムフィルタにかかっていないか）\n\n必要に応じて、上記ポイントをチェックし、再度データを抽出してみてください。現時点では開封率は **0%** です。",
+  "group": "t2s_desc",
+  "rep": 2,
+  "started_at": "2026-10-29T15:40:04+09:00",
+  "ended_at": "2026-10-29T15:40:19+09:00"
+}

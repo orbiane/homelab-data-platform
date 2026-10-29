@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "A3",
+  "question": "流入経路ごとの登録数は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    route,\n    COUNT(DISTINCT account_id) AS registration_count\nFROM\n    main_mart.fct_subscription\nWHERE\n    is_valid_contact_id = TRUE\nGROUP BY\n    route\nORDER BY\n    registration_count DESC;\n```",
+      "query": "SELECT\n    route,\n    COUNT(DISTINCT account_id) AS registration_count\nFROM\n    main_mart.fct_subscription\nWHERE\n    is_valid_contact_id = TRUE\nGROUP BY\n    route\nORDER BY\n    registration_count DESC;",
+      "ok": true,
+      "result": "┌────────────┬────────────────────┐\n│   route    │ registration_count │\n│  varchar   │       int64        │\n├────────────┼────────────────────┤\n│ search     │                 20 │\n│ qr_code    │                 20 │\n│ ad         │                 19 │\n│ link_share │                 19 │\n│ other      │                 16 │\n└────────────┴────────────────────┘"
+    }
+  ],
+  "final_answer": "以下の結果が、流入経路（`route`）ごとの新規登録数（`registration_count`）です。  \n\n| 流入経路 | 登録数 |\n|----------|--------|\n| search   | 20 |\n| qr_code  | 20 |\n| ad       | 19 |\n| link_share | 19 |\n| other    | 16 |\n\n**ポイントまとめ**\n\n- **最も多く登録された経路**は `search` と `qr_code` で、どちらも20件です。  \n- 次いで `ad` と `link_share` がそれぞれ19件とほぼ同数です。  \n- `other` が16件で、全体の中ではやや少なめです。\n\nこのように、検索やQRコードからの流入が最も効果的であることが分かります。今後のマーケティング施策では、これらの経路をさらに強化すると、登録数の増加が期待できるでしょう。",
+  "group": "t2s",
+  "rep": 3,
+  "started_at": "2026-10-29T15:44:29+09:00",
+  "ended_at": "2026-10-29T15:44:37+09:00"
+}

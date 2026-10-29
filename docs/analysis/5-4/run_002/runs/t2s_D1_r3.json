@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D1",
+  "question": "開封率は？",
+  "attempts": [
+    {
+      "llm": "```sql\nWITH sent AS (\n    SELECT COUNT(DISTINCT message_id) AS sent_cnt\n    FROM main_mart.fct_message_event\n    WHERE is_valid_event_type\n      AND event_type = 'send'\n),\nopened AS (\n    SELECT COUNT(DISTINCT message_id) AS open_cnt\n    FROM main_mart.fct_message_event\n    WHERE is_valid_event_type\n      AND event_type = 'open'\n)\nSELECT \n    open_cnt::DOUBLE / NULLIF(sent_cnt, 0) AS open_rate,\n    open_cnt::DOUBLE / NULLIF(sent_cnt, 0) * 100 AS open_rate_percentage\nFROM sent\nCROSS JOIN opened;\n```",
+      "query": "WITH sent AS (\n    SELECT COUNT(DISTINCT message_id) AS sent_cnt\n    FROM main_mart.fct_message_event\n    WHERE is_valid_event_type\n      AND event_type = 'send'\n),\nopened AS (\n    SELECT COUNT(DISTINCT message_id) AS open_cnt\n    FROM main_mart.fct_message_event\n    WHERE is_valid_event_type\n      AND event_type = 'open'\n)\nSELECT \n    open_cnt::DOUBLE / NULLIF(sent_cnt, 0) AS open_rate,\n    open_cnt::DOUBLE / NULLIF(sent_cnt, 0) * 100 AS open_rate_percentage\nFROM sent\nCROSS JOIN opened;",
+      "ok": true,
+      "result": "┌───────────┬──────────────────────┐\n│ open_rate │ open_rate_percentage │\n│  double   │        double        │\n├───────────┼──────────────────────┤\n│      NULL │                 NULL │\n└───────────┴──────────────────────┘"
+    }
+  ],
+  "final_answer": "**結果の概要**\n\n| 項目                | 値   |\n|-------------------|------|\n| open_rate         | NULL |\n| open_rate_percentage | NULL |\n\n**なぜ NULL になるのか**\n\n`open_rate = open_cnt / sent_cnt` の計算で `NULL` が返ってくるのは、**分母の `sent_cnt` が 0（または NULL）だった** ためです。  \nクエリでは `NULLIF(sent_cnt, 0)` を使って 0 除算を回避しているので、`sent_cnt` が 0 の場合は除算自体が `NULL` となり、結果も `NULL` になります。\n\nつまり、対象期間（クエリには日付条件が付いていませんが、デフォルトで全データを対象にしています）に **「send」イベントが 1 件も記録されていない** か、`is_valid_event_type` が `TRUE` のレコードが存在しないことを示しています。\n\n**次に取るべきアクション**\n\n1. **データの有無を確認**  \n   ```sql\n   SELECT\n       COUNT(*) AS total_events,\n       COUNT(CASE WHEN event_type = 'send' THEN 1 END) AS send_events,\n       COUNT(CASE WHEN event_type = 'open' THEN 1 END) AS open_events\n   FROM main_mart.fct_message_event\n   WHERE is_valid_event_type;\n   ```\n   これで「send」や「open」イベントが本当に存在するか確認できます。\n\n2. **期間や条件を絞る**  \n   必要に応じて日付やキャンペーン ID などのフィルタを追加してください。例:\n   ```sql\n   WHERE is_valid_event_type\n     AND event_type IN ('send', 'open')\n     AND event_timestamp >= '2026-01-01' AND event_timestamp < '2027-01-01'\n   ```\n\n3. **`is_valid_event_type` の定義を確認**  \n   このフラグが `TRUE` になる条件が期待通りかどうか、データロードのロジックを見直すと良いでしょう。\n\n4. **開封率の計算例（データがある場合）**  \n   データが確認できたら、以下のように書けば開封率（小数）とパーセンテージが取得できます。\n   ```sql\n   WITH sent AS (\n       SELECT COUNT(DISTINCT message_id) AS sent_cnt\n       FROM main_mart.fct_message_event\n       WHERE is_valid_event_type\n         AND event_type = 'send'\n   ),\n   opened AS (\n       SELECT COUNT(DISTINCT message_id) AS open_cnt\n       FROM main_mart.fct_message_event\n       WHERE is_valid_event_type\n         AND event_type = 'open'\n   )\n   SELECT\n       open_cnt::DOUBLE / NULLIF(sent_cnt, 0)            AS open_rate,\n       open_cnt::DOUBLE / NULLIF(sent_cnt, 0) * 100 AS open_rate_percentage\n   FROM sent\n   CROSS JOIN opened;\n   ```\n\n**結論**  \n現状では「送信されたメッセージが 0 件」もしくは「有効な送信イベントが記録されていない」ため、開封率を算出できません。上記のチェックを実施し、対象となるデータが正しく取得できるように条件を調整した上で、再度開封率を計算してください。",
+  "group": "t2s",
+  "rep": 3,
+  "started_at": "2026-10-29T15:46:05+09:00",
+  "ended_at": "2026-10-29T15:46:29+09:00"
+}

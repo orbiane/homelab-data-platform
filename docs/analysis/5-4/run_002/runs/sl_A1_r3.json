@@ -1,0 +1,18 @@
+{
+  "side": "sl",
+  "id": "A1",
+  "question": "メッセージの種類ごとのクリック数を出して",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics clicked_count --group-by message_event__message_type\n```",
+      "query": "mf query --metrics clicked_count --group-by message_event__message_type",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\nmessage_event__message_type      clicked_count\n-----------------------------  ---------------\nflex                                       168\nimagemap                                   272\nvideo                                      251\ntext                                       225\nimage                                      215"
+    }
+  ],
+  "final_answer": "以下が「メッセージの種類」ごとのクリック数です。\n\n| メッセージタイプ | クリック数 |\n|------------------|------------|\n| flex             | 168 |\n| imagemap         | 272 |\n| video            | 251 |\n| text             | 225 |\n| image            | 215 |\n\n**考察**\n\n- **最もクリック数が多い**のは **imagemap**（272クリック）です。インタラクティブな領域が設定できるため、ユーザーの関心を引きやすいと考えられます。\n- 次いで **video**（251クリック）と **text**（225クリック）が続きます。動画は視覚的に訴求力が高く、テキストはシンプルさがクリックにつながっている可能性があります。\n- **flex** メッセージは 168 クリックと最も少なく、構造が複雑だったり、ユーザーにとって操作が分かりにくいことが影響しているかもしれません。\n- **image** メッセージは 215 クリックで中間的な位置です。画像だけでは情報量が限定的になることがクリック数に影響していると推測できます。\n\n**まとめ**\n\n全体としては、インタラクティブ要素が多い **imagemap** が最もクリックされやすく、シンプルな **text** も高いクリック率を示しています。逆に、カスタマイズ性が高い **flex** はクリック数が低めです。今後の施策では、imagemap や video 形式の活用を強化すると、クリック数の増加が期待できるでしょう。",
+  "group": "sl",
+  "rep": 3,
+  "started_at": "2026-10-29T15:50:17+09:00",
+  "ended_at": "2026-10-29T15:50:28+09:00"
+}

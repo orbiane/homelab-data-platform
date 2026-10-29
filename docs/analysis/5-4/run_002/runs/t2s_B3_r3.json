@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B3",
+  "question": "クリック率はどのくらい？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    (SUM(CASE WHEN is_valid_click THEN 1 ELSE 0 END)::DOUBLE\n     / NULLIF(COUNT(*), 0)) * 100 AS ctr_percent\nFROM main_mart.fct_message_event\nWHERE is_valid_event_type = TRUE;\n```",
+      "query": "SELECT\n    (SUM(CASE WHEN is_valid_click THEN 1 ELSE 0 END)::DOUBLE\n     / NULLIF(COUNT(*), 0)) * 100 AS ctr_percent\nFROM main_mart.fct_message_event\nWHERE is_valid_event_type = TRUE;",
+      "ok": true,
+      "result": "┌───────────────────┐\n│    ctr_percent    │\n│      double       │\n├───────────────────┤\n│ 98.76956680014561 │\n└───────────────────┘"
+    }
+  ],
+  "final_answer": "クエリの実行結果から算出されたクリック率（CTR）は **約 98.77 %** です。\n\n- **計算方法**  \n  - 有効なクリック（`is_valid_click = TRUE`）の件数を全イベント件数で割り、100 を掛けてパーセンテージ化しています。  \n  - `is_valid_event_type = TRUE` のイベントだけを対象にしているため、対象外のイベントは除外されています。\n\n**解釈**  \n- ほぼすべての有効イベントがクリックとみなされている非常に高いCTRです。  \n- もしこの数値が期待値と大きく乖離している場合は、`is_valid_click` の定義やデータ収集ロジックを再確認すると良いでしょう。  \n\nご参考までに、必要に応じて期間別やキャンペーン別に細分化したCTRも算出可能です。ご要望があればお知らせください。",
+  "group": "t2s",
+  "rep": 3,
+  "started_at": "2026-10-29T15:44:43+09:00",
+  "ended_at": "2026-10-29T15:44:55+09:00"
+}

@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D5",
+  "question": "売上の最初の見積もりと確定値は、どれくらい違った？",
+  "attempts": [
+    {
+      "llm": "```sql\nWITH first_est AS (\n    SELECT\n        account_id,\n        revenue_month,\n        revenue_amount AS first_estimate\n    FROM (\n        SELECT\n            *,\n            ROW_NUMBER() OVER (PARTITION BY account_id, revenue_month ORDER BY snapshot_date ASC) AS rn\n        FROM main_mart.fct_revenue\n    ) t\n    WHERE rn = 1\n),\nfinal_est AS (\n    SELECT\n        account_id,\n        revenue_month,\n        revenue_amount AS finalized\n    FROM main_mart.fct_revenue\n    WHERE is_finalized = TRUE\n)\nSELECT\n    SUM(f.first_estimate)                                     AS total_first_estimate,\n    SUM(fn.finalized)                                         AS total_finalized,\n    SUM(fn.finalized) - SUM(f.first_estimate)                 AS diff_amount,\n    CASE\n        WHEN SUM(f.first_estimate) = 0 THEN NULL\n        ELSE (SUM(fn.finalized) - SUM(f.first_estimate)) \n             / SUM(f.first_estimate)::DOUBLE * 100\n    END                                                       AS diff_percent\nFROM first_est f\nJOIN final_est fn USING (account_id, revenue_month);\n```",
+      "query": "WITH first_est AS (\n    SELECT\n        account_id,\n        revenue_month,\n        revenue_amount AS first_estimate\n    FROM (\n        SELECT\n            *,\n            ROW_NUMBER() OVER (PARTITION BY account_id, revenue_month ORDER BY snapshot_date ASC) AS rn\n        FROM main_mart.fct_revenue\n    ) t\n    WHERE rn = 1\n),\nfinal_est AS (\n    SELECT\n        account_id,\n        revenue_month,\n        revenue_amount AS finalized\n    FROM main_mart.fct_revenue\n    WHERE is_finalized = TRUE\n)\nSELECT\n    SUM(f.first_estimate)                                     AS total_first_estimate,\n    SUM(fn.finalized)                                         AS total_finalized,\n    SUM(fn.finalized) - SUM(f.first_estimate)                 AS diff_amount,\n    CASE\n        WHEN SUM(f.first_estimate) = 0 THEN NULL\n        ELSE (SUM(fn.finalized) - SUM(f.first_estimate)) \n             / SUM(f.first_estimate)::DOUBLE * 100\n    END                                                       AS diff_percent\nFROM first_est f\nJOIN final_est fn USING (account_id, revenue_month);",
+      "ok": true,
+      "result": "┌──────────────────────┬─────────────────┬─────────────┬──────────────────┐\n│ total_first_estimate │ total_finalized │ diff_amount │   diff_percent   │\n│        int128        │     int128      │   int128    │      double      │\n├──────────────────────┼─────────────────┼─────────────┼──────────────────┤\n│             75666410 │        78585605 │     2919195 │ 3.85798004689267 │\n└──────────────────────┴─────────────────┴─────────────┴──────────────────┘"
+    }
+  ],
+  "final_answer": "**結果の概要**\n\n| 項目 | 金額 (単位はデータに依存) |\n|------|------------------------|\n| 最初の見積もり合計 | **75,666,410** |\n| 確定値合計 | **78,585,605** |\n| 差額 (確定値 − 見積もり) | **2,919,195** |\n| 差分率 | **約 3.86 %** |\n\n**解釈**\n\n- 最初に記録された売上見積もり（各アカウント・月ごとの最古スナップショット）と、最終的に確定した売上金額を比較した結果、確定値は見積もりより **約291万円（2,919,195）** 多くなっています。  \n- パーセンテージに換算すると、**約3.86 %** の増加です。  \n- つまり、全体としては見積もりがやや保守的であったか、後で修正・追加が行われたために最終的な売上が上回ったと考えられます。\n\n**補足情報（クエリのポイント）**\n\n- `first_est` では、`account_id` と `revenue_month` ごとに **最も古い snapshot_date** の `revenue_amount` を「最初の見積もり」として抽出しています。  \n- `final_est` では `is_finalized = TRUE` のレコードを「確定値」として取得しています。  \n- これらを `account_id` と `revenue_month` で結合し、全体の合計と差分を算出しています。\n\n**結論**\n\n全体の売上は、最初に見積もった金額に対して **約3.9 %（291万）** 上回っています。見積もりと確定値の差は比較的小さく、概ね予測通りの売上が確定したと言えるでしょう。",
+  "group": "t2s",
+  "rep": 3,
+  "started_at": "2026-10-29T15:46:34+09:00",
+  "ended_at": "2026-10-29T15:46:58+09:00"
+}

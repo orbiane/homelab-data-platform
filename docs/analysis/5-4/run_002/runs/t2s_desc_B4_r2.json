@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B4",
+  "question": "業種ごとの配信数",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    a.industry,\n    COUNT(*) AS delivered_count\nFROM main_mart.fct_message_event AS e\nJOIN main_mart.dim_account AS a\n    ON e.account_id = a.account_id\nWHERE\n    e.is_valid_event_type\n    AND e.event_type = 'delivered'   -- 配信（delivery）を表すイベント\nGROUP BY a.industry\nORDER BY delivered_count DESC;\n```",
+      "query": "SELECT\n    a.industry,\n    COUNT(*) AS delivered_count\nFROM main_mart.fct_message_event AS e\nJOIN main_mart.dim_account AS a\n    ON e.account_id = a.account_id\nWHERE\n    e.is_valid_event_type\n    AND e.event_type = 'delivered'   -- 配信（delivery）を表すイベント\nGROUP BY a.industry\nORDER BY delivered_count DESC;",
+      "ok": true,
+      "result": "┌───────────────────┬─────────────────┐\n│     industry      │ delivered_count │\n│      varchar      │      int64      │\n├───────────────────┼─────────────────┤\n│ NULL              │            2446 │\n│ entertainment     │            1481 │\n│ healthcare        │            1463 │\n│ real_estate       │             867 │\n│ education         │             745 │\n│ food_and_beverage │             588 │\n│ retail            │             492 │\n│ beauty            │             227 │\n└───────────────────┴─────────────────┘"
+    }
+  ],
+  "final_answer": "## 業種別の配信（delivered）件数\n\n| 業種                | 配信件数 | 全体に占める割合 |\n|---------------------|----------|------------------|\n| (未設定／NULL)      | 2,446    | 29.4 % |\n| entertainment       | 1,481    | 17.8 % |\n| healthcare          | 1,463    | 17.6 % |\n| real_estate         |   867    | 10.4 % |\n| education           |   745    | 9.0 % |\n| food_and_beverage   |   588    | 7.1 % |\n| retail              |   492    | 5.9 % |\n| beauty              |   227    | 2.7 % |\n| **合計**            | **8,309**| **100 %** |\n\n### 主なポイント\n1. **最も多い業種は「未設定（NULL）」**で、全体の約29 %を占めています。これは、アカウント情報に業種が登録されていないケースが多いことを示唆しています。分析やレポートで正確に業種別の傾向を把握したい場合は、NULL のレコードを除外するか、業種情報の補完を検討すると良いでしょう。\n\n2. **業種別トップは「entertainment」と「healthcare」**です。2 社合わせて約35 %（1,481 + 1,463 = 2,944 件）の配信が行われています。これらの業種は配信効果やユーザーエンゲージメントの分析を優先的に行う価値があります。\n\n3. **real_estate と education** がそれぞれ約10 % と 9 % を占め、続く重要なセグメントです。\n\n4. **beauty** は最も少ない業種で、全体の約2.7 % に留まります。もしこの業種への配信強化が目的であれば、ターゲティングやクリエイティブの見直しが必要です。\n\n### 今後のアクション例\n- **NULL の除外／補完**  \n  - 業種が未設定のレコードを除外して、実際の業種別配信比率を再算出する。  \n  - データクレンジングや外部データとのマージで、業種情報を補完する。\n\n- **業種別の配信効果測定**  \n  - 各業種で開封率・クリック率・コンバージョン率などを追跡し、配信件数だけでなく効果も比較する。\n\n- **配信予算の最適化**  \n  - 配信件数が多く、かつ効果が高い「entertainment」や「healthcare」へ予算をシフトし、ROI を最大化する。\n\n- **低配信業種の掘り起こし**  \n  - 「beauty」や「retail」など配信件数が少ない業種に対し、セグメント拡大やクリエイティブテストを実施して、潜在的な需要を引き出す。\n\n以上が、業種ごとの配信件数とその分析結果です。ご不明点や追加で確認したい指標があればお知らせください。",
+  "group": "t2s_desc",
+  "rep": 2,
+  "started_at": "2026-10-29T15:38:45+09:00",
+  "ended_at": "2026-10-29T15:39:07+09:00"
+}

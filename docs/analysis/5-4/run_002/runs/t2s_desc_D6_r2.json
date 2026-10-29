@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D6",
+  "question": "今月の売上は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS revenue_amount_this_month\nFROM main_mart.fct_revenue\nWHERE is_latest_snapshot\n  AND revenue_month >= DATE_TRUNC('month', CURRENT_DATE)\n  AND revenue_month < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month';\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS revenue_amount_this_month\nFROM main_mart.fct_revenue\nWHERE is_latest_snapshot\n  AND revenue_month >= DATE_TRUNC('month', CURRENT_DATE)\n  AND revenue_month < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month';",
+      "ok": true,
+      "result": "┌───────────────────────────┐\n│ revenue_amount_this_month │\n│          int128           │\n├───────────────────────────┤\n│                      NULL │\n└───────────────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「今月の売上」について、実行したクエリの結果は以下の通りです。\n\n```\nrevenue_amount_this_month\n-------------------------\nNULL\n```\n\n**考えられる理由**\n\n1. **今月分の売上データがまだロードされていない**  \n   現在は 2026‑10‑29 ですので、10 月分の売上がデータウェアハウスに反映されるタイミングが月末以降である可能性があります。\n\n2. **`is_latest_snapshot` が FALSE のレコードしか存在しない**  \n   クエリは `is_latest_snapshot` が true の行だけを対象にしています。最新スナップショットがまだ作成されていない場合、対象レコードがゼロになり、合計が NULL になります。\n\n3. **`revenue_month` の格納形式が期待とずれている**  \n   たとえば `revenue_month` が「2026‑10‑01」以外の形式（文字列やタイムスタンプのタイムゾーン違い）で保存されていると、日付フィルタにヒットしないことがあります。\n\n**次に取るべきアクション**\n\n- **データ投入スケジュールを確認**  \n  売上データが日次・週次でどのタイミングで `main_mart.fct_revenue` に取り込まれるかを確認し、まだ当月分が入っていないかどうかをチェックしてください。\n\n- **スナップショットの状態を確認**  \n  `SELECT DISTINCT is_latest_snapshot FROM main_mart.fct_revenue LIMIT 10;` でフラグの有無を確認し、最新スナップショットが正しく設定されているか確認します。\n\n- **日付型の整合性をチェック**  \n  ```sql\n  SELECT revenue_month, COUNT(*)\n  FROM main_mart.fct_revenue\n  WHERE revenue_month >= DATE_TRUNC('month', CURRENT_DATE)\n    AND revenue_month < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month'\n  GROUP BY revenue_month;\n  ```\n  で `revenue_month` が期待通りの範囲に入っているかを確認します。\n\n- **暫定的に NULL を 0 として扱う**  \n  今月の売上がまだ未確定であっても、レポート上は「0」と表示したい場合は、`COALESCE` を使って NULL を 0 に置き換えることができます。\n  ```sql\n  SELECT COALESCE(SUM(revenue_amount), 0) AS revenue_amount_this_month\n  FROM main_mart.fct_revenue\n  WHERE is_latest_snapshot\n    AND revenue_month >= DATE_TRUNC('month', CURRENT_DATE)\n    AND revenue_month < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month';\n  ```\n\n**結論**  \n現在取得できるデータでは、今月（2026 年 10 月）の売上は「NULL」、すなわちまだ記録が存在しない状態です。上記のチェックポイントを確認し、データが確実に取り込まれるようにプロセスを見直すことをおすすめします。",
+  "group": "t2s_desc",
+  "rep": 2,
+  "started_at": "2026-10-29T15:40:55+09:00",
+  "ended_at": "2026-10-29T15:41:16+09:00"
+}

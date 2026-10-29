@@ -1,0 +1,18 @@
+{
+  "side": "sl",
+  "id": "A3",
+  "question": "流入経路ごとの登録数は？",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics subscription_count --group-by subscription_event__referrer\n```",
+      "query": "mf query --metrics subscription_count --group-by subscription_event__referrer",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\nsubscription_event__referrer      subscription_count\n------------------------------  --------------------\nofficial_directory                               325\ngoogle_ads                                        65\nline_app_search                                  316\nstore_front                                      145\nbusiness_card                                    141\nsns_share                                         66\nposter                                           169\nline_ads                                          87\nevent_booth                                      160\nimport_bulk                                       50\nmessaging_app                                     66\nfacebook_ads                                      62\nunknown                                           41\nyahoo_ads                                         86\nreceipt                                          181\nemail_share                                       75"
+    }
+  ],
+  "final_answer": "以下は、流入経路（referrer）別の登録数（subscription_count）です。\n\n| 流入経路               | 登録数 |\n|----------------------|--------|\n| official_directory   | 325 |\n| line_app_search      | 316 |\n| receipt              | 181 |\n| poster               | 169 |\n| event_booth          | 160 |\n| store_front          | 145 |\n| business_card        | 141 |\n| yahoo_ads            | 86 |\n| line_ads             | 87 |\n| facebook_ads         | 62 |\n| google_ads           | 65 |\n| sns_share            | 66 |\n| messaging_app        | 66 |\n| email_share          | 75 |\n| import_bulk          | 50 |\n| unknown              | 41 |\n\n**合計登録数**は **2,035件** です。\n\n※最も多い流入経路は **official_directory**（325件）で、次いで **line_app_search**（316件）が続きます。全体としては、公式ディレクトリやLINE検索からの流入が大きな割合を占めています。",
+  "group": "sl",
+  "rep": 3,
+  "started_at": "2026-10-29T15:50:28+09:00",
+  "ended_at": "2026-10-29T15:50:42+09:00"
+}

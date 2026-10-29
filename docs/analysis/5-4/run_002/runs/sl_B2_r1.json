@@ -1,0 +1,18 @@
+{
+  "side": "sl",
+  "id": "B2",
+  "question": "配信数は全部でいくつ？",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics delivered_count\n```",
+      "query": "mf query --metrics delivered_count",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\n  delivered_count\n-----------------\n             8428"
+    }
+  ],
+  "final_answer": "クエリの結果、**配信数は 8,428 件** となっています。これが全体の配信数です。",
+  "group": "sl",
+  "rep": 1,
+  "started_at": "2026-10-29T15:32:48+09:00",
+  "ended_at": "2026-10-29T15:32:55+09:00"
+}

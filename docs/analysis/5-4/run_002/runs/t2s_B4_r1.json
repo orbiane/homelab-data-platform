@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B4",
+  "question": "業種ごとの配信数",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    a.industry,\n    COUNT(*) AS delivery_count\nFROM\n    main_mart.fct_message_event AS e\nJOIN\n    main_mart.dim_account AS a\n    ON e.account_id = a.account_id\nWHERE\n    e.event_type = 'delivered'   -- 配信（delivery）に該当するイベント\nGROUP BY\n    a.industry\nORDER BY\n    delivery_count DESC;\n```",
+      "query": "SELECT\n    a.industry,\n    COUNT(*) AS delivery_count\nFROM\n    main_mart.fct_message_event AS e\nJOIN\n    main_mart.dim_account AS a\n    ON e.account_id = a.account_id\nWHERE\n    e.event_type = 'delivered'   -- 配信（delivery）に該当するイベント\nGROUP BY\n    a.industry\nORDER BY\n    delivery_count DESC;",
+      "ok": true,
+      "result": "┌───────────────────┬────────────────┐\n│     industry      │ delivery_count │\n│      varchar      │     int64      │\n├───────────────────┼────────────────┤\n│ NULL              │           2446 │\n│ entertainment     │           1481 │\n│ healthcare        │           1463 │\n│ real_estate       │            867 │\n│ education         │            745 │\n│ food_and_beverage │            588 │\n│ retail            │            492 │\n│ beauty            │            227 │\n└───────────────────┴────────────────┘"
+    }
+  ],
+  "final_answer": "## 業種別の配信数（delivery_count）\n\n| 業種 (industry)        | 配信数 (delivery_count) | 全体に占める割合 |\n|------------------------|------------------------|-----------------|\n| **NULL** (業種未設定) | 2,446                  | **29.4 %** |\n| entertainment          | 1,481                  | 17.8 % |\n| healthcare             | 1,463                  | 17.6 % |\n| real_estate            |   867                  | 10.4 % |\n| education              |   745                  | 9.0 % |\n| food_and_beverage      |   588                  | 7.1 % |\n| retail                 |   492                  | 5.9 % |\n| beauty                 |   227                  | 2.7 % |\n| **合計**                | **8,309**              | 100 % |\n\n### ポイント\n\n1. **業種未設定（NULL）が全体の約30 %** を占めています。  \n   - データクレンジングや、`dim_account.industry` の入力漏れを減らす施策が効果的です。\n\n2. **配信数が多い上位3業種** は  \n   - entertainment（エンタメ）  \n   - healthcare（ヘルスケア）  \n   - real_estate（不動産）  \n   です。これらの業種は配信対象として重要度が高いと考えられます。\n\n3. **beauty（美容）や retail（小売）などは比較的配信が少ない** ため、今後のマーケティング施策での強化余地があります。\n\n### 次に取るべきアクション例\n\n| アクション | 内容 |\n|------------|------|\n| **NULL の除外・補完** | `industry` が NULL のアカウントに対し、過去の取引履歴や属性情報から業種を推定し、`dim_account` を更新する。 |\n| **業種別配信最適化** | 上位業種（entertainment・healthcare）に対しては、配信頻度やクリエイティブを最適化し、エンゲージメント向上を狙う。 |\n| **低配信業種へのシフト** | beauty・retail など配信数が少ない業種に対し、テストキャンペーンを実施し、効果測定を行う。 |\n| **定期的なモニタリング** | 週次・月次で同様の集計を行い、業種別配信トレンドを可視化。異常増減があれば即時対応。 |\n\nご不明点や、別の指標（例：開封率・クリック率）との組み合わせ分析が必要な場合は、遠慮なくお知らせください。",
+  "group": "t2s",
+  "rep": 1,
+  "started_at": "2026-10-29T15:26:54+09:00",
+  "ended_at": "2026-10-29T15:27:15+09:00"
+}

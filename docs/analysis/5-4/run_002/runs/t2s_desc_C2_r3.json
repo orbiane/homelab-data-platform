@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C2",
+  "question": "契約プラン別に売上を比べたい",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    a.plan_type,\n    SUM(r.revenue_amount) AS total_revenue_amount\nFROM main_mart.fct_revenue AS r\nJOIN main_mart.dim_account AS a\n    ON r.account_id = a.account_id\nWHERE r.is_latest_snapshot = TRUE\nGROUP BY a.plan_type\nORDER BY total_revenue_amount DESC;\n```",
+      "query": "SELECT\n    a.plan_type,\n    SUM(r.revenue_amount) AS total_revenue_amount\nFROM main_mart.fct_revenue AS r\nJOIN main_mart.dim_account AS a\n    ON r.account_id = a.account_id\nWHERE r.is_latest_snapshot = TRUE\nGROUP BY a.plan_type\nORDER BY total_revenue_amount DESC;",
+      "ok": true,
+      "result": "┌───────────┬──────────────────────┐\n│ plan_type │ total_revenue_amount │\n│  varchar  │        int128        │\n├───────────┼──────────────────────┤\n│ standard  │             34946700 │\n│ free      │              9088600 │\n│ light     │              5466600 │\n└───────────┴──────────────────────┘"
+    }
+  ],
+  "final_answer": "## 契約プラン別売上の比較結果\n\n| 契約プラン | 売上合計 (円) | 全体に占める割合 |\n|-----------|--------------|------------------|\n| **standard** | 34,946,700 | **約 70.6 %** |\n| free      | 9,088,600  | 約 18.4 % |\n| light     | 5,466,600  | 約 11.0 % |\n\n### 主なポイント\n\n1. **Standard プランが圧倒的に売上を牽引**  \n   - 全体の約 70 % を占めており、最も収益性の高いプランです。  \n   - このプランが主力商品であることから、今後のマーケティングや機能強化はこのプランに重点を置くと効果的です。\n\n2. **Free プランでも一定の売上を確保**  \n   - 無料プランでありながら、全体の約 18 % の売上を生み出しています。  \n   - これは、無料ユーザーがオプション課金や追加機能を利用している可能性があります。Free ユーザー向けの有料アップセル施策を強化すれば、さらに売上増が見込めます。\n\n3. **Light プランは最小規模**  \n   - 全体の約 11 % にとどまります。  \n   - 需要が低い要因を分析（価格設定、機能不足、ターゲット層のミスマッチなど）し、プランの見直しやプロモーションを検討すると良いでしょう。\n\n### 次のステップ（提案）\n\n| 分析項目 | 目的 | 手法例 |\n|----------|------|--------|\n| **プラン別顧客数** | 売上だけでなく、顧客ベースの構成を把握 | `COUNT(DISTINCT account_id)` でプラン別顧客数を算出 |\n| **プラン別ARPU（1顧客あたりの平均売上）** | 各プランの収益効率を評価 | 売上合計 ÷ 顧客数 |\n| **時系列トレンド** | プラン別売上の伸び・減少を把握 | 月次・四半期別に `SUM(revenue_amount)` を集計 |\n| **アップセル率** | Free から有料プランへの移行状況を測定 | 期間内にプラン変更したアカウント数を追跡 |\n| **プラン別解約率** | 各プランの顧客維持状況を評価 | `churn` データと結合し、解約率を算出 |\n\nこれらの追加分析を行うことで、**どのプランが最も収益性が高く、どのプランに改善の余地があるか**をより具体的に把握できます。必要に応じて、SQL クエリや可視化ダッシュボードの作成をご支援しますので、お気軽にお申し付けください。",
+  "group": "t2s_desc",
+  "rep": 3,
+  "started_at": "2026-10-29T15:48:48+09:00",
+  "ended_at": "2026-10-29T15:49:07+09:00"
+}

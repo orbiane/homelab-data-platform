@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C3",
+  "question": "4月の確定した売上（円）はいくら？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS april_finalized_revenue_jpy\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND currency = 'JPY'\n    AND revenue_month >= DATE '2026-04-01'\n    AND revenue_month < DATE '2026-05-01';\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS april_finalized_revenue_jpy\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND currency = 'JPY'\n    AND revenue_month >= DATE '2026-04-01'\n    AND revenue_month < DATE '2026-05-01';",
+      "ok": true,
+      "result": "┌─────────────────────────────┐\n│ april_finalized_revenue_jpy │\n│           int128            │\n├─────────────────────────────┤\n│                        NULL │\n└─────────────────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「2026年4月の確定した売上（円）」について、実行したクエリの結果は以下の通りです。\n\n```\napril_finalized_revenue_jpy\n---------------------------\nNULL\n```\n\n**結果の意味**\n\n- `NULL` が返ってきたということは、条件に合致するレコードが **1件も存在しなかった** ことを示しています。  \n- 具体的には、2026年4月（2026‑04‑01 〜 2026‑04‑30）に **確定済み（`is_finalized = TRUE`）** かつ **通貨が JPY** の売上データがテーブル `main_mart.fct_revenue` に登録されていない、あるいは該当期間のデータがまだロード・集計されていない可能性があります。\n\n**考えられる原因と対策**\n\n1. **データ未投入**  \n   - 4月分の売上データがまだシステムに取り込まれていない可能性があります。データ供給元（販売システムやETLプロセス）を確認してください。\n\n2. **条件の見直し**  \n   - `is_finalized` フラグが正しく設定されているか、または `currency` が本当に `'JPY'` であるかを確認してください。たとえば、通貨コードが大文字・小文字の違いでマッチしていないケースがあります（`'jpy'` など）。\n\n3. **期間の設定ミス**  \n   - `revenue_month` カラムのデータ型や格納形式が日付ではなく「YYYYMM」や「YYYY-MM」文字列の場合、日付リテラルとの比較が期待通りに動作しないことがあります。その場合は、文字列や数値に合わせた条件に変更する必要があります。\n\n4. **NULL が実際の売上ゼロを意味するか**  \n   - ビジネスロジック上、該当期間に売上が全くなかった（＝0円）ことを `NULL` で表現しているケースもあります。その場合は「0円」と解釈して問題ありませんが、データ定義を確認しておくと安心です。\n\n**結論**  \n現在のデータベース上では、2026年4月の「確定済み」かつ「JPY」通貨の売上金額は **取得できません（NULL）** です。実際の金額が必要であれば、上記のようにデータの投入状況やクエリ条件を再確認し、必要に応じてデータ提供元に問い合わせてください。もし「売上が0円」であることが確定している場合は、0円と回答して問題ありません。",
+  "group": "t2s_desc",
+  "rep": 2,
+  "started_at": "2026-10-29T15:39:45+09:00",
+  "ended_at": "2026-10-29T15:40:04+09:00"
+}

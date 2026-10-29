@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B3",
+  "question": "クリック率はどのくらい？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    ROUND(\n        100.0 *\n        SUM(CASE WHEN event_type = 'click' AND is_valid_click THEN 1 ELSE 0 END) /\n        NULLIF(COUNT(CASE WHEN event_type = 'send' AND is_valid_event_type THEN 1 END), 0),\n        2\n    ) AS click_through_rate_percent\nFROM main_mart.fct_message_event;\n```",
+      "query": "SELECT\n    ROUND(\n        100.0 *\n        SUM(CASE WHEN event_type = 'click' AND is_valid_click THEN 1 ELSE 0 END) /\n        NULLIF(COUNT(CASE WHEN event_type = 'send' AND is_valid_event_type THEN 1 END), 0),\n        2\n    ) AS click_through_rate_percent\nFROM main_mart.fct_message_event;",
+      "ok": true,
+      "result": "┌────────────────────────────┐\n│ click_through_rate_percent │\n│           double           │\n├────────────────────────────┤\n│                       NULL │\n└────────────────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「クリック率（CTR）」について、実行したクエリの結果は **NULL** でした。\n\n### なぜ NULL になるか\nクエリでは以下の計算を行っています。\n\n```sql\nSUM(CASE WHEN event_type = 'click' AND is_valid_click THEN 1 ELSE 0 END)   -- クリック数\n/\nNULLIF(COUNT(CASE WHEN event_type = 'send'  AND is_valid_event_type THEN 1 END), 0)  -- 送信数（0 の場合は NULL に変換）\n```\n\n`NULLIF(..., 0)` により、**送信数が 0**（＝該当する `event_type = 'send'` のレコードが存在しない、または `is_valid_event_type` が FALSE のレコードしかない）場合に除算の分母が `NULL` となり、結果全体が `NULL` になります。\n\nしたがって、現在のデータセットでは **送信イベントが 1 件も記録されていない**、または **有効な送信イベントがフィルタ条件に合致していない** ため、クリック率を算出できません。\n\n### 次に取るべきアクション\n\n| 項目 | 確認ポイント | 対応例 |\n|------|----------------|--------|\n| 送信イベントの有無 | `event_type = 'send'` のレコード数を確認 | `SELECT COUNT(*) FROM main_mart.fct_message_event WHERE event_type = 'send';` |\n| 有効フラグの状態 | `is_valid_event_type` が TRUE のレコードがあるか | `SELECT COUNT(*) FROM main_mart.fct_message_event WHERE event_type = 'send' AND is_valid_event_type;` |\n| クリックイベントの有無 | `event_type = 'click'` のレコード数を確認 | `SELECT COUNT(*) FROM main_mart.fct_message_event WHERE event_type = 'click';` |\n| データ取得期間 | データが期待する期間（例：当日、過去30日）に限定されていないか | 必要なら日付フィルタを追加 |\n\n#### 例：送信イベントの件数を確認するクエリ\n```sql\nSELECT\n    COUNT(*) AS total_send_events,\n    COUNT(CASE WHEN is_valid_event_type THEN 1 END) AS valid_send_events\nFROM main_mart.fct_message_event\nWHERE event_type = 'send';\n```\n\n#### 例：クリックイベントの件数を確認するクエリ\n```sql\nSELECT\n    COUNT(*) AS total_click_events,\n    COUNT(CASE WHEN is_valid_click THEN 1 END) AS valid_click_events\nFROM main_mart.fct_message_event\nWHERE event_type = 'click';\n```\n\n### まとめ\n- 現在の結果が `NULL` になるのは、**送信イベントが存在しない**（もしくは有効フラグが立っていない）ためです。\n- まずは送信イベントの有無と有効フラグの状態を確認し、必要に応じてデータ抽出条件や期間を見直してください。\n- 送信イベントが取得でき次第、同じクエリでクリック率（CTR）を再計算すれば、数値（例：`12.34`%）が得られます。",
+  "group": "t2s",
+  "rep": 1,
+  "started_at": "2026-10-29T15:26:36+09:00",
+  "ended_at": "2026-10-29T15:26:54+09:00"
+}

@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D5",
+  "question": "売上の最初の見積もりと確定値は、どれくらい違った？",
+  "attempts": [
+    {
+      "llm": "```sql\nWITH first_estimate AS (\n    -- 最初に記録された見積もり（確定していない最古のスナップショット）\n    SELECT\n        revenue_month,\n        revenue_amount AS est_amount,\n        ROW_NUMBER() OVER (PARTITION BY revenue_month ORDER BY snapshot_date) AS rn\n    FROM main_mart.fct_revenue\n    WHERE is_finalized = FALSE\n),\nfirst_est_per_month AS (\n    SELECT revenue_month, est_amount\n    FROM first_estimate\n    WHERE rn = 1\n),\nfinalized AS (\n    -- 確定した売上（is_finalized が true の最新スナップショット）\n    SELECT\n        revenue_month,\n        revenue_amount AS final_amount\n    FROM main_mart.fct_revenue\n    WHERE is_finalized = TRUE\n)\nSELECT\n    SUM(first_est_per_month.est_amount)      AS total_estimated,\n    SUM(finalized.final_amount)              AS total_finalized,\n    SUM(first_est_per_month.est_amount) - SUM(finalized.final_amount) AS diff_amount,\n    CASE\n        WHEN SUM(finalized.final_amount) = 0 THEN NULL\n        ELSE (SUM(first_est_per_month.est_amount) - SUM(finalized.final_amount))\n             / SUM(finalized.final_amount)::DOUBLE\n    END                                      AS diff_ratio\nFROM first_est_per_month\nFULL JOIN finalized USING (revenue_month);\n```",
+      "query": "WITH first_estimate AS (\n    -- 最初に記録された見積もり（確定していない最古のスナップショット）\n    SELECT\n        revenue_month,\n        revenue_amount AS est_amount,\n        ROW_NUMBER() OVER (PARTITION BY revenue_month ORDER BY snapshot_date) AS rn\n    FROM main_mart.fct_revenue\n    WHERE is_finalized = FALSE\n),\nfirst_est_per_month AS (\n    SELECT revenue_month, est_amount\n    FROM first_estimate\n    WHERE rn = 1\n),\nfinalized AS (\n    -- 確定した売上（is_finalized が true の最新スナップショット）\n    SELECT\n        revenue_month,\n        revenue_amount AS final_amount\n    FROM main_mart.fct_revenue\n    WHERE is_finalized = TRUE\n)\nSELECT\n    SUM(first_est_per_month.est_amount)      AS total_estimated,\n    SUM(finalized.final_amount)              AS total_finalized,\n    SUM(first_est_per_month.est_amount) - SUM(finalized.final_amount) AS diff_amount,\n    CASE\n        WHEN SUM(finalized.final_amount) = 0 THEN NULL\n        ELSE (SUM(first_est_per_month.est_amount) - SUM(finalized.final_amount))\n             / SUM(finalized.final_amount)::DOUBLE\n    END                                      AS diff_ratio\nFROM first_est_per_month\nFULL JOIN finalized USING (revenue_month);",
+      "ok": true,
+      "result": "┌─────────────────┬─────────────────┬─────────────┬─────────────────────┐\n│ total_estimated │ total_finalized │ diff_amount │     diff_ratio      │\n│     int128      │     int128      │   int128    │       double        │\n├─────────────────┼─────────────────┼─────────────┼─────────────────────┤\n│          949100 │        78585605 │   -77636505 │ -0.9879227245244215 │\n└─────────────────┴─────────────────┴─────────────┴─────────────────────┘"
+    }
+  ],
+  "final_answer": "**結果の概要**\n\n| 項目 | 金額（単位） |\n|------|--------------|\n| 最初の見積もり合計 | 949,100 |\n| 確定した売上合計 | 78,585,605 |\n| 差額（見積もり‑確定） | -77,636,505 |\n| 差分比率（(見積‑確定)/確定） | -0.9879（約‑98.8 %） |\n\n**考察**\n\n- 最初に記録された見積もりの総額は **約95万**、確定した売上の総額は **約7,858万** です。  \n- 差額は **‑7,763万5,105** となり、見積もりは確定値に対してほぼ **100 %** 近く不足しています。  \n- 差分比率が **‑0.9879** ということは、見積もりは確定売上の **約1.2 %**（100 % − 98.8 %）にすぎません。言い換えれば、確定売上は最初の見積もりの **約83倍**（78,585,605 ÷ 949,100 ≈ 82.8）に達しています。\n\n**結論**\n\n最初に出された売上見積もりは、実際に確定した金額と比べて大幅に過小評価されていました。全体としては **約98.8 %** の差があり、確定売上は見積もりの約 **83 倍** になるという大きな乖離が確認できました。今後は見積もりプロセスやデータ入力の精度を見直すことで、こうしたギャップを縮小できる余地があります。",
+  "group": "t2s_desc",
+  "rep": 3,
+  "started_at": "2026-10-29T15:49:33+09:00",
+  "ended_at": "2026-10-29T15:49:57+09:00"
+}

@@ -1,0 +1,18 @@
+{
+  "side": "sl",
+  "id": "B4",
+  "question": "業種ごとの配信数",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics delivered_count --group-by account__industry\n```",
+      "query": "mf query --metrics delivered_count --group-by account__industry",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.05 seconds\naccount__industry      delivered_count\n-------------------  -----------------\nentertainment                     1481\nbeauty                             227\nfood_and_beverage                  588\nretail                             492\nhealthcare                        1463\n                                  2565\nreal_estate                        867\neducation                          745"
+    }
+  ],
+  "final_answer": "以下は、業種（account__industry）別に集計した配信数（delivered_count）です。\n\n| 業種               | 配信数 |\n|--------------------|--------|\n| entertainment      | 1,481 |\n| beauty             |   227 |\n| food_and_beverage  |   588 |\n| retail             |   492 |\n| healthcare         | 1,463 |\n| （未設定・不明）    | 2,565 |\n| real_estate        |   867 |\n| education          |   745 |\n\n**ポイント**\n\n- 「未設定・不明」と表示されている行は、業種情報が入力されていないか、データが欠損しているレコードです。このカテゴリだけで **2,565 件** の配信が行われています。\n- 業種別で最も配信数が多いのは **entertainment（1,481 件）**、次いで **healthcare（1,463 件）** です。\n- 全体の配信数は **8,428 件** となります（上記全行の合計）。\n\n**考察・次のアクション例**\n\n1. **未設定レコードの調査**  \n   - 業種が未設定のレコードが全体の約30％（2,565/8,428）を占めています。データ入力フローやインテグレーションプロセスを見直し、業種情報の取得・保存が確実に行われるよう改善を検討してください。\n\n2. **業種別の効果測定**  \n   - 配信数だけでなく、開封率やクリック率などのエンゲージメント指標も併せて分析し、どの業種が最も効果的かを把握すると、今後のターゲティング戦略に活かせます。\n\n3. **リソース配分の最適化**  \n   - 配信数が多い entertainment と healthcare に対しては、クリエイティブやメッセージングをさらに最適化し、ROI を高める施策を検討すると効果的です。\n\nご不明点や、他の指標（例：配信数に対する開封率・クリック率）での分析が必要な場合は、お気軽にお知らせください。",
+  "group": "sl",
+  "rep": 2,
+  "started_at": "2026-10-29T15:42:00+09:00",
+  "ended_at": "2026-10-29T15:42:14+09:00"
+}

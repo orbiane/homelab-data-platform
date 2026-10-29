@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B4",
+  "question": "業種ごとの配信数",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    a.industry,\n    COUNT(DISTINCT e.message_id) AS delivery_count\nFROM\n    main_mart.dim_account AS a\nJOIN\n    main_mart.fct_message_event AS e\n    ON a.account_id = e.account_id\nWHERE\n    e.is_valid_event_type\nGROUP BY\n    a.industry\nORDER BY\n    delivery_count DESC;\n```",
+      "query": "SELECT\n    a.industry,\n    COUNT(DISTINCT e.message_id) AS delivery_count\nFROM\n    main_mart.dim_account AS a\nJOIN\n    main_mart.fct_message_event AS e\n    ON a.account_id = e.account_id\nWHERE\n    e.is_valid_event_type\nGROUP BY\n    a.industry\nORDER BY\n    delivery_count DESC;",
+      "ok": true,
+      "result": "┌───────────────────┬────────────────┐\n│     industry      │ delivery_count │\n│      varchar      │     int64      │\n├───────────────────┼────────────────┤\n│ NULL              │             44 │\n│ entertainment     │             33 │\n│ healthcare        │             33 │\n│ retail            │             17 │\n│ food_and_beverage │             14 │\n│ real_estate       │             13 │\n│ education         │             12 │\n│ beauty            │              8 │\n└───────────────────┴────────────────┘"
+    }
+  ],
+  "final_answer": "以下は「業種（industry）ごとの配信数（delivery_count）」の集計結果です。\n\n| 業種                | 配信数 |\n|-------------------|------|\n| （未設定）NULL     | 44   |\n| entertainment      | 33   |\n| healthcare         | 33   |\n| retail             | 17   |\n| food_and_beverage  | 14   |\n| real_estate        | 13   |\n| education          | 12   |\n| beauty             | 8    |\n\n**ポイント**\n\n1. **業種が未設定（NULL）のアカウントが最も多く、44件の配信が行われています。**  \n   - データ品質の観点から、可能であれば業種情報を補完すると、より正確な分析が可能です。\n\n2. **エンターテイメントとヘルスケアが同数（33件）で2位にランクインしています。**  \n   - どちらの業種も配信効果が高い可能性があるため、今後のキャンペーンで重点的にターゲットにすると効果的です。\n\n3. **小売（retail）や飲食（food_and_beverage）も一定数（それぞれ17件・14件）配信されています。**  \n   - これらの業種は顧客接点が多いことが想定されるため、パーソナライズドメッセージやプロモーションの効果測定を行う価値があります。\n\n4. **不動産（real_estate）、教育（education）、美容（beauty）は配信数が比較的少ないですが、ニッチなターゲット層へのアプローチとしては有望です。**\n\n**次のステップの提案**\n\n- **NULL の業種情報を補完**：アカウントマスタに業種が未入力のレコードを洗い出し、可能であれば外部データや営業担当者から情報を取得し、業種フィールドを埋める。\n- **業種別のエンゲージメント指標（開封率、クリック率など）を追加で集計**：配信数だけでなく、実際の効果を測る指標を併せて分析すると、どの業種が最もROIが高いかが見えてきます。\n- **上位業種（エンターテイメント・ヘルスケア）向けにカスタマイズしたキャンペーン**を設計し、A/Bテストで効果検証を行う。\n\n以上が、業種ごとの配信数に関する集計結果と考察です。ご参考になれば幸いです。",
+  "group": "t2s",
+  "rep": 2,
+  "started_at": "2026-10-29T15:35:54+09:00",
+  "ended_at": "2026-10-29T15:36:09+09:00"
+}

@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C3",
+  "question": "4月の確定した売上（円）はいくら？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS total_revenue_jpy\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND currency = 'JPY'\n    AND revenue_month >= DATE '2026-04-01'\n    AND revenue_month <  DATE '2026-05-01';\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS total_revenue_jpy\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND currency = 'JPY'\n    AND revenue_month >= DATE '2026-04-01'\n    AND revenue_month <  DATE '2026-05-01';",
+      "ok": true,
+      "result": "┌───────────────────┐\n│ total_revenue_jpy │\n│      int128       │\n├───────────────────┤\n│              NULL │\n└───────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「4月の確定した売上（円）はいくら？」について、実行したクエリの結果は以下の通りです。\n\n```\ntotal_revenue_jpy\n-----------------\nNULL\n```\n\n### 結果の意味\n- **NULL が返ってきた**ということは、条件に合致するレコードが一件も存在しなかったことを示しています。具体的には、2026年4月（2026‑04‑01 から 2026‑05‑01 未満）の期間において、以下の条件をすべて満たすデータがテーブル `main_mart.fct_revenue` にありませんでした。\n  - `is_finalized = TRUE`（確定済み）\n  - `currency = 'JPY'`（通貨が円）\n  - `revenue_month` が2026年4月\n\n### 考えられる原因\n1. **データが未入力**  \n   4月分の売上データがまだシステムに取り込まれていない、あるいは入力が遅れている可能性があります。\n\n2. **確定フラグが未設定**  \n   売上は記録されていても、`is_finalized` が `FALSE` のまま（未確定）であるため、今回の集計対象外となっているかもしれません。\n\n3. **通貨が円以外**  \n   売上は記録されているが、`currency` が `JPY` ではなく、別の通貨（例：USD, EUR など）で保存されている可能性があります。\n\n4. **期間指定の誤り**  \n   `revenue_month` カラムのデータ型や格納形式が日付ではなく月単位（例：`2026-04` のような文字列）である場合、日付比較でヒットしないことがあります。\n\n### 次のアクション\n- **データの有無を確認**  \n  ```sql\n  SELECT COUNT(*) AS cnt\n  FROM main_mart.fct_revenue\n  WHERE revenue_month >= DATE '2026-04-01'\n    AND revenue_month <  DATE '2026-05-01';\n  ```\n  まずは期間だけでレコード数を確認し、データ自体が存在するかを確かめます。\n\n- **確定フラグの状態を確認**  \n  ```sql\n  SELECT is_finalized, COUNT(*) AS cnt\n  FROM main_mart.fct_revenue\n  WHERE revenue_month >= DATE '2026-04-01'\n    AND revenue_month <  DATE '2026-05-01'\n  GROUP BY is_finalized;\n  ```\n  確定済みか未確定かの分布を把握します。\n\n- **通貨別の集計**  \n  ```sql\n  SELECT currency, SUM(revenue_amount) AS total\n  FROM main_mart.fct_revenue\n  WHERE revenue_month >= DATE '2026-04-01'\n    AND revenue_month <  DATE '2026-05-01'\n  GROUP BY currency;\n  ```\n  円以外の通貨で売上が記録されていないか確認します。\n\n- **データ型・格納形式の確認**  \n  `revenue_month` の定義を確認し、日付型であるか、文字列型で「YYYY-MM」形式かを調べます。文字列形式の場合は比較条件を `WHERE revenue_month = '2026-04'` のように変更する必要があります。\n\n### まとめ\n現時点のクエリ結果からは、2026年4月分の **確定済みかつ円建ての売上データは存在しない** と結論付けられます。上記のチェック項目を順に確認し、データが正しく格納・フラグ付けされているかをご確認ください。もしデータがまだ入力されていないことが判明した場合は、担当部門へデータの投入を依頼する必要があります。",
+  "group": "t2s",
+  "rep": 1,
+  "started_at": "2026-10-29T15:27:51+09:00",
+  "ended_at": "2026-10-29T15:28:11+09:00"
+}

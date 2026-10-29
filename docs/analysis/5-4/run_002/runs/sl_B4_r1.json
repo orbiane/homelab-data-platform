@@ -1,0 +1,18 @@
+{
+  "side": "sl",
+  "id": "B4",
+  "question": "業種ごとの配信数",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics delivered_count --group-by account__industry\n```",
+      "query": "mf query --metrics delivered_count --group-by account__industry",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.05 seconds\naccount__industry      delivered_count\n-------------------  -----------------\n                                  2565\nreal_estate                        867\nbeauty                             227\nfood_and_beverage                  588\nentertainment                     1481\nretail                             492\nhealthcare                        1463\neducation                          745"
+    }
+  ],
+  "final_answer": "以下は、業種（`account__industry`）別の配信数（`delivered_count`）です。\n\n| 業種                     | 配信数 |\n|--------------------------|--------|\n| （未設定／不明）         | 2,565 |\n| entertainment（エンタメ）| 1,481 |\n| healthcare（ヘルスケア） | 1,463 |\n| real_estate（不動産）    |   867 |\n| education（教育）        |   745 |\n| food_and_beverage（飲食）|   588 |\n| retail（小売）           |   492 |\n| beauty（美容）           |   227 |\n\n**ポイントまとめ**\n\n- 最も多く配信されているのは業種が未設定（もしくは不明）のレコードで、2,565件です。  \n- エンターテインメント業界が次に多く、1,481件と高い配信数を示しています。  \n- ヘルスケア、 不動産、 教育と続き、飲食・小売・美容の順に配信数が少なくなっています。  \n\nこの結果から、業種が明示されていないデータが全体の配信数の約30%を占めていることが分かります。業種別の配信効果を分析したい場合は、未設定データを除外して比較すると、エンタメ・ヘルスケアが主要な配信対象であることが見えてきます。",
+  "group": "sl",
+  "rep": 1,
+  "started_at": "2026-10-29T15:33:04+09:00",
+  "ended_at": "2026-10-29T15:33:16+09:00"
+}

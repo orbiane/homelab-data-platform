@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D6",
+  "question": "今月の売上は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS total_revenue_this_month\nFROM\n    main_mart.fct_revenue\nWHERE\n    DATE_TRUNC('month', revenue_month) = DATE_TRUNC('month', CURRENT_DATE)\n    AND is_finalized = TRUE\n    AND is_latest_snapshot = TRUE;\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS total_revenue_this_month\nFROM\n    main_mart.fct_revenue\nWHERE\n    DATE_TRUNC('month', revenue_month) = DATE_TRUNC('month', CURRENT_DATE)\n    AND is_finalized = TRUE\n    AND is_latest_snapshot = TRUE;",
+      "ok": true,
+      "result": "┌──────────────────────────┐\n│ total_revenue_this_month │\n│          int128          │\n├──────────────────────────┤\n│                     NULL │\n└──────────────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「今月の売上」について、実行したクエリの結果は次のとおりです。\n\n| total_revenue_this_month |\n|--------------------------|\n| NULL                     |\n\n**結果の解釈**\n\n- `NULL` が返ってきたということは、現在の月（2026‑10‑01〜2026‑10‑31）の売上データが **「確定済み（is_finalized = TRUE）」かつ「最新スナップショット（is_latest_snapshot = TRUE）」** の条件を満たすレコードが存在しないことを示しています。  \n- 具体的には以下のようなケースが考えられます。  \n  1. **今月分の売上データがまだ投入・確定されていない**  \n  2. データロードのタイミングやバッチ処理が遅れており、`is_finalized` が `TRUE` になっていない  \n  3. `revenue_month` カラムの値が期待する日付形式（例：2026‑10‑01 のような月初日）になっていないため、`DATE_TRUNC('month', revenue_month)` が現在月と一致しない  \n  4. テーブル自体に今月分の行がまだ作成されていない\n\n**次に取るべきアクション（例）**\n\n1. **データ投入・確定プロセスの確認**  \n   - 今月分の売上が正しく `main_mart.fct_revenue` にロードされているか、ETL ジョブやバッチ処理のステータスを確認してください。  \n   - `is_finalized` が `TRUE` に設定されるタイミングを確認し、必要であれば手動でフラグを立てるか、ジョブのスケジュールを見直します。\n\n2. **`revenue_month` のデータ内容をチェック**  \n   ```sql\n   SELECT DISTINCT revenue_month\n   FROM main_mart.fct_revenue\n   WHERE DATE_TRUNC('month', revenue_month) = DATE_TRUNC('month', CURRENT_DATE);\n   ```\n   - 期待通りの月（2026‑10‑01 など）が格納されているか確認します。もし形式が異なる場合は、データロード時の変換ロジックを修正します。\n\n3. **スナップショットフラグの確認**  \n   ```sql\n   SELECT COUNT(*) AS cnt\n   FROM main_mart.fct_revenue\n   WHERE is_latest_snapshot = TRUE;\n   ```\n   - 最新スナップショットが正しく設定されているかを確認し、必要ならばスナップショット生成プロセスを再実行します。\n\n4. **暫定的に条件を緩めて確認**（デバッグ用）  \n   ```sql\n   SELECT SUM(revenue_amount) AS total_revenue_this_month\n   FROM main_mart.fct_revenue\n   WHERE DATE_TRUNC('month', revenue_month) = DATE_TRUNC('month', CURRENT_DATE);\n   ```\n   - `is_finalized` や `is_latest_snapshot` の条件を外すことで、今月分のデータがそもそも存在するかどうかをざっくり確認できます。\n\n**まとめ**\n\n現在のクエリ結果からは、**今月（2026‑10 月）の売上金額がデータベース上に記録されていない**、もしくは条件に合致するレコードが無いため `NULL` が返されています。上記の確認ポイントをチェックし、データが正しくロード・確定されているかをご確認ください。データが揃えば、同じクエリで正しい売上合計が取得できるはずです。",
+  "group": "t2s",
+  "rep": 3,
+  "started_at": "2026-10-29T15:46:58+09:00",
+  "ended_at": "2026-10-29T15:47:18+09:00"
+}

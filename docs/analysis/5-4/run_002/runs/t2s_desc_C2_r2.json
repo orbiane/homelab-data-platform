@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C2",
+  "question": "契約プラン別に売上を比べたい",
+  "attempts": [
+    {
+      "llm": "```sql\nWITH latest_rev AS (\n    SELECT\n        account_id,\n        revenue_amount,\n        currency\n    FROM main_mart.fct_revenue\n    WHERE is_latest_snapshot = TRUE\n)\n\nSELECT\n    da.plan_type,\n    SUM(lr.revenue_amount) AS total_revenue_amount,\n    COUNT(DISTINCT lr.account_id) AS accounts_contributing\nFROM latest_rev lr\nJOIN main_mart.dim_account da\n    ON lr.account_id = da.account_id\nGROUP BY da.plan_type\nORDER BY total_revenue_amount DESC;\n```",
+      "query": "WITH latest_rev AS (\n    SELECT\n        account_id,\n        revenue_amount,\n        currency\n    FROM main_mart.fct_revenue\n    WHERE is_latest_snapshot = TRUE\n)\n\nSELECT\n    da.plan_type,\n    SUM(lr.revenue_amount) AS total_revenue_amount,\n    COUNT(DISTINCT lr.account_id) AS accounts_contributing\nFROM latest_rev lr\nJOIN main_mart.dim_account da\n    ON lr.account_id = da.account_id\nGROUP BY da.plan_type\nORDER BY total_revenue_amount DESC;",
+      "ok": true,
+      "result": "┌───────────┬──────────────────────┬───────────────────────┐\n│ plan_type │ total_revenue_amount │ accounts_contributing │\n│  varchar  │        int128        │         int64         │\n├───────────┼──────────────────────┼───────────────────────┤\n│ standard  │             34946700 │                    14 │\n│ free      │              9088600 │                     4 │\n│ light     │              5466600 │                     2 │\n└───────────┴──────────────────────┴───────────────────────┘"
+    }
+  ],
+  "final_answer": "## 結果サマリー\n\n| 契約プラン | 売上合計 (revenue_amount) | 売上に貢献したアカウント数 |\n|-----------|---------------------------|----------------------------|\n| standard  | 34,946,700                | 14                         |\n| free      | 9,088,600                 | 4                          |\n| light     | 5,466,600                 | 2                          |\n\n### 主なポイント\n\n1. **最も売上が大きいプランは「standard」**  \n   - 全体売上の約 68%（34,946,700 / (34,946,700+9,088,600+5,466,600) ≈ 0.68）を占めています。  \n   - 14 アカウントが売上に寄与しており、プラン全体の約 70%（14 / (14+4+2) ≈ 0.70）を占めています。\n\n2. **「free」プランは売上が2位**  \n   - 売上は約 9,088,600 で、全体の約 18% を占めます。  \n   - 4 アカウントが貢献していますが、1 アカウントあたりの平均売上は **2,272,150** です。\n\n3. **「light」プランは最も小規模**  \n   - 売上は約 5,466,600、全体の約 11% に相当します。  \n   - 2 アカウントが貢献しており、1 アカウントあたりの平均売上は **2,733,300** です。\n\n### アカウントあたりの平均売上（プラン別）\n\n| 契約プラン | 平均売上 (revenue_amount / accounts_contributing) |\n|-----------|--------------------------------------------------|\n| standard  | 2,496,193 |\n| free      | 2,272,150 |\n| light     | 2,733,300 |\n\n- 「light」プランは少数のアカウントが高めの平均売上を出していますが、全体規模は小さいため、総売上へのインパクトは限定的です。\n- 「standard」プランはアカウント数・売上ともに圧倒的に大きく、事業全体の収益基盤を支えていることが分かります。\n\n## 次のステップ（追加分析の提案）\n\n1. **売上金額の通貨確認**  \n   - `currency` カラムはクエリで取得していません。複数通貨が混在している場合は、為替レートで統一した上で再集計すると正確です。\n\n2. **期間別の比較**  \n   - 今回は最新スナップショットのみを対象にしています。月次・四半期別に売上推移を見れば、プランごとの成長・減少トレンドが把握できます。\n\n3. **プランアップグレード/ダウングレードの流れ**  \n   - `dim_account` の履歴情報（プラン変更日等）があれば、どのプランからどのプランへ移行したかを追跡し、アップセル/ダウンセルの効果を測定できます。\n\n4. **顧客セグメント別の売上**  \n   - 業種、地域、利用開始日などのディメンションと組み合わせ、プラン別にどのセグメントが高い売上を生んでいるかを分析すると、ターゲティング施策のヒントが得られます。\n\n5. **LTV（顧客生涯価値）との相関**  \n   - 各プランの平均 LTV を算出し、売上だけでなく長期的な価値を比較すると、プラン戦略の最適化につながります。\n\n---\n\n**まとめ**  \n「standard」プランが全体売上の約 2/3 を占め、最も重要な収益源です。一方「free」や「light」プランも一定の売上を生んでおり、特に「light」プランは少数ながら平均単価が高い点が特徴です。上記の追加分析を行うことで、プラン別の売上構造をさらに深掘りし、事業戦略に活かすことができます。",
+  "group": "t2s_desc",
+  "rep": 2,
+  "started_at": "2026-10-29T15:39:23+09:00",
+  "ended_at": "2026-10-29T15:39:45+09:00"
+}

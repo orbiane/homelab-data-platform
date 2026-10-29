@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B3",
+  "question": "クリック率はどのくらい？",
+  "attempts": [
+    {
+      "llm": "```sql\nWITH delivered AS (\n    SELECT COUNT(*) AS delivered_count\n    FROM main_mart.fct_message_event\n    WHERE event_type = 'delivered'\n      AND is_valid_event_type\n),\nclicked AS (\n    SELECT COUNT(*) AS clicked_count\n    FROM main_mart.fct_message_event\n    WHERE is_valid_click\n)\nSELECT \n    clicked.clicked_count,\n    delivered.delivered_count,\n    CASE \n        WHEN delivered.delivered_count = 0 THEN NULL\n        ELSE clicked.clicked_count * 1.0 / delivered.delivered_count\n    END AS ctr\nFROM clicked, delivered;\n```",
+      "query": "WITH delivered AS (\n    SELECT COUNT(*) AS delivered_count\n    FROM main_mart.fct_message_event\n    WHERE event_type = 'delivered'\n      AND is_valid_event_type\n),\nclicked AS (\n    SELECT COUNT(*) AS clicked_count\n    FROM main_mart.fct_message_event\n    WHERE is_valid_click\n)\nSELECT \n    clicked.clicked_count,\n    delivered.delivered_count,\n    CASE \n        WHEN delivered.delivered_count = 0 THEN NULL\n        ELSE clicked.clicked_count * 1.0 / delivered.delivered_count\n    END AS ctr\nFROM clicked, delivered;",
+      "ok": true,
+      "result": "┌───────────────┬─────────────────┬────────────────────┐\n│ clicked_count │ delivered_count │        ctr         │\n│     int64     │      int64      │       double       │\n├───────────────┼─────────────────┼────────────────────┤\n│         13647 │            8428 │ 1.6192453725676317 │\n└───────────────┴─────────────────┴────────────────────┘"
+    }
+  ],
+  "final_answer": "クリック率（CTR）は、クエリの実行結果から次のように計算されています。\n\n- 配信数（delivered_count）: 8,428 件  \n- クリック数（clicked_count）: 13,647 件  \n- クリック率（CTR）: 13,647 ÷ 8,428 ≈ **1.62**（＝162 %）\n\n**結果**  \n> クリック率は約 **1.62（162 %）** です。\n\n※クリック数が配信数を上回っているため、CTR が 100 % を超える（162 %）という結果になっています。通常は配信されたメッセージあたりのクリックは 1 回以下になることが多いので、データの定義や集計条件（例えば同一メッセージに対する複数クリックのカウントや、配信対象外のクリックが含まれていないか）を再確認するとよいでしょう。",
+  "group": "t2s_desc",
+  "rep": 1,
+  "started_at": "2026-10-29T15:30:02+09:00",
+  "ended_at": "2026-10-29T15:30:16+09:00"
+}

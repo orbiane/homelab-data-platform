@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B3",
+  "question": "クリック率はどのくらい？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    ROUND(\n        100.0 *\n        SUM(CASE WHEN is_valid_click THEN 1 ELSE 0 END) /\n        NULLIF(SUM(CASE WHEN is_valid_event_type THEN 1 ELSE 0 END), 0),\n        2\n    ) AS click_rate_percent\nFROM main_mart.fct_message_event;\n```",
+      "query": "SELECT\n    ROUND(\n        100.0 *\n        SUM(CASE WHEN is_valid_click THEN 1 ELSE 0 END) /\n        NULLIF(SUM(CASE WHEN is_valid_event_type THEN 1 ELSE 0 END), 0),\n        2\n    ) AS click_rate_percent\nFROM main_mart.fct_message_event;",
+      "ok": true,
+      "result": "┌────────────────────┐\n│ click_rate_percent │\n│       double       │\n├────────────────────┤\n│              99.36 │\n└────────────────────┘"
+    }
+  ],
+  "final_answer": "クリック率は **99.36%** です。これは、全ての有効なイベント（is_valid_event_type が TRUE のもの）のうち、有効なクリック（is_valid_click が TRUE のもの）が占める割合を計算した結果です。ほぼすべてのイベントがクリックとしてカウントされている非常に高いクリック率となっています。",
+  "group": "t2s",
+  "rep": 2,
+  "started_at": "2026-10-29T15:35:45+09:00",
+  "ended_at": "2026-10-29T15:35:54+09:00"
+}

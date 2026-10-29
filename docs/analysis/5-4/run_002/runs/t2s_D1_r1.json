@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D1",
+  "question": "開封率は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    ROUND(\n        100.0 *\n        SUM(CASE WHEN event_type = 'open'      AND is_valid_event_type THEN 1 ELSE 0 END)::DOUBLE /\n        NULLIF(SUM(CASE WHEN event_type = 'delivered' AND is_valid_event_type THEN 1 ELSE 0 END), 0),\n        2\n    ) AS open_rate_percent\nFROM main_mart.fct_message_event\nWHERE is_valid_contact_id;\n```",
+      "query": "SELECT\n    ROUND(\n        100.0 *\n        SUM(CASE WHEN event_type = 'open'      AND is_valid_event_type THEN 1 ELSE 0 END)::DOUBLE /\n        NULLIF(SUM(CASE WHEN event_type = 'delivered' AND is_valid_event_type THEN 1 ELSE 0 END), 0),\n        2\n    ) AS open_rate_percent\nFROM main_mart.fct_message_event\nWHERE is_valid_contact_id;",
+      "ok": true,
+      "result": "┌───────────────────┐\n│ open_rate_percent │\n│      double       │\n├───────────────────┤\n│               0.0 │\n└───────────────────┘"
+    }
+  ],
+  "final_answer": "**開封率は 0.0 % です。**\n\nクエリの結果では、配信（`delivered`）されたメッセージに対して「開封」（`open`）された件数が全くなく、  \n\\[\n\\text{開封率} = \\frac{\\text{開封件数}}{\\text{配信件数}} \\times 100 = 0\\%\n\\]\nとなっています。\n\n※配信件数が存在しているにもかかわらず開封が記録されていないため、0 % と算出されています。データの取得タイミングやイベントの記録設定を確認すると、実態が把握しやすくなるかもしれません。",
+  "group": "t2s",
+  "rep": 1,
+  "started_at": "2026-10-29T15:28:11+09:00",
+  "ended_at": "2026-10-29T15:28:23+09:00"
+}

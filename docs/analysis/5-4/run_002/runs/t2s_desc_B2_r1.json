@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B2",
+  "question": "配信数は全部でいくつ？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT COUNT(*) AS delivered_count\nFROM main_mart.fct_message_event\nWHERE event_type = 'delivered'\n  AND is_valid_event_type = TRUE;\n```",
+      "query": "SELECT COUNT(*) AS delivered_count\nFROM main_mart.fct_message_event\nWHERE event_type = 'delivered'\n  AND is_valid_event_type = TRUE;",
+      "ok": true,
+      "result": "┌─────────────────┐\n│ delivered_count │\n│      int64      │\n├─────────────────┤\n│            8428 │\n└─────────────────┘"
+    }
+  ],
+  "final_answer": "配信数は **8,428 件** です。",
+  "group": "t2s_desc",
+  "rep": 1,
+  "started_at": "2026-10-29T15:29:56+09:00",
+  "ended_at": "2026-10-29T15:30:02+09:00"
+}

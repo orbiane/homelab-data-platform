@@ -1,0 +1,18 @@
+{
+  "side": "sl",
+  "id": "A3",
+  "question": "流入経路ごとの登録数は？",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics subscription_count --group-by subscription_event__referrer\n```",
+      "query": "mf query --metrics subscription_count --group-by subscription_event__referrer",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\nsubscription_event__referrer      subscription_count\n------------------------------  --------------------\nofficial_directory                               325\ngoogle_ads                                        65\nposter                                           169\nline_ads                                          87\nevent_booth                                      160\nimport_bulk                                       50\nfacebook_ads                                      62\nline_app_search                                  316\nstore_front                                      145\nmessaging_app                                     66\nbusiness_card                                    141\nsns_share                                         66\nemail_share                                       75\nunknown                                           41\nyahoo_ads                                         86\nreceipt                                          181"
+    }
+  ],
+  "final_answer": "以下は、各流入経路（referrer）ごとの新規登録（subscription）件数です。\n\n| 流入経路 | 登録件数 |\n|---|---|\n| official_directory | 325 |\n| google_ads | 65 |\n| poster | 169 |\n| line_ads | 87 |\n| event_booth | 160 |\n| import_bulk | 50 |\n| facebook_ads | 62 |\n| line_app_search | 316 |\n| store_front | 145 |\n| messaging_app | 66 |\n| business_card | 141 |\n| sns_share | 66 |\n| email_share | 75 |\n| unknown | 41 |\n| yahoo_ads | 86 |\n| receipt | 181 |\n\n### 主なポイント\n\n1. **最も多くの登録を獲得している流入経路**  \n   - `official_directory` が 325 件でトップ。  \n   - 次いで `line_app_search` が 316 件、`receipt` が 181 件、`event_booth` が 160 件です。\n\n2. **広告系チャネルのパフォーマンス**  \n   - Google Ads（65件）や Facebook Ads（62件）、Yahoo Ads（86件）は、全体の中では中規模な成果です。  \n   - LINE Ads（87件）はやや高めの成果となっています。\n\n3. **オフライン・リアルイベント系**  \n   - `poster`（169件）や `event_booth`（160件）、`business_card`（141件）は、オフラインでのプロモーションが効果的であることを示しています。\n\n4. **SNS・シェア系**  \n   - `sns_share`（66件）と `email_share`（75件）は、ユーザーによるシェアが一定の登録につながっています。\n\n5. **不明（unknown）**  \n   - `unknown` が 41 件あります。流入元が取得できていないケースがあるため、トラッキング設定の見直しを検討すると良いでしょう。\n\n### 合計登録件数\n\n全チャネルの合計は **2,017 件** です。\n\n---\n\n**まとめ**  \n- 「公式ディレクトリ」と「LINE アプリ検索」が最も効果的な流入経路です。これらのチャネルへの投資や最適化を強化すると、さらに登録数増加が見込めます。  \n- オフラインプロモーション（ポスター、ブース、名刺配布）も一定の成果を上げているため、オンライン施策と組み合わせたハイブリッド戦略が有効です。  \n- 広告系は中規模の成果なので、クリエイティブ改善やターゲティング精度向上で更なる伸びが期待できます。  \n- `unknown` の流入元が残っている点は、トラッキングの精度向上の余地があります。\n\n以上が、流入経路ごとの登録数とその分析結果です。ご参考になれば幸いです。",
+  "group": "sl",
+  "rep": 2,
+  "started_at": "2026-10-29T15:41:25+09:00",
+  "ended_at": "2026-10-29T15:41:40+09:00"
+}

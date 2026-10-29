@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "A3",
+  "question": "流入経路ごとの登録数は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    route,\n    COUNT(*) AS subscription_count\nFROM\n    main_mart.fct_subscription\nGROUP BY\n    route\nORDER BY\n    subscription_count DESC;\n```",
+      "query": "SELECT\n    route,\n    COUNT(*) AS subscription_count\nFROM\n    main_mart.fct_subscription\nGROUP BY\n    route\nORDER BY\n    subscription_count DESC;",
+      "ok": true,
+      "result": "┌────────────┬────────────────────┐\n│   route    │ subscription_count │\n│  varchar   │       int64        │\n├────────────┼────────────────────┤\n│ qr_code    │                796 │\n│ search     │                641 │\n│ ad         │                300 │\n│ link_share │                207 │\n│ other      │                 91 │\n└────────────┴────────────────────┘"
+    }
+  ],
+  "final_answer": "以下は、流入経路（`route`）ごとの登録数（`subscription_count`）です。\n\n| 流入経路 | 登録数 |\n|----------|--------|\n| **qr_code** | 796 |\n| **search**  | 641 |\n| **ad**      | 300 |\n| **link_share** | 207 |\n| **other**   | 91 |\n\n### 考察\n- **QRコード経由が最も多く、全体の約35%（796件）** を占めています。QRコードを活用したキャンペーンやオフラインでの配布が効果的であることが伺えます。  \n- 次いで **検索（search）からの流入が641件** と多く、SEOや自然検索からの訪問者も重要な獲得チャネルです。  \n- **広告（ad）からの登録は300件** と、広告投資のリターンも一定程度期待できますが、QRコードや検索に比べるとやや劣ります。  \n- **リンクシェア（link_share）とその他（other）** はそれぞれ207件、91件で、全体に占める割合は低めです。シェア促進施策や「その他」経路の詳細分析を行うことで、さらなる改善余地が見込めます。\n\n### 推奨アクション\n1. **QRコード施策の拡大**  \n   - オフラインイベントや店舗、プロモーション資料にQRコードを増設し、トラッキングを強化する。  \n\n2. **検索エンジン最適化（SEO）**  \n   - キーワード調査とコンテンツ強化により、検索からの流入をさらに増やす。  \n\n3. **広告効果の検証**  \n   - どの広告媒体・クリエイティブが最も効果的かA/Bテストを実施し、投資対効果（ROI）を最適化する。  \n\n4. **リンクシェア促進**  \n   - SNSやメールマガジンでのシェアボタン設置、インセンティブ（紹介特典）を提供し、シェアからの登録を促す。  \n\n5. **「その他」経路の詳細分析**  \n   - ログやヒートマップ等で「その他」経路の具体的な流入元を特定し、潜在的なチャネルを開拓する。\n\n以上の結果と考察をご参考に、流入経路別の施策強化をご検討ください。",
+  "group": "t2s_desc",
+  "rep": 2,
+  "started_at": "2026-10-29T15:38:04+09:00",
+  "ended_at": "2026-10-29T15:38:18+09:00"
+}

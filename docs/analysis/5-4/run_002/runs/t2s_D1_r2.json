@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D1",
+  "question": "開封率は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    100.0 * SUM(CASE WHEN event_type = 'open' THEN 1 ELSE 0 END) \n          / NULLIF(COUNT(*), 0) AS open_rate_percentage\nFROM main_mart.fct_message_event\nWHERE is_valid_event_type;\n```",
+      "query": "SELECT\n    100.0 * SUM(CASE WHEN event_type = 'open' THEN 1 ELSE 0 END) \n          / NULLIF(COUNT(*), 0) AS open_rate_percentage\nFROM main_mart.fct_message_event\nWHERE is_valid_event_type;",
+      "ok": true,
+      "result": "┌──────────────────────┐\n│ open_rate_percentage │\n│        double        │\n├──────────────────────┤\n│                  0.0 │\n└──────────────────────┘"
+    }
+  ],
+  "final_answer": "**開封率（Open Rate）**は **0.0 %** です。\n\nクエリの結果では、`event_type = 'open'` の件数が全体のイベント数に対して 0 件であったため、開封率は 0% と算出されています。  \n※ `is_valid_event_type` が true のレコードのみを対象にしている点も考慮してください。もし実際には開封イベントが存在すべき場合は、データの取り込みや `event_type` の記録方法を再確認する必要があります。",
+  "group": "t2s",
+  "rep": 2,
+  "started_at": "2026-10-29T15:36:57+09:00",
+  "ended_at": "2026-10-29T15:37:06+09:00"
+}

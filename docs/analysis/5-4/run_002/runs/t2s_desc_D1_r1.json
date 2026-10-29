@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D1",
+  "question": "開封率は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(CASE WHEN event_type = 'open'   AND is_valid_event_type THEN 1 ELSE 0 END)::DOUBLE\n    /\n    NULLIF(SUM(CASE WHEN event_type = 'delivered' AND is_valid_event_type THEN 1 ELSE 0 END), 0)\n    AS open_rate\nFROM main_mart.fct_message_event;\n```",
+      "query": "SELECT\n    SUM(CASE WHEN event_type = 'open'   AND is_valid_event_type THEN 1 ELSE 0 END)::DOUBLE\n    /\n    NULLIF(SUM(CASE WHEN event_type = 'delivered' AND is_valid_event_type THEN 1 ELSE 0 END), 0)\n    AS open_rate\nFROM main_mart.fct_message_event;",
+      "ok": true,
+      "result": "┌───────────┐\n│ open_rate │\n│  double   │\n├───────────┤\n│       0.0 │\n└───────────┘"
+    }
+  ],
+  "final_answer": "**開封率（Open Rate）**は **0.0**（＝0 %）です。\n\n### 考えられる原因\n1. **開封イベントが記録されていない**  \n   `event_type = 'open'` かつ `is_valid_event_type = TRUE` のレコードが 0 件です。\n\n2. **配信イベントが存在しない**（または `is_valid_event_type = FALSE` が多い）  \n   配信数が 0 だった場合は `NULLIF` により除算が回避されますが、今回の結果は `0.0` なので配信はあるが開封が全くない状態です。\n\n3. **データ取得範囲やフィルタ条件の問題**  \n   - 期間やキャンペーンで絞り込みを行っていないか  \n   - `is_valid_event_type` が期待通りに設定されているか（例: データロード時にフラグが誤って `FALSE` になっている）\n\n### 次のアクション\n| 項目 | 確認・対策 |\n|------|------------|\n| **開封イベントの有無** | `SELECT COUNT(*) FROM main_mart.fct_message_event WHERE event_type='open' AND is_valid_event_type;` で件数を確認 |\n| **配信イベントの件数** | 同様に `event_type='delivered'` の件数を確認 |\n| **期間・キャンペーンフィルタ** | 必要に応じて `WHERE event_date BETWEEN '2026-10-01' AND '2026-10-29'` などで絞り込み |\n| **フラグ設定の検証** | `is_valid_event_type` の定義・生成ロジックをレビュー |\n| **データ更新の有無** | 最近のバッチや ETL が正しく走っているか確認 |\n\n### まとめ\n現在の集計結果からは、対象データ内で「開封」されたメールが全くない（もしくは有効な開封イベントがカウントされていない）ため、開封率は **0 %** となっています。上記の確認項目を順にチェックし、データ取得条件やフラグ設定に問題がないか検証すると、原因が特定できるはずです。必要に応じて、期間やキャンペーン別に再集計することで、より詳細な開封率の把握が可能です。",
+  "group": "t2s_desc",
+  "rep": 1,
+  "started_at": "2026-10-29T15:31:19+09:00",
+  "ended_at": "2026-10-29T15:31:35+09:00"
+}

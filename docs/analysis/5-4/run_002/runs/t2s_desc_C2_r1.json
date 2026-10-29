@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C2",
+  "question": "契約プラン別に売上を比べたい",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    da.plan_type,\n    SUM(fr.revenue_amount) AS revenue_amount\nFROM\n    main_mart.dim_account AS da\nJOIN\n    main_mart.fct_revenue AS fr\n    ON da.account_id = fr.account_id\nWHERE\n    fr.is_latest_snapshot = TRUE\nGROUP BY\n    da.plan_type\nORDER BY\n    revenue_amount DESC;\n```",
+      "query": "SELECT\n    da.plan_type,\n    SUM(fr.revenue_amount) AS revenue_amount\nFROM\n    main_mart.dim_account AS da\nJOIN\n    main_mart.fct_revenue AS fr\n    ON da.account_id = fr.account_id\nWHERE\n    fr.is_latest_snapshot = TRUE\nGROUP BY\n    da.plan_type\nORDER BY\n    revenue_amount DESC;",
+      "ok": true,
+      "result": "┌───────────┬────────────────┐\n│ plan_type │ revenue_amount │\n│  varchar  │     int128     │\n├───────────┼────────────────┤\n│ standard  │       34946700 │\n│ free      │        9088600 │\n│ light     │        5466600 │\n└───────────┴────────────────┘"
+    }
+  ],
+  "final_answer": "以下は「契約プラン（plan_type）別」の売上合計です。\n\n| 契約プラン | 売上金額 (JPY) | 売上比率 |\n|-----------|---------------|----------|\n| standard  | 34,946,700    | 約 70.6 % |\n| free      | 9,088,600     | 約 18.4 % |\n| light     | 5,466,600     | 約 11.0 % |\n\n**分析ポイント**\n\n1. **標準プラン（standard）が圧倒的に売上を牽引**  \n   - 全体の約7割を占めています。顧客単価が高い、もしくは契約件数が多いことが考えられます。\n\n2. **無料プラン（free）でもかなりの売上**  \n   - 無料プランでありながら全体の約18 %を占めている点は注目に値します。  \n   - 無料プラン利用者のうち、一部が有料オプションや追加機能を購入している可能性があります。\n\n3. **ライトプラン（light）は比較的低いシェア**  \n   - 全体の約11 %で、標準プランに比べて売上が少ないですが、成長余地があると考えられます。\n\n**次のアクション例**\n\n| アクション | 目的・期待効果 |\n|------------|----------------|\n| 標準プランの顧客維持施策強化 | 高シェアを維持し、解約率低減。アップセルやクロスセルの機会を拡大。 |\n| 無料プランから有料プランへの転換率分析 | 無料ユーザーの有料化促進施策（トライアル期間延長、機能制限緩和など）を検討。 |\n| ライトプランのマーケティング強化 | ターゲット層を再定義し、プランの価値訴求を改善。価格や機能の見直しでシェア拡大を狙う。 |\n| プラン別の顧客単価（ARPU）算出 | 各プランの収益効率を把握し、リソース配分の最適化に活用。 |\n\n**まとめ**\n\n- 現時点では「standard」プランが売上の大部分を占めており、事業の柱として重要です。\n- 「free」プランでも意外に高い売上があるため、無料ユーザーの有料化施策を検討するとさらなる売上増が期待できます。\n- 「light」プランはシェアが小さいものの、適切なプロモーションやプラン改定で成長余地があります。\n\n以上を踏まえて、プラン別の売上構造を意識した施策を検討してください。",
+  "group": "t2s_desc",
+  "rep": 1,
+  "started_at": "2026-10-29T15:30:49+09:00",
+  "ended_at": "2026-10-29T15:31:06+09:00"
+}

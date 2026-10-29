@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D6",
+  "question": "今月の売上は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS revenue_amount_this_month\nFROM\n    main_mart.fct_revenue\nWHERE\n    revenue_month = DATE_TRUNC('month', CURRENT_DATE)::DATE\n    AND is_latest_snapshot = TRUE;\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS revenue_amount_this_month\nFROM\n    main_mart.fct_revenue\nWHERE\n    revenue_month = DATE_TRUNC('month', CURRENT_DATE)::DATE\n    AND is_latest_snapshot = TRUE;",
+      "ok": true,
+      "result": "┌───────────────────────────┐\n│ revenue_amount_this_month │\n│          int128           │\n├───────────────────────────┤\n│                      NULL │\n└───────────────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「今月の売上」について、実行したクエリの結果は以下の通りです。\n\n```\nrevenue_amount_this_month\n-------------------------\nNULL\n```\n\n**考えられる原因**\n\n| 原因 | 説明 |\n|------|------|\n| 今月分のデータがまだロードされていない | `revenue_month` が当月（2026‑10‑01 〜 2026‑10‑31）に該当するレコードが `fct_revenue` テーブルに存在しない可能性があります。月次バッチがまだ実行されていない、あるいはデータ取得のタイミングが遅れていることが考えられます。 |\n| `is_latest_snapshot` が FALSE のレコードしかない | クエリでは `is_latest_snapshot = TRUE` を条件にしています。最新スナップショットがまだマークされていない、またはスナップショット生成プロセスでフラグが正しく設定されていない場合、対象外となります。 |\n| データ品質の問題 | 売上金額 (`revenue_amount`) が NULL である行だけが存在する、もしくは `SUM` の対象が全て NULL になるケースです。 |\n\n**次に取るべきアクション**\n\n1. **データの有無を確認**  \n   ```sql\n   SELECT COUNT(*) AS cnt,\n          COUNT(revenue_amount) AS non_null_cnt\n   FROM main_mart.fct_revenue\n   WHERE revenue_month = DATE_TRUNC('month', CURRENT_DATE)::DATE;\n   ```\n   これで当月分のレコード数と、金額が入っているレコード数を把握できます。\n\n2. **スナップショットフラグの確認**  \n   ```sql\n   SELECT DISTINCT is_latest_snapshot\n   FROM main_mart.fct_revenue\n   WHERE revenue_month = DATE_TRUNC('month', CURRENT_DATE)::DATE;\n   ```\n   `TRUE` が出てこない場合、最新スナップショットが作成されていないことが分かります。\n\n3. **ETL バッチの実行状況をチェック**  \n   - 当月の売上データをロードするバッチジョブが正常に完了しているか\n   - ジョブのスケジュールが月初や月末に設定されているか\n\n4. **暫定的にフラグを外す（テスト目的）**  \n   ```sql\n   SELECT SUM(revenue_amount) AS revenue_amount_this_month\n   FROM main_mart.fct_revenue\n   WHERE revenue_month = DATE_TRUNC('month', CURRENT_DATE)::DATE;\n   ```\n   これで `is_latest_snapshot` 条件を除外し、データが存在すれば金額が取得できます。\n\n**結論**\n\n現在のクエリ結果が `NULL` であることは、**「今月の売上データがテーブルに存在しない」**、もしくは **「最新スナップショットがマークされていない」** ことを示しています。上記の確認手順を実施し、データの有無・ETL の進捗を確認したうえで、必要に応じてデータロードやスナップショット設定を修正してください。データが正しく投入されれば、再度同じクエリを実行することで今月の売上金額が取得できます。",
+  "group": "t2s_desc",
+  "rep": 3,
+  "started_at": "2026-10-29T15:49:57+09:00",
+  "ended_at": "2026-10-29T15:50:17+09:00"
+}

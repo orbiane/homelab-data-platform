@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C3",
+  "question": "4月の確定した売上（円）はいくら？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT \n    SUM(revenue_amount) AS total_finalized_revenue_yen\nFROM \n    main_mart.fct_revenue\nWHERE \n    is_finalized = TRUE\n    AND EXTRACT(MONTH FROM revenue_month) = 4\n    -- Optional: restrict to Japanese yen if multiple currencies exist\n    AND (currency = 'JPY' OR currency = '円');\n```",
+      "query": "SELECT \n    SUM(revenue_amount) AS total_finalized_revenue_yen\nFROM \n    main_mart.fct_revenue\nWHERE \n    is_finalized = TRUE\n    AND EXTRACT(MONTH FROM revenue_month) = 4\n    -- Optional: restrict to Japanese yen if multiple currencies exist\n    AND (currency = 'JPY' OR currency = '円');",
+      "ok": true,
+      "result": "┌─────────────────────────────┐\n│ total_finalized_revenue_yen │\n│           int128            │\n├─────────────────────────────┤\n│                        NULL │\n└─────────────────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「4月の確定した売上（円）」について、実行したクエリの結果は以下の通りです。\n\n```\ntotal_finalized_revenue_yen\n---------------------------\nNULL\n```\n\n`SUM` 関数は対象となる行が 1 件も存在しない場合に `NULL` を返します。したがって、現在の **main_mart.fct_revenue** テーブルには、次の条件をすべて満たすレコードがありません。\n\n- `is_finalized = TRUE`（確定済み）\n- `revenue_month` が 4 月（`EXTRACT(MONTH FROM revenue_month) = 4`）\n- 通貨が日本円（`currency = 'JPY'` または `currency = '円'`）\n\nこの結果から、**4 月の確定した売上（円）は 0 円** と考えてよいでしょう。\n\n※ もし売上データが存在すると期待している場合は、以下の点をご確認ください。\n\n1. **データの投入タイミング**  \n   4 月分の売上がまだロードされていない可能性があります。\n\n2. **フラグの設定**  \n   `is_finalized` が `TRUE` になっていない（未確定扱い）レコードがあるかもしれません。\n\n3. **通貨コード**  \n   `currency` カラムの値が `'JPY'` や `'円'` 以外（例: `'JPY '` のように余白が入っている）で保存されている可能性があります。  \n   必要に応じて `TRIM(currency) = 'JPY'` などで確認してください。\n\n4. **日付形式**  \n   `revenue_month` が日付型ではなく文字列や整数型で保存されている場合、`EXTRACT(MONTH …)` が正しく抽出できていない可能性があります。  \n\n上記を確認したうえで、再度クエリを実行いただくと、正しい売上金額が取得できるはずです。ご不明点があれば、データのスキーマやサンプル行をご提示いただければ、さらに具体的なチェックポイントをご案内いたします。",
+  "group": "t2s",
+  "rep": 3,
+  "started_at": "2026-10-29T15:45:50+09:00",
+  "ended_at": "2026-10-29T15:46:05+09:00"
+}

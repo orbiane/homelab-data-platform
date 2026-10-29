@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C1",
+  "question": "売上の合計はいくら？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS total_revenue\nFROM main_mart.fct_revenue\nWHERE is_latest_snapshot = TRUE;\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS total_revenue\nFROM main_mart.fct_revenue\nWHERE is_latest_snapshot = TRUE;",
+      "ok": true,
+      "result": "┌───────────────┐\n│ total_revenue │\n│    int128     │\n├───────────────┤\n│      49621900 │\n└───────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「売上の合計」は、クエリの実行結果から以下の通りです。\n\n**売上合計：49,621,900**（単位はテーブル `fct_revenue` の `revenue_amount` カラムに設定されている通貨単位です）\n\nこの金額は、最新のスナップショット（`is_latest_snapshot = TRUE`）に含まれる全レコードの `revenue_amount` を合計したものです。",
+  "group": "t2s_desc",
+  "rep": 2,
+  "started_at": "2026-10-29T15:39:17+09:00",
+  "ended_at": "2026-10-29T15:39:23+09:00"
+}

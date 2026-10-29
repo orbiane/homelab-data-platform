@@ -1,0 +1,18 @@
+{
+  "side": "sl",
+  "id": "D5",
+  "question": "売上の最初の見積もりと確定値は、どれくらい違った？",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics revenue_amount --group-by revenue_record__currency,revenue_record__is_finalized\n```",
+      "query": "mf query --metrics revenue_amount --group-by revenue_record__currency,revenue_record__is_finalized",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\nrevenue_record__currency    revenue_record__is_finalized      revenue_amount\n--------------------------  ------------------------------  ----------------\nJPY                         True                                    37481600\nUSD                         False                                     851000\nJPY                         False                                    7958500\nUSD                         True                                     3330800"
+    }
+  ],
+  "final_answer": "**売上の最初の見積もり（確定前）と確定値（確定後）の差は、通貨別・全体で次のとおりです。**\n\n| 通貨 | 確定額 | 見積もり額（未確定） | 差額（確定額‑見積もり） | 増加率（%） |\n|------|--------|-------------------|------------------------|------------|\n| JPY | 37,481,600 | 7,958,500 | **29,523,100** | **約 371 %** |\n| USD | 3,330,800 |   851,000 | **2,479,800**  | **約 291 %** |\n| **合計** | **40,812,400** | **8,809,500** | **32,002,900** | **約 363 %** |\n\n### 考察\n- **日本円 (JPY)** の売上は、最初の見積もりから約 3.7 倍に増加しています。  \n- **米ドル (USD)** の売上も、約 2.9 倍に伸びました。  \n- 全体としては、見積もり額に対して約 **3.6 倍**（363 %）の増加となり、**約 3.2 億円（USD 約 2,480,000）** の差が生じています。\n\nこの結果から、最初の見積もりと比べて最終的に確定した売上は大幅に上回っていることが分かります。必要に応じて、見積もりプロセスや予測精度の改善を検討するとよいでしょう。",
+  "group": "sl",
+  "rep": 3,
+  "started_at": "2026-10-29T15:53:22+09:00",
+  "ended_at": "2026-10-29T15:53:44+09:00"
+}

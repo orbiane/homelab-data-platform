@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "A3",
+  "question": "流入経路ごとの登録数は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    COALESCE(referrer, 'Unknown') AS referrer,\n    COUNT(*) AS subscription_count\nFROM main_mart.fct_subscription\nGROUP BY referrer\nORDER BY subscription_count DESC;\n```",
+      "query": "SELECT\n    COALESCE(referrer, 'Unknown') AS referrer,\n    COUNT(*) AS subscription_count\nFROM main_mart.fct_subscription\nGROUP BY referrer\nORDER BY subscription_count DESC;",
+      "ok": true,
+      "result": "┌────────────────────┬────────────────────┐\n│      referrer      │ subscription_count │\n│      varchar       │       int64        │\n├────────────────────┼────────────────────┤\n│ official_directory │                325 │\n│ line_app_search    │                316 │\n│ receipt            │                181 │\n│ poster             │                169 │\n│ event_booth        │                160 │\n│ store_front        │                145 │\n│ business_card      │                141 │\n│ line_ads           │                 87 │\n│ yahoo_ads          │                 86 │\n│ email_share        │                 75 │\n│ sns_share          │                 66 │\n│ messaging_app      │                 66 │\n│ google_ads         │                 65 │\n│ facebook_ads       │                 62 │\n│ import_bulk        │                 50 │\n│ unknown            │                 41 │\n└────────────────────┴────────────────────┘\n  16 rows                       2 columns"
+    }
+  ],
+  "final_answer": "**流入経路別の登録数（2026‑10‑29 時点）**\n\n| 流入経路 (referrer) | 登録数 (件) | 全体に対する比率 |\n|-------------------|-----------|----------------|\n| official_directory | 325 | 15.97 % |\n| line_app_search     | 316 | 15.53 % |\n| receipt             | 181 | 8.89 % |\n| poster              | 169 | 8.30 % |\n| event_booth         | 160 | 7.86 % |\n| store_front         | 145 | 7.13 % |\n| business_card       | 141 | 6.93 % |\n| line_ads            | 87  | 4.27 % |\n| yahoo_ads           | 86  | 4.23 % |\n| email_share         | 75  | 3.68 % |\n| sns_share           | 66  | 3.25 % |\n| messaging_app       | 66  | 3.25 % |\n| google_ads          | 65  | 3.19 % |\n| facebook_ads        | 62  | 3.05 % |\n| import_bulk         | 50  | 2.46 % |\n| unknown（不明）    | 41  | 2.02 % |\n| **合計**            | **2,035** | **100 %** |\n\n### 主なポイント\n\n1. **上位2経路が全体の約31.5 %**  \n   - `official_directory` と `line_app_search` がそれぞれ約16 %ずつを占め、合計で登録の約3分の1を生み出しています。これらのチャネルは引き続き重点的に最適化すべきです。\n\n2. **オフライン・イベント系の効果が大きい**  \n   - `receipt`（領収書）、`poster`（ポスター）、`event_booth`（イベントブース）といったオフライン施策でも、合わせて約24 %の登録が発生しています。オンラインだけでなく、実店舗やイベントでの露出も重要です。\n\n3. **広告系は全体の約15 %**  \n   - `line_ads`、`yahoo_ads`、`google_ads`、`facebook_ads` の4つで約14.5 %の登録。広告予算の配分やクリエイティブの改善余地があります。\n\n4. **不明（unknown）** が2 %程度。  \n   - データ取得の際にリファラ情報が取得できていないケースが散見されます。計測タグやUTMパラメータの見直しで、さらなる可視化が期待できます。\n\n### 今後のアクション提案\n\n| アクション | 理由・期待効果 |\n|-----------|----------------|\n| **① official_directory と line_app_search の施策強化** | 登録数が最も多く、改善余地が大きい。A/Bテストやコンテンツ最適化で更なる増加が期待できる。 |\n| **② オフライン施策のデジタル連携** | `receipt`・`poster`・`event_booth` が高い効果を示す。QRコードや専用キャンペーンURLでオンラインへの誘導を強化。 |\n| **③ 広告チャネルのROI分析** | 広告系の登録比率は約15 %。クリック単価やコンバージョン率を細かく測定し、費用対効果の高い媒体へシフト。 |\n| **④ 計測精度向上** | `unknown` が残ると正確なチャネル評価が困難になる。UTMパラメータの標準化、タグマネージャーの導入で取得漏れを削減。 |\n| **⑤ クロスチャネルレポートの構築** | オンラインとオフラインの流入経路を統合し、顧客ジャーニー全体を可視化。施策間の相乗効果を測定できる。 |\n\n---\n\n**まとめ**  \n全体で2,035件の新規登録があり、上位2つの流入経路だけで約31 %を占めています。オフライン施策や広告も一定の貢献をしており、全チャネルを横断的に最適化すれば、さらに登録数の伸長が見込めます。まずは最も効果の高い `official_directory` と `line_app_search` に注力しつつ、計測精度向上とオフライン施策のデジタル化を同時に進めることをおすすめします。",
+  "group": "t2s_desc",
+  "rep": 1,
+  "started_at": "2026-10-29T15:29:30+09:00",
+  "ended_at": "2026-10-29T15:29:56+09:00"
+}

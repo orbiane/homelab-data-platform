@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B5",
+  "question": "2月の確定した売上（円）はいくら？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    COALESCE(SUM(revenue_amount), 0) AS feb_finalized_revenue_yen\nFROM main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND currency = 'JPY'\n    AND EXTRACT(YEAR FROM revenue_month) = 2026\n    AND EXTRACT(MONTH FROM revenue_month) = 2;\n```",
+      "query": "SELECT\n    COALESCE(SUM(revenue_amount), 0) AS feb_finalized_revenue_yen\nFROM main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND currency = 'JPY'\n    AND EXTRACT(YEAR FROM revenue_month) = 2026\n    AND EXTRACT(MONTH FROM revenue_month) = 2;",
+      "ok": true,
+      "result": "┌───────────────────────────┐\n│ feb_finalized_revenue_yen │\n│          int128           │\n├───────────────────────────┤\n│                  10448341 │\n└───────────────────────────┘"
+    }
+  ],
+  "final_answer": "2026年2月に確定した売上（日本円）は **10,448,341円** です。",
+  "group": "t2s",
+  "rep": 3,
+  "started_at": "2026-10-29T15:45:18+09:00",
+  "ended_at": "2026-10-29T15:45:26+09:00"
+}

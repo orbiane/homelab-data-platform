@@ -1,0 +1,118 @@
+# 確定値の写し 45 個を answer_queries.sql の出力と照合: OK / referrer 16 種
+sl_A1_r1	○	
+sl_A1_r2	○	
+sl_A1_r3	○	
+sl_A3_r1	○	
+sl_A3_r2	○	
+sl_A3_r3	○	
+sl_B2_r1	○	
+sl_B2_r2	○	
+sl_B2_r3	○	
+sl_B3_r1	○	
+sl_B3_r2	×	
+sl_B3_r3	○	
+sl_B4_r1	○	
+sl_B4_r2	○	
+sl_B4_r3	○	
+sl_B5_r1	○	
+sl_B5_r2	×	
+sl_B5_r3	×	
+sl_C1_r1	○	要確認
+sl_C1_r2	○	要確認
+sl_C1_r3	○	要確認
+sl_C2_r1	×	
+sl_C2_r2	○	
+sl_C2_r3	×	
+sl_C3_r1	×	要確認
+sl_C3_r2	×	要確認
+sl_C3_r3	×	要確認
+sl_D1_r1	答えなし	
+sl_D1_r2	答えなし	
+sl_D1_r3	答えなし	
+sl_D2_r1	答えなし	
+sl_D2_r2	答えなし	
+sl_D2_r3	答えなし	
+sl_D5_r1	×	
+sl_D5_r2	×	
+sl_D5_r3	×	
+sl_D6_r1	○	要確認
+sl_D6_r2	答えなし	
+sl_D6_r3	○	要確認
+t2s_A1_r1	×	
+t2s_A1_r2	×	
+t2s_A1_r3	×	
+t2s_A3_r1	×	
+t2s_A3_r2	×	
+t2s_A3_r3	×	
+t2s_B2_r1	○	
+t2s_B2_r2	○	
+t2s_B2_r3	×	
+t2s_B3_r1	×	
+t2s_B3_r2	×	
+t2s_B3_r3	×	
+t2s_B4_r1	×	
+t2s_B4_r2	×	
+t2s_B4_r3	×	
+t2s_B5_r1	×	
+t2s_B5_r2	×	
+t2s_B5_r3	×	
+t2s_C1_r1	×	要確認
+t2s_C1_r2	×	要確認
+t2s_C1_r3	×	要確認
+t2s_C2_r1	×	
+t2s_C2_r2	×	
+t2s_C2_r3	×	
+t2s_C3_r1	×	要確認
+t2s_C3_r2	×	要確認
+t2s_C3_r3	×	要確認
+t2s_D1_r1	×	
+t2s_D1_r2	×	
+t2s_D1_r3	×	
+t2s_D2_r1	×	
+t2s_D2_r2	×	
+t2s_D2_r3	×	
+t2s_D5_r1	×	
+t2s_D5_r2	×	
+t2s_D5_r3	×	
+t2s_D6_r1	○	要確認
+t2s_D6_r2	○	要確認
+t2s_D6_r3	○	要確認
+t2s_desc_A1_r1	×	
+t2s_desc_A1_r2	×	
+t2s_desc_A1_r3	×	
+t2s_desc_A3_r1	○	
+t2s_desc_A3_r2	○	
+t2s_desc_A3_r3	○	
+t2s_desc_B2_r1	○	
+t2s_desc_B2_r2	○	
+t2s_desc_B2_r3	○	
+t2s_desc_B3_r1	×	
+t2s_desc_B3_r2	×	
+t2s_desc_B3_r3	×	
+t2s_desc_B4_r1	×	
+t2s_desc_B4_r2	×	
+t2s_desc_B4_r3	×	
+t2s_desc_B5_r1	○	
+t2s_desc_B5_r2	○	
+t2s_desc_B5_r3	○	
+t2s_desc_C1_r1	×	要確認
+t2s_desc_C1_r2	×	要確認
+t2s_desc_C1_r3	×	要確認
+t2s_desc_C2_r1	×	
+t2s_desc_C2_r2	×	
+t2s_desc_C2_r3	×	
+t2s_desc_C3_r1	×	要確認
+t2s_desc_C3_r2	×	要確認
+t2s_desc_C3_r3	×	要確認
+t2s_desc_D1_r1	×	
+t2s_desc_D1_r2	×	
+t2s_desc_D1_r3	×	
+t2s_desc_D2_r1	○	
+t2s_desc_D2_r2	○	
+t2s_desc_D2_r3	○	
+t2s_desc_D5_r1	×	
+t2s_desc_D5_r2	×	
+t2s_desc_D5_r3	×	
+t2s_desc_D6_r1	○	要確認
+t2s_desc_D6_r2	○	要確認
+t2s_desc_D6_r3	○	要確認

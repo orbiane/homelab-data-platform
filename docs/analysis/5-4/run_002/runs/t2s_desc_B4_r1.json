@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B4",
+  "question": "業種ごとの配信数",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    da.industry,\n    COUNT(*) AS delivered_count\nFROM main_mart.fct_message_event AS me\nJOIN main_mart.dim_account AS da\n    ON me.account_id = da.account_id\nWHERE\n    me.event_type = 'delivered'\n    AND me.is_valid_event_type\nGROUP BY\n    da.industry\nORDER BY\n    delivered_count DESC;\n```",
+      "query": "SELECT\n    da.industry,\n    COUNT(*) AS delivered_count\nFROM main_mart.fct_message_event AS me\nJOIN main_mart.dim_account AS da\n    ON me.account_id = da.account_id\nWHERE\n    me.event_type = 'delivered'\n    AND me.is_valid_event_type\nGROUP BY\n    da.industry\nORDER BY\n    delivered_count DESC;",
+      "ok": true,
+      "result": "┌───────────────────┬─────────────────┐\n│     industry      │ delivered_count │\n│      varchar      │      int64      │\n├───────────────────┼─────────────────┤\n│ NULL              │            2446 │\n│ entertainment     │            1481 │\n│ healthcare        │            1463 │\n│ real_estate       │             867 │\n│ education         │             745 │\n│ food_and_beverage │             588 │\n│ retail            │             492 │\n│ beauty            │             227 │\n└───────────────────┴─────────────────┘"
+    }
+  ],
+  "final_answer": "以下は、配信（`event_type = 'delivered'`）が記録されたメッセージの件数を業種（industry）別に集計した結果です。\n\n| 業種                | 配信数 |\n|-------------------|------|\n| **NULL**（業種未設定） | 2,446 |\n| entertainment     | 1,481 |\n| healthcare        | 1,463 |\n| real_estate       |   867 |\n| education         |   745 |\n| food_and_beverage |   588 |\n| retail            |   492 |\n| beauty            |   227 |\n\n### ポイント\n\n1. **業種未設定が最も多い**  \n   - `industry` が NULL のレコードが 2,446 件で、全体の約 30% を占めています。業種情報が欠損しているアカウントが多いため、データクレンジングや業種属性の付与が必要です。\n\n2. **上位3業種**  \n   - `entertainment`（エンターテインメント）と `healthcare`（ヘルスケア）がそれぞれ約 1,500 件ずつで、続いて `real_estate`（不動産）が 867 件です。これらの業種は配信対象として重要度が高いと考えられます。\n\n3. **配信数が少ない業種**  \n   - `beauty`（美容）は 227 件と最も少なく、他の業種に比べて配信機会が限られています。もし美容関連の顧客拡大を狙う場合は、ターゲティング施策の見直しやデータ取得の強化が必要です。\n\n### 今後のアクション例\n\n- **業種情報の補完**  \n  - NULL のアカウントに対し、外部データソースやアンケート等で業種情報を取得し、分析の精度を上げる。\n\n- **上位業種への重点施策**  \n  - `entertainment`、`healthcare`、`real_estate` への配信は既に多いが、クリック率やコンバージョン率と併せて効果測定を行い、ROI が高いか確認する。\n\n- **低配信業種の掘り起こし**  \n  - `beauty` や `retail` など配信数が少ない業種に対し、専用のキャンペーンやコンテンツを作成し、配信機会を増やす。\n\n以上が、業種別の配信数に関する現状の集計結果と、考えられる次のステップです。ご不明点や追加で分析したい指標があればお知らせください。",
+  "group": "t2s_desc",
+  "rep": 1,
+  "started_at": "2026-10-29T15:30:16+09:00",
+  "ended_at": "2026-10-29T15:30:31+09:00"
+}

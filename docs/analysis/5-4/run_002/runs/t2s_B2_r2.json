@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B2",
+  "question": "配信数は全部でいくつ？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT COUNT(*) AS total_deliveries\nFROM main_mart.fct_message_event\nWHERE event_type = 'delivered'\n  AND is_valid_event_type;\n```",
+      "query": "SELECT COUNT(*) AS total_deliveries\nFROM main_mart.fct_message_event\nWHERE event_type = 'delivered'\n  AND is_valid_event_type;",
+      "ok": true,
+      "result": "┌──────────────────┐\n│ total_deliveries │\n│      int64       │\n├──────────────────┤\n│             8428 │\n└──────────────────┘"
+    }
+  ],
+  "final_answer": "配信数は全部で **8,428 件** です。これは、`event_type` が `'delivered'` であり、かつ有効なイベントとしてフラグが立っているレコードの総数です。",
+  "group": "t2s",
+  "rep": 2,
+  "started_at": "2026-10-29T15:35:36+09:00",
+  "ended_at": "2026-10-29T15:35:45+09:00"
+}

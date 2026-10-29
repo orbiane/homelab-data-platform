@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C2",
+  "question": "契約プラン別に売上を比べたい",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    a.plan_type,\n    SUM(r.revenue_amount) AS total_revenue\nFROM main_mart.dim_account AS a\nJOIN main_mart.fct_revenue AS r\n    ON a.account_id = r.account_id\nWHERE r.is_latest_snapshot = TRUE\nGROUP BY a.plan_type\nORDER BY total_revenue DESC;\n```",
+      "query": "SELECT\n    a.plan_type,\n    SUM(r.revenue_amount) AS total_revenue\nFROM main_mart.dim_account AS a\nJOIN main_mart.fct_revenue AS r\n    ON a.account_id = r.account_id\nWHERE r.is_latest_snapshot = TRUE\nGROUP BY a.plan_type\nORDER BY total_revenue DESC;",
+      "ok": true,
+      "result": "┌───────────┬───────────────┐\n│ plan_type │ total_revenue │\n│  varchar  │    int128     │\n├───────────┼───────────────┤\n│ standard  │      34946700 │\n│ free      │       9088600 │\n│ light     │       5466600 │\n└───────────┴───────────────┘"
+    }
+  ],
+  "final_answer": "ご要望の「契約プラン別の売上比較」について、クエリの実行結果をもとに以下の通りご報告します。\n\n### 売上（Revenue）集計結果（最新スナップショット）\n\n| 契約プラン (plan_type) | 総売上 (total_revenue) |\n|------------------------|------------------------|\n| **standard**           | 34,946,700 円 |\n| **free**               | 9,088,600 円 |\n| **light**              | 5,466,600 円 |\n\n（単位は `int128` ですが、金額としては円と想定しています）\n\n### 全体に占める比率\n\n全プランの合計売上は **49,501,900 円** です。各プランの売上が全体に占める割合は次の通りです。\n\n| 契約プラン | 売上額 | 全体に対する比率 |\n|------------|--------|-------------------|\n| standard   | 34,946,700 円 | **70.6 %** |\n| free       | 9,088,600 円  | **18.4 %** |\n| light      | 5,466,600 円  | **11.0 %** |\n\n### 考察\n\n1. **standard プランが圧倒的に売上の大半（約 71 %）を占めています**。このプランが主要な収益源であることが分かります。  \n2. **free プランも一定の売上を生み出していますが、標準プランに比べると約 1/4 の規模です**。無料プランから有料（standard）へのアップセル施策が売上拡大の鍵になる可能性があります。  \n3. **light プランは最も小さい売上（約 11 %）です**。このプランの利用者が少ない理由を分析し、価格設定や機能改善を検討すると効果が期待できるでしょう。\n\n### 次のステップ（ご提案）\n\n- **プラン別の顧客数とARPU（1顧客あたりの平均売上）** を合わせて算出し、売上だけでなく顧客ベースの健康度も評価する。  \n- **free → standard のコンバージョン率** を測定し、無料プランから有料プランへの移行施策（キャンペーン、機能解放、メールマーケティング等）の効果測定を行う。  \n- **light プランの利用状況（利用頻度、解約率）** を詳細に分析し、プランの見直しや新しいバリュー提案を検討する。\n\n以上が、契約プラン別の売上比較結果とその簡易分析です。ご不明点や追加で分析したい項目がありましたら、お気軽にお知らせください。",
+  "group": "t2s",
+  "rep": 2,
+  "started_at": "2026-10-29T15:36:24+09:00",
+  "ended_at": "2026-10-29T15:36:40+09:00"
+}

@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D6",
+  "question": "今月の売上は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS total_revenue\nFROM\n    main_mart.fct_revenue\nWHERE\n    DATE_TRUNC('month', revenue_month) = DATE_TRUNC('month', CURRENT_DATE)\n    AND is_latest_snapshot;\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS total_revenue\nFROM\n    main_mart.fct_revenue\nWHERE\n    DATE_TRUNC('month', revenue_month) = DATE_TRUNC('month', CURRENT_DATE)\n    AND is_latest_snapshot;",
+      "ok": true,
+      "result": "┌───────────────┐\n│ total_revenue │\n│    int128     │\n├───────────────┤\n│          NULL │\n└───────────────┘"
+    }
+  ],
+  "final_answer": "**回答：**\n\n現在のクエリ実行結果では、今月の売上（`total_revenue`）が **`NULL`** となっています。  \nこれは、以下のいずれか、あるいは複数が原因で今月分の売上データが取得できていないことを示しています。\n\n| 可能性 | 内容 |\n|---|---|\n| 1. 今月分のデータが未投入 | `main_mart.fct_revenue` テーブルに、`revenue_month` が今月（例：2026‑10‑01 ～ 2026‑10‑31）に該当する行がまだロードされていない。 |\n| 2. `is_latest_snapshot` が `TRUE` でない | 同月のデータが存在していても、最新スナップショットフラグが立っていない行は除外されている。 |\n| 3. `revenue_month` の型・値が期待とずれている | `revenue_month` が日付型でなく文字列やタイムスタンプとして保存されている場合、`DATE_TRUNC('month', revenue_month)` が正しく比較できないことがある。 |\n| 4. テーブルのパーティションやビューの定義で今月が除外されている | たとえば、パーティションが「前月まで」しか保持していないケース。 |\n\n---\n\n### 次のステップ（確認・改善策）\n\n1. **データ有無の簡易確認**  \n   ```sql\n   SELECT COUNT(*) AS cnt,\n          MIN(revenue_month) AS min_month,\n          MAX(revenue_month) AS max_month\n   FROM main_mart.fct_revenue\n   WHERE is_latest_snapshot;\n   ```\n   *これで最新スナップショットの行数と、期間の最小・最大が分かります。*\n\n2. **今月の行だけを確認**（`is_latest_snapshot` を外す）\n   ```sql\n   SELECT *\n   FROM main_mart.fct_revenue\n   WHERE DATE_TRUNC('month', revenue_month) = DATE_TRUNC('month', CURRENT_DATE);\n   ```\n   *結果が返ってくるかで、フラグが原因かどうかが判断できます。*\n\n3. **フラグなしで合計を取得し、NULL を 0 に変換**  \n   ```sql\n   SELECT COALESCE(SUM(revenue_amount), 0) AS total_revenue\n   FROM main_mart.fct_revenue\n   WHERE DATE_TRUNC('month', revenue_month) = DATE_TRUNC('month', CURRENT_DATE);\n   ```\n   *データが無い場合でも「0」と表示でき、レポート上の扱いが楽になります。*\n\n4. **ETL/データパイプラインのチェック**  \n   - 今月の取引データが **いつ** `fct_revenue` にロードされるか（日次、週次、月次など）を確認。  \n   - `is_latest_snapshot` が正しく設定されているか、スケジュール遅延がないかを確認。\n\n5. **日付型の整合性確認**  \n   ```sql\n   SELECT DISTINCT data_type\n   FROM information_schema.columns\n   WHERE table_schema = 'main_mart'\n     AND table_name   = 'fct_revenue'\n     AND column_name  = 'revenue_month';\n   ```\n   *期待通り `DATE` または `TIMESTAMP` になっているかを確認。*\n\n---\n\n### 現時点での結論\n\n- **今月の売上は「データが存在しない」ため、現在のクエリでは `NULL` が返されています。**  \n- 実際に売上が発生しているかどうかは、上記の確認クエリでデータの有無やフラグの状態をチェックする必要があります。  \n\n上記の手順で原因を特定し、必要に応じてデータ投入やクエリ条件の調整（`COALESCE` の使用や `is_latest_snapshot` の見直し）を行ってください。  \n\nご不明点や追加で調査したい項目があれば、お知らせください。",
+  "group": "t2s",
+  "rep": 1,
+  "started_at": "2026-10-29T15:28:59+09:00",
+  "ended_at": "2026-10-29T15:29:20+09:00"
+}

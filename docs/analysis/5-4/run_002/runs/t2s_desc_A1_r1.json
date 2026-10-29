@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "A1",
+  "question": "メッセージの種類ごとのクリック数を出して",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    message_type,\n    COUNT(*) AS clicked_count\nFROM main_mart.fct_message_event\nWHERE is_valid_click = TRUE\n  AND is_valid_event_type = TRUE\nGROUP BY message_type\nORDER BY clicked_count DESC;\n```",
+      "query": "SELECT\n    message_type,\n    COUNT(*) AS clicked_count\nFROM main_mart.fct_message_event\nWHERE is_valid_click = TRUE\n  AND is_valid_event_type = TRUE\nGROUP BY message_type\nORDER BY clicked_count DESC;",
+      "ok": true,
+      "result": "┌──────────────┬───────────────┐\n│ message_type │ clicked_count │\n│   varchar    │     int64     │\n├──────────────┼───────────────┤\n│ imagemap     │          3474 │\n│ video        │          3075 │\n│ text         │          2546 │\n│ image        │          2523 │\n│ flex         │          1948 │\n└──────────────┴───────────────┘"
+    }
+  ],
+  "final_answer": "以下は、メッセージの種類（`message_type`）ごとの有効クリック数（`clicked_count`）です。\n\n| メッセージ種別 | クリック数 |\n|----------------|------------|\n| imagemap       | 3,474 件 |\n| video          | 3,075 件 |\n| text           | 2,546 件 |\n| image          | 2,523 件 |\n| flex           | 1,948 件 |\n\n**ポイント**\n\n- **最もクリックが多いのは `imagemap`** で、3,474 件のクリックが記録されています。  \n- 次いで `video`、`text`、`image`、`flex` の順にクリック数が多く、いずれも2,000 件以上です。  \n- これらはすべて `is_valid_click = TRUE` かつ `is_valid_event_type = TRUE` の条件を満たす有効なクリックイベントです。\n\nこの結果から、インタラクティブな要素を含む `imagemap` がユーザーの関心を最も引いていることが分かります。今後のコンテンツ改善や配信戦略の参考にしてください。",
+  "group": "t2s_desc",
+  "rep": 1,
+  "started_at": "2026-10-29T15:29:20+09:00",
+  "ended_at": "2026-10-29T15:29:30+09:00"
+}

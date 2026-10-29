@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D2",
+  "question": "登録した人は何人？（重複なし）",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT COUNT(DISTINCT contact_id) AS registration_count\nFROM main_mart.fct_subscription\nWHERE contact_id IS NOT NULL;\n```",
+      "query": "SELECT COUNT(DISTINCT contact_id) AS registration_count\nFROM main_mart.fct_subscription\nWHERE contact_id IS NOT NULL;",
+      "ok": true,
+      "result": "┌────────────────────┐\n│ registration_count │\n│       int64        │\n├────────────────────┤\n│               2000 │\n└────────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「登録した人は何人か（重複なし）」について、実行したクエリの結果は以下のとおりです。\n\n**登録者数（重複なし）: 2,000 人**\n\nクエリでは `contact_id` が NULL でないレコードを対象に、`COUNT(DISTINCT contact_id)` で一意の `contact_id` の数をカウントしています。その結果、登録されたユニークなユーザーは **2,000 人** でした。",
+  "group": "t2s_desc",
+  "rep": 2,
+  "started_at": "2026-10-29T15:40:19+09:00",
+  "ended_at": "2026-10-29T15:40:26+09:00"
+}

@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "A3",
+  "question": "流入経路ごとの登録数は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    route,\n    COUNT(*) AS registration_count\nFROM main_mart.fct_subscription\nWHERE is_valid_contact_id\nGROUP BY route\nORDER BY registration_count DESC;\n```",
+      "query": "SELECT\n    route,\n    COUNT(*) AS registration_count\nFROM main_mart.fct_subscription\nWHERE is_valid_contact_id\nGROUP BY route\nORDER BY registration_count DESC;",
+      "ok": true,
+      "result": "┌────────────┬────────────────────┐\n│   route    │ registration_count │\n│  varchar   │       int64        │\n├────────────┼────────────────────┤\n│ qr_code    │                708 │\n│ search     │                566 │\n│ ad         │                270 │\n│ link_share │                180 │\n│ other      │                 83 │\n└────────────┴────────────────────┘"
+    }
+  ],
+  "final_answer": "以下の表は、**有効なコンタクト ID が付与された登録（サブスクリプション）**を流入経路（route）別に集計した結果です。登録数が多い順に並べています。\n\n| 流入経路 | 登録数 |\n|----------|--------|\n| **qr_code**（QRコード） | 708 件 |\n| **search**（検索） | 566 件 |\n| **ad**（広告） | 270 件 |\n| **link_share**（リンクシェア） | 180 件 |\n| **other**（その他） | 83 件 |\n\n**合計登録数**は **1,807 件** です。\n\n### 主なポイント\n- **QRコード経由**が最も多く、全体の約 **39%**（708 / 1807）を占めています。  \n- 次いで **検索** が約 **31%**、**広告** が約 **15%** と続きます。  \n- **リンクシェア** と **その他** はそれぞれ約 **10%** と **5%** にとどまります。\n\nこの結果から、QRコードや検索経由の流入が登録獲得に大きく寄与していることが分かります。今後のマーケティング施策やリソース配分の検討に活用できるでしょう。",
+  "group": "t2s",
+  "rep": 1,
+  "started_at": "2026-10-29T15:26:18+09:00",
+  "ended_at": "2026-10-29T15:26:29+09:00"
+}

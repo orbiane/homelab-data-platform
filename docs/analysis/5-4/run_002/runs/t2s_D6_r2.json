@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D6",
+  "question": "今月の売上は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(r.revenue_amount) AS total_revenue\nFROM\n    main_mart.fct_revenue AS r\nWHERE\n    r.is_latest_snapshot = TRUE\n    AND r.revenue_month >= DATE_TRUNC('month', CURRENT_DATE)\n    AND r.revenue_month < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month';\n```",
+      "query": "SELECT\n    SUM(r.revenue_amount) AS total_revenue\nFROM\n    main_mart.fct_revenue AS r\nWHERE\n    r.is_latest_snapshot = TRUE\n    AND r.revenue_month >= DATE_TRUNC('month', CURRENT_DATE)\n    AND r.revenue_month < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month';",
+      "ok": true,
+      "result": "┌───────────────┐\n│ total_revenue │\n│    int128     │\n├───────────────┤\n│          NULL │\n└───────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「今月の売上」について、実行したクエリの結果は以下の通りです。\n\n```\ntotal_revenue\n-------------\nNULL\n```\n\n### 考えられる原因\n\n1. **今月分のデータがまだロードされていない**  \n   `r.is_latest_snapshot = TRUE` かつ `revenue_month` が今月（2026‑10‑01 〜 2026‑10‑31）に該当するレコードが、現在のスナップショットには存在しません。データ更新のバッチがまだ実行されていない、あるいは遅延している可能性があります。\n\n2. **該当期間に売上が記録されていない**  \n   もしデータが正しくロードされているにも関わらず `NULL` が返ってくる場合、対象期間の売上金額がすべて `NULL` または 0 である可能性があります（ただし通常は 0 が返るはずです）。\n\n3. **フィルタ条件のミス**  \n   - `revenue_month` が日付型ではなく文字列やタイムスタンプとして保存されている場合、`DATE_TRUNC` との比較が意図した通りに機能していない可能性があります。  \n   - `is_latest_snapshot` が期待通りに `TRUE` に設定されていないレコードがあるかもしれません。\n\n### 次に取るべきアクション\n\n| アクション | 内容 |\n|---|---|\n| データロード状況の確認 | データパイプライン（ETL／ELT）やスケジュールジョブが今月分の `fct_revenue` を正しくインサートしているか確認してください。 |\n| スナップショットフラグのチェック | `is_latest_snapshot` が `TRUE` になる条件（例：最新の日付のレコードだけをマークするロジック）が正しく機能しているか検証します。 |\n| データ型と比較ロジックの確認 | `revenue_month` カラムのデータ型が DATE もしくは TIMESTAMP であること、そして `DATE_TRUNC('month', CURRENT_DATE)` との比較が期待通りに動作しているか確認してください。 |\n| 代替クエリでの確認 | 今月分のレコードが存在するか簡易的に確認するクエリを実行してみます。例：<br>`SELECT COUNT(*) FROM main_mart.fct_revenue WHERE revenue_month >= DATE_TRUNC('month', CURRENT_DATE) AND revenue_month < DATE_TRUNC('month', CURRENT_DATE) + INTERVAL '1 month';` |\n| 過去月との比較 | 直近の数か月分の売上合計を取得し、データが全体的に欠損していないか確認します。例：<br>`SELECT revenue_month, SUM(revenue_amount) FROM main_mart.fct_revenue WHERE is_latest_snapshot = TRUE AND revenue_month >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '3 month' GROUP BY revenue_month;` |\n\n### 現時点での結論\n\n現状のクエリ結果からは「今月（2026‑10月）の売上データがシステム上に存在しない」ことが示唆されます。したがって、**今月の売上金額はまだ計測できない**、もしくは **データが未投入である** と回答できます。\n\nデータが揃い次第、再度同様のクエリを実行すれば、正確な売上合計が取得できるはずです。ご不明点や追加の調査が必要な場合は、データエンジニアリングチームへお問い合わせください。",
+  "group": "t2s",
+  "rep": 2,
+  "started_at": "2026-10-29T15:37:28+09:00",
+  "ended_at": "2026-10-29T15:37:47+09:00"
+}

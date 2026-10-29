@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "D6",
+  "question": "今月の売上は？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS revenue_amount\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_latest_snapshot\n    AND EXTRACT(year FROM revenue_month) = EXTRACT(year FROM CURRENT_DATE)\n    AND EXTRACT(month FROM revenue_month) = EXTRACT(month FROM CURRENT_DATE);\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS revenue_amount\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_latest_snapshot\n    AND EXTRACT(year FROM revenue_month) = EXTRACT(year FROM CURRENT_DATE)\n    AND EXTRACT(month FROM revenue_month) = EXTRACT(month FROM CURRENT_DATE);",
+      "ok": true,
+      "result": "┌────────────────┐\n│ revenue_amount │\n│     int128     │\n├────────────────┤\n│           NULL │\n└────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「今月の売上」について、以下のクエリを実行しました。\n\n```sql\nSELECT\n    SUM(revenue_amount) AS revenue_amount\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_latest_snapshot\n    AND EXTRACT(year FROM revenue_month) = EXTRACT(year FROM CURRENT_DATE)\n    AND EXTRACT(month FROM revenue_month) = EXTRACT(month FROM CURRENT_DATE);\n```\n\n**実行結果**\n\n| revenue_amount |\n|----------------|\n| NULL           |\n\n### 結果の解釈\n- `NULL` が返ってきたということは、**対象月（2026年10月）の最新スナップショットが `fct_revenue` テーブルに存在しない**ことを示しています。  \n- つまり、現在のところ「今月分の売上データ」がテーブルにロードされていない、もしくは `is_latest_snapshot = TRUE` のレコードがない状態です。\n\n### 考えられる原因\n1. **データ投入がまだ完了していない**  \n   - 月次の売上集計バッチが実行されていない、または実行が遅延している可能性があります。\n2. **スナップショットフラグの設定ミス**  \n   - `is_latest_snapshot` が `TRUE` に設定されていないレコードがある（例：前月のスナップショットが残っている）ため、今月分がフィルタに引っかからない。\n3. **テーブルのパーティションや日付型の不整合**  \n   - `revenue_month` が正しい月を示す日付型で格納されていない、もしくはタイムゾーンの違いで月がずれている可能性。\n\n### 次のアクション\n- **ETL ジョブのステータス確認**  \n  今月分の売上データを生成・ロードするバッチが正常に完了しているか、ログやスケジューラ（Airflow、DBT など）で確認してください。\n- **`is_latest_snapshot` の状態を調査**  \n  ```sql\n  SELECT\n      revenue_month,\n      is_latest_snapshot,\n      COUNT(*) AS cnt\n  FROM main_mart.fct_revenue\n  WHERE EXTRACT(year FROM revenue_month) = EXTRACT(year FROM CURRENT_DATE)\n    AND EXTRACT(month FROM revenue_month) = EXTRACT(month FROM CURRENT_DATE)\n  GROUP BY revenue_month, is_latest_snapshot;\n  ```\n  で今月のレコードが存在するか、フラグの状態を確認すると原因が絞り込めます。\n- **データのロード遅延が予想される場合**  \n  今月の売上は翌月初旬に確定するケースが多いので、現時点では「未確定」としてレポートに記載し、確定次第再集計する旨を関係者へ伝えるとよいでしょう。\n\n---\n\n**結論**  \n現時点（2026‑10‑29）では、`main_mart.fct_revenue` テーブルに今月（2026年10月）の最新売上データが存在しないため、売上金額は取得できません。データ投入プロセスやスナップショットフラグの設定を確認し、データが利用可能になり次第再度集計してください。",
+  "group": "t2s_desc",
+  "rep": 1,
+  "started_at": "2026-10-29T15:32:10+09:00",
+  "ended_at": "2026-10-29T15:32:31+09:00"
+}

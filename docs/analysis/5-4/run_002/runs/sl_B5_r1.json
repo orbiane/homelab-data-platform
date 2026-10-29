@@ -1,0 +1,24 @@
+{
+  "side": "sl",
+  "id": "B5",
+  "question": "2月の確定した売上（円）はいくら？",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query \\\n  --metrics revenue_amount \\\n  --where \"{{ Dimension('revenue_record__is_finalized') }} = true AND {{ Dimension('revenue_record__currency') }} = 'JPY' AND {{ Dimension('revenue_record__revenue_month') }} = '2026-02'\" \\\n  --decimals 2\n```",
+      "query": "mf query \\\n  --metrics revenue_amount \\\n  --where \"{{ Dimension('revenue_record__is_finalized') }} = true AND {{ Dimension('revenue_record__currency') }} = 'JPY' AND {{ Dimension('revenue_record__revenue_month') }} = '2026-02'\" \\\n  --decimals 2",
+      "ok": false,
+      "result": "ERROR: Runtime Error\n  Conversion Error: invalid timestamp field format: \"2026-02\", expected format is (YYYY-MM-DD HH:MM:SS[.US][±HH[:MM[:SS]]| ZONE])\n  \n  LINE 19: ...urrency = 'JPY' AND revenue_record__revenue_month__month = '2026-02'\n                                                                         ^\n\nLog File:: ~/homelab-data-platform/dbt_project/logs/metricflow.log\nArtifact Path: ~/homelab-data-platform/dbt_project/target/semantic_manifest.json\nArtifact Modified Time: 2026-10-29T03:00:02.634256\n\nIf you think you found a bug, please report it here:\n    https://github.com/dbt-labs/metricflow/issues"
+    },
+    {
+      "llm": "```bash\nmf query \\\n  --metrics revenue_amount \\\n  --where \"{{ Dimension('revenue_record__is_finalized') }} = true AND {{ Dimension('revenue_record__currency') }} = 'JPY' AND {{ TimeDimension('revenue_record__revenue_month', 'month') }} = '2026-02-01'\" \\\n  --decimals 2\n```",
+      "query": "mf query \\\n  --metrics revenue_amount \\\n  --where \"{{ Dimension('revenue_record__is_finalized') }} = true AND {{ Dimension('revenue_record__currency') }} = 'JPY' AND {{ TimeDimension('revenue_record__revenue_month', 'month') }} = '2026-02-01'\" \\\n  --decimals 2",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\n  revenue_amount\n----------------\n         5476600"
+    }
+  ],
+  "final_answer": "2月の確定した売上（円）は **5,476,600円** です。これは、売上が確定（`revenue_record__is_finalized = true`）かつ通貨がJPYであるレコードを対象に、2026年2月分の合計金額を小数点第2位まで表示した結果です。",
+  "group": "sl",
+  "rep": 1,
+  "started_at": "2026-10-29T15:33:16+09:00",
+  "ended_at": "2026-10-29T15:33:37+09:00"
+}

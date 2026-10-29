@@ -1,0 +1,18 @@
+{
+  "side": "sl",
+  "id": "D5",
+  "question": "売上の最初の見積もりと確定値は、どれくらい違った？",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics revenue_amount --group-by revenue_record__is_finalized --order -revenue_amount\n```",
+      "query": "mf query --metrics revenue_amount --group-by revenue_record__is_finalized --order -revenue_amount",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\nrevenue_record__is_finalized      revenue_amount\n------------------------------  ----------------\nTrue                                    40812400\nFalse                                    8809500"
+    }
+  ],
+  "final_answer": "**売上の最初の見積もりと確定値の差は次の通りです。**\n\n| 区分                     | 金額（円） |\n|--------------------------|-----------|\n| **確定値 (True)**        | 40,812,400 |\n| **見積もり (False)**     | 8,809,500  |\n| **差額**                 | **32,002,900** |\n\n### 差額の概要\n- **差額**は **約3,200万円**（32,002,900円）です。  \n- 確定値は見積もりの **約4.6倍**（40,812,400 ÷ 8,809,500 ≈ 4.63）となっており、  \n  見積もりに対して **約363% 増加** しています。  \n\n### まとめ\n最初の見積もり（約8.8 百万）に対して、最終的に確定した売上は約40.8 百万となり、約3,200万円（約4.6倍）上回っています。これが「売上の最初の見積もりと確定値は、どれくらい違った？」という質問への回答です。",
+  "group": "sl",
+  "rep": 2,
+  "started_at": "2026-10-29T15:43:57+09:00",
+  "ended_at": "2026-10-29T15:44:15+09:00"
+}

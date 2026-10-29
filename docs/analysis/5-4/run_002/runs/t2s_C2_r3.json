@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C2",
+  "question": "契約プラン別に売上を比べたい",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    a.plan_type,\n    SUM(r.revenue_amount) AS total_revenue,\n    COUNT(DISTINCT r.account_id) AS account_count\nFROM main_mart.fct_revenue AS r\nJOIN main_mart.dim_account AS a USING (account_id)\nWHERE r.is_latest_snapshot = TRUE\nGROUP BY a.plan_type\nORDER BY total_revenue DESC;\n```",
+      "query": "SELECT\n    a.plan_type,\n    SUM(r.revenue_amount) AS total_revenue,\n    COUNT(DISTINCT r.account_id) AS account_count\nFROM main_mart.fct_revenue AS r\nJOIN main_mart.dim_account AS a USING (account_id)\nWHERE r.is_latest_snapshot = TRUE\nGROUP BY a.plan_type\nORDER BY total_revenue DESC;",
+      "ok": true,
+      "result": "┌───────────┬───────────────┬───────────────┐\n│ plan_type │ total_revenue │ account_count │\n│  varchar  │    int128     │     int64     │\n├───────────┼───────────────┼───────────────┤\n│ standard  │      34946700 │            14 │\n│ free      │       9088600 │             4 │\n│ light     │       5466600 │             2 │\n└───────────┴───────────────┴───────────────┘"
+    }
+  ],
+  "final_answer": "以下は「契約プラン（plan_type）別」の売上（revenue）と利用アカウント数の比較結果です。\n\n| 契約プラン | 売上合計 (円) | 売上比率 | 利用アカウント数 | アカウント比率 |\n|------------|--------------|----------|------------------|----------------|\n| **standard** | 34,946,700 | 約 70.6 % | 14 | 約 70 % |\n| **free**      | 9,088,600  | 約 18.4 % | 4  | 約 20 % |\n| **light**     | 5,466,600  | 約 11.0 % | 2  | 約 10 % |\n\n### 主なポイント\n\n1. **最も売上が大きいのは「standard」プラン**  \n   - 全体売上の約 70 % を占め、利用アカウント数も全体の 70 %（14 件）です。  \n   - 高単価・高利用率のプランと考えられます。\n\n2. 「free」プランは **売上が全体の約 18 %** にとどまりますが、利用アカウント数は 4 件（20 %）と、比較的多くの顧客が利用しているものの、単価が低いことが伺えます。\n\n3. 「light」プランは **売上が約 11 %**、利用アカウント数は 2 件（10 %）で、規模は小さいものの一定の収益を確保しています。\n\n### 考えられる次のアクション\n\n- **standardプランの拡大**：既に高い売上貢献度があるため、アップセルやクロスセルの機会を増やす施策を検討。\n- **freeプランからの有料化促進**：利用者数は比較的多いので、機能制限やプレミアムオファーを通じて「standard」や「light」への移行を促す。\n- **lightプランの差別化**：現状は小規模ですが、特定のニーズに合わせた機能追加や価格設定で、さらなる売上拡大の余地があります。\n\n以上が、契約プラン別に売上を比較した結果とその解釈です。ご参考になれば幸いです。",
+  "group": "t2s",
+  "rep": 3,
+  "started_at": "2026-10-29T15:45:34+09:00",
+  "ended_at": "2026-10-29T15:45:50+09:00"
+}

@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "C3",
+  "question": "4月の確定した売上（円）はいくら？",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    SUM(revenue_amount) AS revenue_amount_jpy\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND is_latest_snapshot = TRUE\n    AND currency = 'JPY'\n    AND EXTRACT(MONTH FROM revenue_month) = 4;\n```",
+      "query": "SELECT\n    SUM(revenue_amount) AS revenue_amount_jpy\nFROM\n    main_mart.fct_revenue\nWHERE\n    is_finalized = TRUE\n    AND is_latest_snapshot = TRUE\n    AND currency = 'JPY'\n    AND EXTRACT(MONTH FROM revenue_month) = 4;",
+      "ok": true,
+      "result": "┌────────────────────┐\n│ revenue_amount_jpy │\n│       int128       │\n├────────────────────┤\n│               NULL │\n└────────────────────┘"
+    }
+  ],
+  "final_answer": "ご質問の「4月の確定した売上（円）はいくら？」について、実行したクエリの結果は次の通りです。\n\n```\nrevenue_amount_jpy\n-----------------\nNULL\n```\n\n**考えられる理由**\n\n1. **対象データが存在しない**  \n   - `is_finalized = TRUE`（確定済み）かつ `is_latest_snapshot = TRUE`（最新スナップショット）で、通貨が `JPY`、かつ `revenue_month` が4月であるレコードがテーブルに無い可能性があります。\n\n2. **NULL が返っているケース**  \n   - `SUM` 関数は、集計対象の行が全く無い場合に `NULL` を返します。したがって、該当する行が 0 件であることを示しています。\n\n**結論**  \n現在のデータでは、4月に確定した日本円（JPY）での売上は **0円**（データが存在しない）と解釈できます。\n\nもし、別の条件（例：別通貨での売上、確定フラグが付いていないデータ、過去のスナップショットなど）でも確認したい場合は、条件を変更して再度クエリを実行してください。データの投入や確定処理がまだ完了していない可能性もあるため、データ投入担当者や業務プロセスを確認するとよいでしょう。",
+  "group": "t2s_desc",
+  "rep": 3,
+  "started_at": "2026-10-29T15:49:07+09:00",
+  "ended_at": "2026-10-29T15:49:21+09:00"
+}

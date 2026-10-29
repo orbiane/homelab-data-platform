@@ -1,0 +1,18 @@
+{
+  "side": "t2s",
+  "id": "B4",
+  "question": "業種ごとの配信数",
+  "attempts": [
+    {
+      "llm": "```sql\nSELECT\n    d.industry,\n    COUNT(*) AS delivery_count\nFROM\n    main_mart.fct_message_event AS e\nJOIN\n    main_mart.dim_account AS d\n    ON e.account_id = d.account_id\nGROUP BY\n    d.industry\nORDER BY\n    delivery_count DESC;\n```",
+      "query": "SELECT\n    d.industry,\n    COUNT(*) AS delivery_count\nFROM\n    main_mart.fct_message_event AS e\nJOIN\n    main_mart.dim_account AS d\n    ON e.account_id = d.account_id\nGROUP BY\n    d.industry\nORDER BY\n    delivery_count DESC;",
+      "ok": true,
+      "result": "┌───────────────────┬────────────────┐\n│     industry      │ delivery_count │\n│      varchar      │     int64      │\n├───────────────────┼────────────────┤\n│ NULL              │           3975 │\n│ entertainment     │           2482 │\n│ healthcare        │           2437 │\n│ real_estate       │           1417 │\n│ education         │           1202 │\n│ food_and_beverage │            973 │\n│ retail            │            825 │\n│ beauty            │            371 │\n└───────────────────┴────────────────┘"
+    }
+  ],
+  "final_answer": "## 業種別の配信数（2026‑10‑29 時点）\n\n| ランキング | 業種                | 配信数 | 全体に占める割合 |\n|------------|-------------------|------:|----------------:|\n| 1          | (未設定) **NULL** | 3,975 | 29.1 % |\n| 2          | entertainment      | 2,482 | 18.1 % |\n| 3          | healthcare         | 2,437 | 17.8 % |\n| 4          | real_estate        | 1,417 | 10.4 % |\n| 5          | education          | 1,202 | 8.8 % |\n| 6          | food_and_beverage  |   973 | 7.1 % |\n| 7          | retail             |   825 | 6.0 % |\n| 8          | beauty             |   371 | 2.7 % |\n| **合計**   | —                 |13,682 | 100 % |\n\n### 主なポイント\n\n1. **NULL が最も多い**  \n   - 約 30 %（3,975件）が業種情報なしのアカウントです。データ品質の観点から、業種情報の取得・補完を検討すると効果的です。\n\n2. **上位3業種は entertainment、healthcare、real_estate**  \n   - entertainment と healthcare がそれぞれ約 18 % と 18 % のシェアを占め、合わせて全体の約 36 % を構成しています。これらの業種向けに配信内容やタイミングを最適化すれば、効果向上が期待できます。\n\n3. **小規模業種**  \n   - beauty は全体の約 2.7 % にとどまります。もしこの業種に対して特別な施策を検討している場合は、配信対象の拡大やターゲティングの見直しが必要です。\n\n### 今後のアクション提案\n\n| アクション | 目的 | 推奨手順 |\n|------------|------|----------|\n| **NULL の補完** | データ完全性の向上 | - アカウント登録時に必須項目として業種を取得<br>- 既存の NULL アカウントに対し、過去の取引履歴やメールアドレスドメインから推測し、手動または自動で補完 |\n| **業種別コンテンツの最適化** | エンゲージメント向上 | - entertainment・healthcare 向けに高クリック率のクリエイティブをテスト<br>- 各業種のニーズに合わせたメッセージ文言や配信時間帯を AB テスト |\n| **低シェア業種への拡大施策** | 市場シェア拡大 | - beauty や retail などシェアが小さい業種に対し、限定キャンペーンや提携プロモーションを実施<br>- 業種別リスト取得・新規顧客獲得のための広告出稿を検討 |\n| **定期的なモニタリング** | 効果測定と迅速な改善 | - 月次で業種別配信数・開封率・クリック率をレポート化<br>- 変化が大きい業種は原因分析（季節要因、キャンペーン実施有無等）を実施 |\n\n### まとめ\n\n現在、配信数は **13,682 件** で、そのうち **約 30 % が業種情報なし**、続いて **entertainment（18 %）** と **healthcare（18 %）** が主要な配信先です。業種情報の欠損を解消しつつ、上位業種向けにパーソナライズド配信を強化することで、全体の配信効果を高められると考えられます。ご質問やさらに詳細な分析が必要な場合はお知らせください。",
+  "group": "t2s",
+  "rep": 3,
+  "started_at": "2026-10-29T15:44:55+09:00",
+  "ended_at": "2026-10-29T15:45:18+09:00"
+}

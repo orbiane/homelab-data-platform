@@ -1,0 +1,24 @@
+{
+  "side": "sl",
+  "id": "B3",
+  "question": "クリック率はどのくらい？",
+  "attempts": [
+    {
+      "llm": "```bash\nmf query --metrics ctr --order -metric_time --limit 1\n```",
+      "query": "mf query --metrics ctr --order -metric_time --limit 1",
+      "ok": false,
+      "result": "ERROR: Got error(s) during query resolution.\n\nError #1:\n  Message:\n\n    The order-by item '-metric_time' does not match exactly one of the query items.\n\n  Query Input:\n\n    -metric_time\n\n  Issue Location:\n\n    [Resolve Query(['ctr'])]\n\nLog File:: ~/homelab-data-platform/dbt_project/logs/metricflow.log\nArtifact Path: ~/homelab-data-platform/dbt_project/target/semantic_manifest.json\nArtifact Modified Time: 2026-10-29T03:00:02.634256\n\nIf you think you found a bug, please report it here:\n    https://github.com/dbt-labs/metricflow/issues"
+    },
+    {
+      "llm": "```bash\nmf query --metrics ctr --group-by metric_time --order -metric_time --limit 1\n```",
+      "query": "mf query --metrics ctr --group-by metric_time --order -metric_time --limit 1",
+      "ok": true,
+      "result": "✔ Success 🦄 - query completed after 0.04 seconds\nmetric_time__day       ctr\n-------------------  -----\n2026-04-13T00:00:00      0"
+    }
+  ],
+  "final_answer": "クエリの結果を見ると、最新の日付（2026‑04‑13）のクリック率（CTR）は **0** です。  \n\nつまり、2026‑04‑13 時点で計測されたクリック率は 0% となっています。  \n\n※この数値はクエリで取得した最新のデータです。もし別の日付や期間での CTR が必要であれば、日付範囲や集計方法を変えて再度クエリを実行してください。",
+  "group": "sl",
+  "rep": 2,
+  "started_at": "2026-10-29T15:41:46+09:00",
+  "ended_at": "2026-10-29T15:42:00+09:00"
+}
