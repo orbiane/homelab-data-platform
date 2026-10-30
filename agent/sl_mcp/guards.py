@@ -102,7 +102,14 @@ def clean_mf(text):
 
 
 def hide_home(text):
-    return text.replace(str(HOME), "~")
+    # ホームのパスは ~ に、DuckDB の鍵のエラー文の「by user 名前」の名前は消す
+    text = text.replace(str(HOME), "~")
+    return re.sub(r"\bby user [A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*", "by user (名前は省略)", text)
+
+
+def all_null(rows):
+    """行が1行以上あり、渡した値がすべて空（None）なら True。"""
+    return len(rows) > 0 and all(v is None for row in rows for v in row)
 
 
 def _value(cell):
@@ -126,11 +133,12 @@ def parse_mf_table(text):
             columns = [header[a:(spans[j + 1][0] if j + 1 < len(spans) else len(header))].strip()
                        for j, (a, _) in enumerate(spans)]
             rows = []
-            for row in lines[i + 1:]:
-                if not row.strip() and not rows and len(columns) == 1:
-                    # 指標1つで値が空のとき、mf は空の1行を出す
-                    rows.append([None])
-                    continue
+            rest = lines[i + 1:]
+            if not rest or not rest[0].strip():
+                # group-by なしで値が空のとき、mf は見出しと ---- のあとに空の1行を出す
+                # （clean_mf の strip で、その空の行は消えていることがある）
+                return columns, [[None] * len(columns)]
+            for row in rest:
                 if not row.strip():
                     break
                 cells = [row[a:(spans[j + 1][0] if j + 1 < len(spans) else len(row))]

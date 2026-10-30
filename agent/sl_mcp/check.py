@@ -8,6 +8,7 @@
 """
 import asyncio
 import datetime
+import getpass
 import hashlib
 import json
 import re
@@ -116,7 +117,13 @@ async def over_stdio():
             kinds["mf_error"] = r["kind"]
             check("5 mf の書き方のエラーは mf_error で、mf の文を返す",
                   r["kind"] == "mf_error" and "Conversion Error" in r.get("text", ""), r["kind"])
-            check("5 4つの kind がすべて違う", len(set(kinds.values())) == 4, str(kinds))
+            r = await call("query_metrics", metrics=["revenue_amount"],
+                           where=["{{ TimeDimension('metric_time', 'month') }} = '2026-10-01'"])  # group-by なしで、合う行が無い
+            kinds["null_value"] = r["kind"]
+            check("5 group-by なしで合う行が無いと null_value", r["kind"] == "null_value" and r["mf_query_ran"],
+                  f"{r['kind']} {r.get('rows')}")
+            check("5 5つの kind がすべて違い、それぞれ期待した kind",
+                  len(set(kinds.values())) == 5 and all(k == v for k, v in kinds.items()), str(kinds))
 
             # 条件6：run_sql で書き込み・外のファイルが通らない
             r = await call("run_sql", sql="SELECT current_setting('enable_external_access') AS ext, "
@@ -125,8 +132,15 @@ async def over_stdio():
                   r["kind"] == "ok" and r["results"][0]["rows"] == [{"ext": False, "locked": True}], str(r.get("results")))
             r = await call("run_sql", sql="SELECT count(*) AS n FROM main_mart.dim_account;")
             check("6 読む SQL は通る", r["kind"] == "ok", f"{r['kind']} {r.get('results') or r.get('text')}")
+            sql_kinds = {"ok": r["kind"]}
             r = await call("run_sql", sql="SELECT 1 AS x WHERE false;")
+            sql_kinds["empty"] = r["kind"]
             check("6 0行は empty", r["kind"] == "empty", r["kind"])
+            r = await call("run_sql", sql="SELECT sum(n) AS total FROM main_mart.dim_account, (SELECT 1 AS n) WHERE false;")
+            sql_kinds["null_value"] = r["kind"]
+            check("6 0行を合計すると null_value", r["kind"] == "null_value", f"{r['kind']} {r.get('results')}")
+            r = await call("run_sql", sql="SELECT * FROM (VALUES (1, NULL), (NULL, 2)) AS t(a, b);")
+            check("6 一部だけ空の複数行は ok", r["kind"] == "ok", f"{r['kind']} {r.get('results')}")
             for label, sql in [
                 ("CREATE TABLE", "CREATE TABLE sl_mcp_probe AS SELECT 1 AS x;"),
                 ("外のファイルを読む", "SELECT * FROM read_csv('../data_generation/output.sha256');"),
@@ -135,7 +149,10 @@ async def over_stdio():
                 ("ドットコマンド", ".shell echo sl_mcp_probe"),
             ]:
                 r = await call("run_sql", sql=sql)
+                sql_kinds.setdefault("sql_error", r["kind"])
                 check(f"6 {label} は sql_error", r["kind"] == "sql_error", (r.get("text") or "")[:90])
+            check("6 run_sql の4つの kind がすべて違い、それぞれ期待した kind",
+                  len(set(sql_kinds.values())) == 4 and all(k == v for k, v in sql_kinds.items()), str(sql_kinds))
 
 
 def in_process():
@@ -157,6 +174,9 @@ def in_process():
         holder.stdin.close()
         holder.wait(timeout=10)
     check("6 外のプロセスが書き込みで開いていると busy", r["kind"] == "busy", (r.get("text") or "")[:120])
+    text = r.get("text") or ""
+    check("6 busy の文にユーザー名が無い",
+          getpass.getuser() not in text and "by user (名前は省略)" in text, text[text.find("Conflicting"):][:90])
     guards.WAREHOUSE = db
     try:
         r = server.run_sql("SELECT x FROM t;")

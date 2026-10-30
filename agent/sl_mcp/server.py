@@ -14,10 +14,13 @@ mcp = FastMCP("sl")
 ORDER = ("数字の問いには、まず SL の道具（list_metrics → get_dimensions → query_metrics）を使い、"
          "SL で答えられないときだけ run_sql を使う。")
 NO_ANSWER = "kind が ok と empty 以外なら、答えは得られていない。数字を作らず、答えられなかったと伝える。"
+NULL_VALUE = ("値の欄がすべて空だった。条件に合う行が0件だったのか、行はあるが値が欠けていたのかは、"
+              "この返事からは分からない。")
 
 MESSAGES = {
     "ok": "結果の行がある。",
     "empty": "条件に合う行が0件だった。",
+    "null_value": NULL_VALUE,
     "unknown_name": "登録されていない指標か切り口の名前がある。mf query は呼んでいない。",
     "bad_where": "where に {{ }} が無い。mf query は呼んでいない。",
     "mf_error": "mf がエラーを返した。text は mf の文。",
@@ -71,6 +74,7 @@ def get_dimensions(metric: str) -> dict[str, Any]:
     "where の書き方：\"{{ Dimension('order_id__revenue') }} > 100\" のように Dimension() で囲む。"
     "時間は {{ TimeDimension('metric_time', 'day') }} のように粒度を付けて書ける。\n"
     "返す kind：ok（結果の行がある）／empty（条件に合う行が0件だった）／"
+    "null_value（" + NULL_VALUE + "）／"
     "unknown_name（登録されていない指標か切り口の名前がある。mf は呼んでいない）／"
     "bad_where（where に {{ }} が無い。mf は呼んでいない）／mf_error（mf がエラーを返した。文はそのまま）／"
     "busy（ほかのプロセスが DB を開いていて開けなかった）／maintenance（毎晩の dbt build の時間帯なので断った）。"
@@ -145,13 +149,17 @@ def query_metrics(
     columns, rows = guards.parse_mf_table(out)
     if not columns:
         return reply("mf_error", text=out, **fields)
+    value_idx = [i for i, c in enumerate(columns) if c in metrics]
+    if guards.all_null([[row[i] for i in value_idx] for row in rows]):
+        return reply("null_value", columns=columns, rows=rows, text=out, **fields)
     return reply("ok", columns=columns, rows=rows, text=out, **fields)
 
 
 @mcp.tool(description=(
     "warehouse.duckdb（DuckDB）に SQL を投げて、結果を返す。読み取り専用で開く。" + ORDER + "\n"
     "結果は文ごとに results に入る。1つの文で返す行は " + str(guards.MAX_ROWS) + " 行まで。\n"
-    "返す kind：ok（結果の行がある）／empty（結果の行が0件だった）／sql_error（SQL がエラーになった。文はそのまま）／"
+    "返す kind：ok（結果の行がある）／empty（結果の行が0件だった）／"
+    "null_value（" + NULL_VALUE + "）／sql_error（SQL がエラーになった。文はそのまま）／"
     "busy（ほかのプロセスが DB を開いていて開けなかった）／maintenance（毎晩の dbt build の時間帯なので断った）。"
     + NO_ANSWER
 ))
@@ -170,6 +178,8 @@ def run_sql(sql: str) -> dict[str, Any]:
                         "rows": rows[:guards.MAX_ROWS]})
     if all(r["row_count"] == 0 for r in results):
         return reply("empty", results=results)
+    if guards.all_null([list(row.values()) for r in results for row in r["rows"]]):
+        return reply("null_value", results=results)
     return reply("ok", results=results)
 
 

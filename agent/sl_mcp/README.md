@@ -21,6 +21,16 @@ dbt 公式の dbt-mcp は、Semantic Layer の道具が dbt Platform の API を
 
 説明文を「よく」しようとして、罠の注意を足さないこと。
 
+## run_sql を `-safe` で開いている理由
+
+DuckDB の CLI の「.」で始まる命令（`.shell`、`.output` など）は、SQL より手前で CLI が処理する。
+そのため、`-readonly`（読み取り専用）と `enable_external_access=false`（外部アクセスの遮断）の外を通り、シェルの実行やファイルの書き出しができてしまう。
+5-4 の `docs/analysis/5-4/run_001/harness.py` の `run_t2s`（`-readonly` と `SET enable_external_access=false;`）にも同じ穴があった。
+`-safe` を付けると、これらの命令が止まり、外部アクセスも切れて設定も固まる。`-safe` を外さないこと。
+
+5-4 の記録（`run_001` と `run_002` の `runs/*.json`、143本・157試行）で、LLM が書いたクエリは143本（sl の mf コマンド 53本、t2s の SQL 90本）。
+そのうち「.」で始まる行を含むものは0本だった。5-4 で、この穴が実際に使われた跡は無い。
+
 ## 順番を説明文で頼むだけにして、仕組みで強制しない理由
 
 「まず SL の道具を使い、SL で答えられないときだけ `run_sql` を使う」という順番は、道具の説明文で頼んでいるだけで、サーバーは強制しない。
