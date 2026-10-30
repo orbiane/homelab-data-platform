@@ -19,7 +19,8 @@
       "Bash(uv tool *)",
       "Bash(docker compose down *)",
       "Edit(**/_metrics.yml)",
-      "Edit(**/_semantic_models.yml)"
+      "Edit(**/_semantic_models.yml)",
+      "Bash(git config core.hooksPath *)"
     ],
     "deny": [
       "Bash(git push --force *)",
@@ -33,7 +34,9 @@
       "Bash(pip install *)",
       "Bash(pip3 install *)",
       "Bash(docker volume rm *)",
-      "Bash(docker system prune *)"
+      "Bash(docker system prune *)",
+      "Bash(git commit --no-verify *)",
+      "Bash(git commit -n *)"
     ]
   }
 }

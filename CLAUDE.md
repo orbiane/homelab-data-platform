@@ -24,6 +24,9 @@
 3. **ツールのバージョンを上げない。** 比較実験の再現性のため固定（dbt-core 1.11.8 / dbt-duckdb 1.10.1 / dbt-metricflow 0.14.0）。`mf` が表示する `pip install --upgrade` の案内には従わない
 4. **git の履歴を書き換えない。** filter-repo / rebase / reset --hard / force push をしない。push は人間の承認後
 5. **公開リポジトリである。** ユーザー名、IP・MAC アドレス、ホームディレクトリを含む絶対パス、クレデンシャルをコミットしない。パスは相対パスか `~` で書く。`~/.dbt/profiles.yml` をリポジトリにコピーしない
+   - コミットの前に `.githooks/` の hook が、足す行とコミットメッセージを検査する（ホームディレクトリの絶対パス、家の LAN と Tailscale の IP、MAC アドレス、代表的なクレデンシャルの形、git の外のファイルに置いた検査語）。1件でも見つかればコミットは止まる
+   - hook に止められたら、hook を飛ばす書き方（`--no-verify`、`-n`）や hooksPath を変える書き方で通そうとしない。自分が足した行なら直す。誤検知だと思ったら、検査を弱めずに止まって報告する。検査語のファイルの中身は、どのファイルにもコミットメッセージにも書かない
+   - clone し直したら `git config core.hooksPath .githooks` を設定し、検査語のファイル `.git/info/private-words` を作る（無いとコミットは止まる）
 6. **語彙は架空ドメインのもの**（account / contact / subscription / message_event）。実在サービス固有の用語を持ち込まない
    - referrer の値には、実在のブランド名がいくつか残っている（generator の REFERRERS）。基準データを固定しているため段階3で直す。新しく見つけたときだけ報告する
 7. **データを作り直す前に聞く。** `data_generation/` の generator 再実行と `warehouse.duckdb` への書き込みは、調査中の証拠を消すことがある

@@ -1,0 +1,15 @@
+#!/bin/sh
+# コミットメッセージの全部の行を調べる。
+
+. "$(dirname "$0")/scan.sh"
+
+tmp=$(mktemp -d) || exit 1
+trap 'rm -rf "$tmp"' EXIT
+
+awk -v txtf="$tmp/txt" -v locf="$tmp/loc" '
+  { print > txtf; print "メッセージ:" NR > locf }
+  END { printf "" > txtf; printf "" > locf }
+' "$1" || exit 1
+
+scan_lines commit-msg "$tmp/txt" "$tmp/loc" || exit 1
+exit 0

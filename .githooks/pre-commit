@@ -1,0 +1,23 @@
+#!/bin/sh
+# 今回のコミットで足す行（git diff --cached の + の行）だけを調べる。
+# 今あるファイル全体は調べない。
+
+. "$(dirname "$0")/scan.sh"
+
+tmp=$(mktemp -d) || exit 1
+trap 'rm -rf "$tmp"' EXIT
+
+git diff --cached --no-color --no-ext-diff --text -U0 >"$tmp/diff" || exit 1
+
+# + の行を、本文（txt）と場所（loc。ファイル名:行番号）に分けて書き出す。
+# ファイルの見出しの +++ は、@@ の前にあるものだけを見出しとして扱う。
+awk -v txtf="$tmp/txt" -v locf="$tmp/loc" '
+  /^diff --git / { inhunk = 0; next }
+  /^\+\+\+ / && !inhunk { f = substr($0, 5); sub(/^b\//, "", f); next }
+  /^@@ / { inhunk = 1; n = $3; sub(/^\+/, "", n); sub(/,.*/, "", n); ln = n + 0; next }
+  inhunk && /^\+/ { print substr($0, 2) > txtf; print f ":" ln > locf; ln++ }
+  END { printf "" > txtf; printf "" > locf }
+' "$tmp/diff" || exit 1
+
+scan_lines pre-commit "$tmp/txt" "$tmp/loc" || exit 1
+exit 0
