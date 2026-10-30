@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "sl": {
+      "command": "uv",
+      "args": ["run", "--frozen", "--project", "agent/sl_mcp", "python", "agent/sl_mcp/server.py"]
+    }
+  }
+}
