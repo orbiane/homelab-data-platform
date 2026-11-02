@@ -19,7 +19,7 @@ import time
 from pathlib import Path
 
 from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
+from mcp.client.stdio import get_default_environment, stdio_client
 
 import guards
 import server
@@ -155,6 +155,52 @@ async def over_stdio():
                   len(set(sql_kinds.values())) == 4 and all(k == v for k, v in sql_kinds.items()), str(sql_kinds))
 
 
+async def tools_over_stdio(mode=None):
+    """.mcp.json と同じコマンドでサーバーを起動し、道具の名前と説明文を返す。mode があれば SL_MCP_MODE に入れる。"""
+    conf = json.loads((REPO / ".mcp.json").read_text())["mcpServers"]["sl"]
+    env = get_default_environment()
+    if mode is not None:
+        env["SL_MCP_MODE"] = mode
+    params = StdioServerParameters(command=conf["command"], args=conf["args"], cwd=str(REPO), env=env)
+    async with stdio_client(params) as (read, write):
+        async with ClientSession(read, write) as s:
+            await s.initialize()
+            tools = {t.name: t.description for t in (await s.list_tools()).tools}
+            calls = {}
+            if mode == "sql":
+                r = await s.call_tool("list_metrics", arguments={})
+                calls["list_metrics"] = r.structuredContent
+                r = await s.call_tool("run_sql", arguments={"sql": "SELECT count(*) AS n FROM main_mart.dim_account;"})
+                calls["run_sql"] = r.structuredContent
+            return tools, calls
+
+
+async def sql_mode():
+    # 条件8：SL_MCP_MODE=sql の形。既定の形は変えない
+    default, _ = await tools_over_stdio()
+    sql, calls = await tools_over_stdio("sql")
+    check("8 sql の形では道具がちょうど2つ", sorted(sql) == ["list_metrics", "run_sql"], str(sorted(sql)))
+    text = "\n".join(sql.values())
+    hits = [w for w in ("query_metrics", "get_dimensions", "SL の道具") if w in text]
+    check("8 sql の形の説明文に query_metrics・get_dimensions・順番の文が出てこない", not hits, str(hits))
+    same = all(sql[n] == default[n].replace(server.ORDER_SL, "") for n in sql)
+    check("8 sql の形の説明文は、既定の説明文から順番の文を除いたものと同じ", same)
+    check("8 既定の形の説明文には順番の文がある（比べる相手の確かめ）",
+          all(server.ORDER_SL in default[n] for n in default), str(sorted(default)))
+    man = {m["name"]: m.get("description") for m in json.loads(guards.MANIFEST.read_text())["metrics"]}
+    r = calls["list_metrics"]
+    check("8 sql の形の list_metrics は manifest の説明をそのまま返す",
+          r["kind"] == "ok" and {m["name"]: m["description"] for m in r["metrics"]} == man)
+    r = calls["run_sql"]
+    check("8 sql の形の run_sql は読む SQL が通る", r["kind"] == "ok", f"{r['kind']} {r.get('results')}")
+    # 知らない値では起動しない（既定の形に落ちない）
+    p = subprocess.run(["uv", "run", "--frozen", "--project", "agent/sl_mcp", "python", "agent/sl_mcp/server.py"],
+                       cwd=REPO, env={**get_default_environment(), "SL_MCP_MODE": "sqll"},
+                       capture_output=True, text=True, timeout=120, stdin=subprocess.DEVNULL)
+    check("8 SL_MCP_MODE の知らない値では起動しない", p.returncode != 0 and "SL_MCP_MODE" in p.stderr,
+          f"exit={p.returncode}")
+
+
 def in_process():
     # busy：使い捨ての DuckDB ファイルを、別のプロセスに書き込みで開かせたまま、run_sql を呼ぶ
     tmp = Path(tempfile.mkdtemp(prefix="sl_mcp_busy_"))
@@ -204,6 +250,7 @@ def in_process():
 if __name__ == "__main__":
     before = sha256(guards.WAREHOUSE)
     asyncio.run(over_stdio())
+    asyncio.run(sql_mode())
     in_process()
     after = sha256(guards.WAREHOUSE)
     check("6 warehouse.duckdb の sha256 が試す前と同じ", before == after, f"{before[:12]} → {after[:12]}")
