@@ -36,8 +36,8 @@
 - dbt コマンドは `dbt_project/` の中で実行する（相対パス依存）
 - `mf` は `~/.local/bin/mf` への symlink で、uv の管理外。見つからない・壊れていると思っても、再インストールせずに報告する
 - `mf` には環境変数 `DBT_PROFILES_DIR` が要る（シェル設定で `~/.dbt` を指している）。profiles が見つからないと言われたら、まず `echo $DBT_PROFILES_DIR`
-- `dbt sl` 系は使わない（dbt Platform 前提）。`mf query` / `mf list metrics` を使う
-- DuckDB を読むだけなら `duckdb -readonly dbt_project/warehouse.duckdb`
+- `dbt sl` 系は使わない（dbt Platform 前提）。データを見るときは MCP の道具（sl）を使う
+- 段階2から、Bash で `mf` と `duckdb` を直接打つのは禁止にしてある（settings.json の deny。理由は `agent/sl_mcp/README.md`）
 - Airflow は `airflow/` の Docker Compose。UI はホスト側ポート 8081（8080 は Docker が占有）。DAG は毎日 JST 03:00 に `dbt build` を実行する
 - Docker Desktop は macOS の再起動後に自動起動しない（`open -a Docker`）
 - 生成データの版は `data_generation/output.sha256` で照合する（`cd data_generation/output && shasum -a 256 -c ../output.sha256`）。数値を出す前や比較実験の前に照合し、合わなければ止めて報告する

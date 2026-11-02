@@ -35,3 +35,27 @@ DuckDB の CLI の「.」で始まる命令（`.shell`、`.output` など）は�
 
 「まず SL の道具を使い、SL で答えられないときだけ `run_sql` を使う」という順番は、道具の説明文で頼んでいるだけで、サーバーは強制しない。
 エージェントが説明文の順番を守るかを観察するための、意図した設計である。
+
+## Bash で mf と duckdb を打つ道を閉じた理由
+
+MCP のサーバーは道具を足すだけで、エージェントから Bash の道を取り上げない。
+Bash で `mf` や `duckdb` を直接打つと、サーバーの柵（`{{ }}` の確かめ、`kind`、`-safe`）を素通りする。
+段階2では、エージェントが説明文の順番を守るかを4つの道具の中で観察するので、`.claude/settings.json` の deny に `Bash(mf *)` と `Bash(duckdb *)` を入れて閉じた。
+4つの道具は allow に1つずつ名前で書いた（`mcp__sl__*` とまとめて書くと、道具を足したときに承認なしで使えてしまうため）。
+
+deny はコマンドの文字に当たるだけなので、フルパス（`~/.local/bin/mf`）や `sh -c` などの書き方はすり抜ける。
+Manual モード（承認を毎回聞くモード）なら、それらは承認の画面で止まる。
+
+## 知っている穴（直していない）：query_metrics の where
+
+`query_metrics` の where は自由な文字で、`mf` を通って DuckDB の SQL にそのまま入る。
+`run_sql` の `-safe` は、この道には掛かっていない。
+
+試し（2026-11-02、MCP を通さず Python から `server.query_metrics` を1回呼んだ。読むだけ）：
+
+- metrics `revenue_amount`、group_by `revenue_record__currency`
+- where `{{ Dimension('revenue_record__currency') }} IN (SELECT 'JPY' FROM read_csv('../data_generation/output.sha256'))`
+- 結果は kind `ok`、行は `JPY 45440100`（ADR-006 の JPY 45,440,100 と同じ）
+
+where の中の SQL が、リポジトリの中の別のファイル（`data_generation/output.sha256`）を読めた。書き込みの試しはしていない。
+今は、悪意のあるエージェントではなく、間違えるエージェントが相手なので直さない。段階3で扱う。

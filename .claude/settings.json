@@ -3,8 +3,10 @@
   "permissions": {
     "defaultMode": "default",
     "allow": [
-      "Bash(mf *)",
-      "Bash(duckdb -readonly *)",
+      "mcp__sl__list_metrics",
+      "mcp__sl__get_dimensions",
+      "mcp__sl__query_metrics",
+      "mcp__sl__run_sql",
       "Bash(dbt parse *)",
       "Bash(dbt ls *)",
       "Bash(dbt compile *)",
@@ -35,6 +37,8 @@
       "Bash(pip3 install *)",
       "Bash(docker volume rm *)",
       "Bash(docker system prune *)",
+      "Bash(mf *)",
+      "Bash(duckdb *)",
       "Bash(git commit --no-verify *)",
       "Bash(git commit -n *)"
     ]
