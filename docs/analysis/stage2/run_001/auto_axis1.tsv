@@ -1,0 +1,79 @@
+# 確定値の写し 45 個を answer_queries.sql の出力と照合: OK / referrer 16 種
+sl_mcp_A1_r1	○	
+sl_mcp_A1_r2	○	
+sl_mcp_A1_r3	○	
+sl_mcp_A3_r1	○	
+sl_mcp_A3_r2	○	
+sl_mcp_A3_r3	○	
+sl_mcp_B2_r1	○	
+sl_mcp_B2_r2	○	
+sl_mcp_B2_r3	○	
+sl_mcp_B3_r1	○	
+sl_mcp_B3_r2	○	
+sl_mcp_B3_r3	○	
+sl_mcp_B4_r1	○	
+sl_mcp_B4_r2	○	
+sl_mcp_B4_r3	○	
+sl_mcp_B5_r1	○	
+sl_mcp_B5_r2	○	
+sl_mcp_B5_r3	○	
+sl_mcp_C1_r1	○	要確認
+sl_mcp_C1_r2	○	要確認
+sl_mcp_C1_r3	○	要確認
+sl_mcp_C2_r1	○	
+sl_mcp_C2_r2	○	
+sl_mcp_C2_r3	○	
+sl_mcp_C3_r1	×	要確認
+sl_mcp_C3_r2	○	要確認
+sl_mcp_C3_r3	×	要確認
+sl_mcp_D1_r1	○	
+sl_mcp_D1_r2	○	
+sl_mcp_D1_r3	○	
+sl_mcp_D2_r1	○	
+sl_mcp_D2_r2	○	
+sl_mcp_D2_r3	○	
+sl_mcp_D5_r1	○	
+sl_mcp_D5_r2	×	
+sl_mcp_D5_r3	○	
+sl_mcp_D6_r1	×	要確認
+sl_mcp_D6_r2	×	要確認
+sl_mcp_D6_r3	×	要確認
+sql_mcp_A1_r1	○	
+sql_mcp_A1_r2	○	
+sql_mcp_A1_r3	○	
+sql_mcp_A3_r1	○	
+sql_mcp_A3_r2	○	
+sql_mcp_A3_r3	○	
+sql_mcp_B2_r1	○	
+sql_mcp_B2_r2	○	
+sql_mcp_B2_r3	○	
+sql_mcp_B3_r1	○	
+sql_mcp_B3_r2	○	
+sql_mcp_B3_r3	○	
+sql_mcp_B4_r1	×	
+sql_mcp_B4_r2	×	
+sql_mcp_B4_r3	×	
+sql_mcp_B5_r1	○	
+sql_mcp_B5_r2	○	
+sql_mcp_B5_r3	○	
+sql_mcp_C1_r1	○	要確認
+sql_mcp_C1_r2	○	要確認
+sql_mcp_C1_r3	○	要確認
+sql_mcp_C2_r1	×	
+sql_mcp_C2_r2	×	
+sql_mcp_C2_r3	×	
+sql_mcp_C3_r1	×	要確認
+sql_mcp_C3_r2	×	要確認
+sql_mcp_C3_r3	○	要確認
+sql_mcp_D1_r1	○	
+sql_mcp_D1_r2	○	
+sql_mcp_D1_r3	○	
+sql_mcp_D2_r1	○	
+sql_mcp_D2_r2	○	
+sql_mcp_D2_r3	○	
+sql_mcp_D5_r1	○	
+sql_mcp_D5_r2	○	
+sql_mcp_D5_r3	○	
+sql_mcp_D6_r1	×	要確認
+sql_mcp_D6_r2	×	要確認
+sql_mcp_D6_r3	×	要確認

@@ -1,0 +1,215 @@
+{
+  "side": "sl",
+  "group": "sql_mcp",
+  "question": "メッセージの種類ごとのクリック数を出して",
+  "started_at": "2026-11-02T16:26:18+09:00",
+  "ended_at": "2026-11-02T16:26:43+09:00",
+  "exit_code": 0,
+  "claude_version": "2.1.316 (Claude Code)",
+  "model_flag": "claude-opus-5-5",
+  "effort": "medium",
+  "init_model": "claude-opus-5-5",
+  "models_used": [
+    "claude-opus-5-5"
+  ],
+  "flags": [
+    "-p",
+    "<質問>",
+    "--system-prompt",
+    "あなたはデータアナリストです。今日は 2026-10-29 です。使える道具を使って、質問に答えてください。\n答えは、質問した人に向けて日本語で書いてください。道具を使わずに答える場合は、理由を書いてください。",
+    "--model",
+    "claude-opus-5-5",
+    "--effort",
+    "medium",
+    "--tools",
+    "",
+    "--mcp-config",
+    "~/stage2-venue/mcp_sql_mcp.json",
+    "--strict-mcp-config",
+    "--allowedTools",
+    "mcp__data__list_metrics",
+    "mcp__data__run_sql",
+    "--permission-mode",
+    "dontAsk",
+    "--permission-prompts",
+    "none",
+    "--restricted",
+    "--disable-slash-commands",
+    "--max-turns",
+    "20",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--no-session-persistence"
+  ],
+  "env_set": {
+    "CLAUDE_CODE_DISABLE_CLAUDE_MDS": "1",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+    "DISABLE_AUTOUPDATER": "1",
+    "ENABLE_TOOL_SEARCH": "false"
+  },
+  "env_stripped_names": [
+    "CLAUDECODE",
+    "CLAUDE_CODE_BRIDGE_SESSION_ID",
+    "CLAUDE_CODE_CHILD_SESSION",
+    "CLAUDE_CODE_ENTRYPOINT",
+    "CLAUDE_CODE_EXECPATH",
+    "CLAUDE_CODE_MESSAGING_SOCKET",
+    "CLAUDE_CODE_MESSAGING_TOKEN",
+    "CLAUDE_CODE_SESSION_ATTENDED",
+    "CLAUDE_CODE_SESSION_ID",
+    "CLAUDE_EFFORT",
+    "CLAUDE_PID"
+  ],
+  "init": {
+    "claude_code_version": "2.1.316",
+    "tools": [
+      "mcp__data__list_metrics",
+      "mcp__data__run_sql"
+    ],
+    "mcp_servers": [
+      {
+        "name": "data",
+        "status": "connected",
+        "source": "dynamic"
+      }
+    ],
+    "plugins": [
+      {
+        "name": "cc-plugin-agents-md",
+        "path": "builtin",
+        "source": "cc-plugin-agents-md@builtin"
+      },
+      {
+        "name": "cc-plugin-telemetry",
+        "path": "builtin",
+        "source": "cc-plugin-telemetry@builtin"
+      },
+      {
+        "name": "cc-plugin-plugin-authoring",
+        "path": "builtin",
+        "source": "cc-plugin-plugin-authoring@builtin"
+      },
+      {
+        "name": "cc-plugin-easel",
+        "path": "builtin",
+        "source": "cc-plugin-easel@builtin"
+      }
+    ],
+    "skills": [],
+    "slash_commands": [],
+    "output_style": "default",
+    "permissionMode": "dontAsk",
+    "apiKeySource": "none",
+    "agents": [
+      "claude",
+      "Explore",
+      "general-purpose",
+      "Plan",
+      "statusline-setup"
+    ],
+    "per_turn_effort_active": true,
+    "additional_directories": []
+  },
+  "stop_reason": "end_turn",
+  "terminal_reason": "completed",
+  "safety_stops": 0,
+  "calls": [
+    {
+      "seq": 1,
+      "tool": "mcp__data__list_metrics",
+      "input": {},
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"metrics\":[{\"name\":\"ctr\",\"description\":\"クリック率 = クリック数 ÷ 配信数\"},{\"name\":\"clicked_count\",\"description\":\"クリック数\"},{\"name\":\"delivered_count\",\"description\":\"配信数\"},{\"name\":\"revenue_amount\",\"description\":\"売上額（最新スナップショットの値。未確定の月を含む）。\\n★通貨混在：JPY と USD を無変換で合算しているため、\\ncurrency で絞らない全体値は意味を持たない。\\n\"},{\"name\":\"subscription_count\",\"description\":\"登録数（全量。U プレフィックスが欠けた contact_id を含む実データそのまま）\"}]}"
+    },
+    {
+      "seq": 2,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select table_schema, table_name, column_name, data_type from information_schema.columns order by 1,2"
+      },
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"results\":[{\"row_count\":83,\"truncated\":false,\"rows\":[{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"account_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"account_seq\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"handle\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"account_name\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"industry\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"plan_type\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"region\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"status\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"created_at\",\"data_type\":\"TIMESTAMP\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"as_of_date\",\"data_type\":\"DATE\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"event_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"dt\",\"data_type\":\"DATE\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"message_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"account_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"contact_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"message_type\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"event_type\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"event_timestamp\",\"data_type\":\"TIMESTAMP\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"click_url\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"is_valid_event_type\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"is_valid_click\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"is_late_arrival\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"is_valid_contact_id\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"account_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"revenue_month\",\"data_type\":\"DATE\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"snapshot_date\",\"data_type\":\"DATE\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"revenue_amount\",\"data_type\":\"BIGINT\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"currency\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"message_count\",\"data_type\":\"BIGINT\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"is_finalized\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"is_zero_revenue\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"is_latest_snapshot\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_subscription\",\"column_name\":\"event_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_subscription\",\"column_name\":\"account_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_subscription\",\"column_name\":\"contact_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_subscription\",\"column_name\":\"is_valid_contact_id\",\"data_type\":\"BOOLEAN\"},{…（切った）"
+    },
+    {
+      "seq": 3,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select message_type, event_type, is_valid_event_type, is_valid_click, count(*) n, count(distinct event_id) de from main_mart.fct_message_event group by all order by 1,2,3,4"
+      },
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"results\":[{\"row_count\":77,\"truncated\":false,\"rows\":[{\"message_type\":\"flex\",\"event_type\":\"CLICK\",\"is_valid_event_type\":false,\"is_valid_click\":false,\"n\":1,\"de\":1},{\"message_type\":\"flex\",\"event_type\":\"CLICK\",\"is_valid_event_type\":false,\"is_valid_click\":true,\"n\":6,\"de\":6},{\"message_type\":\"flex\",\"event_type\":\"blocked\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":24,\"de\":24},{\"message_type\":\"flex\",\"event_type\":\"clicked\",\"is_valid_event_type\":true,\"is_valid_click\":false,\"n\":17,\"de\":17},{\"message_type\":\"flex\",\"event_type\":\"clicked\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":151,\"de\":151},{\"message_type\":\"flex\",\"event_type\":\"deliverd\",\"is_valid_event_type\":false,\"is_valid_click\":false,\"n\":1,\"de\":1},{\"message_type\":\"flex\",\"event_type\":\"deliverd\",\"is_valid_event_type\":false,\"is_valid_click\":true,\"n\":6,\"de\":6},{\"message_type\":\"flex\",\"event_type\":\"delivered\",\"is_valid_event_type\":true,\"is_valid_click\":false,\"n\":11,\"de\":11},{\"message_type\":\"flex\",\"event_type\":\"delivered\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":1192,\"de\":1192},{\"message_type\":\"flex\",\"event_type\":\"failed\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":32,\"de\":32},{\"message_type\":\"flex\",\"event_type\":\"open\",\"is_valid_event_type\":false,\"is_valid_click\":false,\"n\":1,\"de\":1},{\"message_type\":\"flex\",\"event_type\":\"open\",\"is_valid_event_type\":false,\"is_valid_click\":true,\"n\":6,\"de\":6},{\"message_type\":\"flex\",\"event_type\":\"opened\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":549,\"de\":549},{\"message_type\":\"flex\",\"event_type\":\"unsubscribe\",\"is_valid_event_type\":false,\"is_valid_click\":true,\"n\":6,\"de\":6},{\"message_type\":\"flex\",\"event_type\":null,\"is_valid_event_type\":null,\"is_valid_click\":false,\"n\":8,\"de\":8},{\"message_type\":\"image\",\"event_type\":\"CLICK\",\"is_valid_event_type\":false,\"is_valid_click\":false,\"n\":2,\"de\":2},{\"message_type\":\"image\",\"event_type\":\"CLICK\",\"is_valid_event_type\":false,\"is_valid_click\":true,\"n\":2,\"de\":2},{\"message_type\":\"image\",\"event_type\":\"blocked\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":42,\"de\":42},{\"message_type\":\"image\",\"event_type\":\"clicked\",\"is_valid_event_type\":true,\"is_valid_click\":false,\"n\":14,\"de\":14},{\"message_type\":\"image\",\"event_type\":\"clicked\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":201,\"de\":201},{\"message_type\":\"image\",\"event_type\":\"deliverd\",\"is_valid_event_type\":false,\"is_valid_click\":true,\"n\":4,\"de\":4},{\"message_type\":\"image\",\"event_type\":\"delivered\",\"is_valid_event_type\":true,\"is_valid_click\":false,\"n\":17,\"de\":17},{\"message_type\":\"image\",\"event_type\":\"delivered\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":1523,\"de\":1523},{\"message_type\":\"image\",\"event_type\":\"failed\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":37,\"de\":37},{\"message_type\":\"image\",\"event_type\":\"open\",\"is_valid_event_type\":false,\"is_valid_click\":false,\"n\":2,\"de\":2},{\"message_type\":\"image\",\"event_type\":\"open\",\"is_valid_event_type\":false,\"is_valid_click\":true,\"n\":3,\"de\":3},{\"message_type\":\"image\",\"event_type\":\"opened\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":720,\"de\":720},{\"message_type\":\"image\",\"event_type\":\"unsubscribe\",\"is_valid_event_type\":false,\"is_valid_click\":false,\"n\":3,\"de\":3},{\"message_type\":\"image\",\"event_type\":\"unsubscribe\",\"is_valid_event_type\":false,\"is_valid_click\":true,\"n\":1,\"de\":1},{\"message_type\":\"image\",\"event_type\":null,\"is_valid_event_type\":null,\"is_valid_click\":false,\"n\":6,\"de\":6},{\"message_type\":\"imagemap\",\"event_type\":\"CLICK\",\"is_valid_event_type\":false,\"is_valid_click\":false,\"n\":1,\"de\":1},{\"message_type\":\"imagemap\",\"event_type\":\"CLICK\",\"is_valid_event_type\":false,\"is_valid_click\":true,\"n\":2,\"de\":2},{\"message_type\":\"imagemap\",\"event_type\":\"blocked\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":36,\"de\":36},{\"message_type\":\"imagemap\",\"event_type\":\"clicked\",\"is_valid_event_type\":true,\"is_valid_click\":false,\"n\":29,\"de\":29},{\"message_type\":\"imagemap\",\"event_type\":\"clicked\",\"is_valid_event_type\":true,\"is_valid_click\":true,\"n\":243,\"de\":2…（切った）"
+    },
+    {
+      "seq": 4,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select event_type, is_valid_click, click_url is null as url_null, is_late_arrival, is_valid_contact_id, count(*) n, min(click_url) ex from main_mart.fct_message_event where lower(event_type) in ('clicked','click') group by all order by 1,2,3"
+      },
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"results\":[{\"row_count\":8,\"truncated\":false,\"rows\":[{\"event_type\":\"CLICK\",\"is_valid_click\":false,\"url_null\":false,\"is_late_arrival\":false,\"is_valid_contact_id\":true,\"n\":7,\"ex\":\"https://example-saas.jp/campaign/spring\"},{\"event_type\":\"CLICK\",\"is_valid_click\":true,\"url_null\":true,\"is_late_arrival\":false,\"is_valid_contact_id\":true,\"n\":22,\"ex\":null},{\"event_type\":\"clicked\",\"is_valid_click\":false,\"url_null\":true,\"is_late_arrival\":true,\"is_valid_contact_id\":true,\"n\":1,\"ex\":null},{\"event_type\":\"clicked\",\"is_valid_click\":false,\"url_null\":true,\"is_late_arrival\":false,\"is_valid_contact_id\":false,\"n\":9,\"ex\":null},{\"event_type\":\"clicked\",\"is_valid_click\":false,\"url_null\":true,\"is_late_arrival\":false,\"is_valid_contact_id\":true,\"n\":90,\"ex\":null},{\"event_type\":\"clicked\",\"is_valid_click\":true,\"url_null\":false,\"is_late_arrival\":true,\"is_valid_contact_id\":true,\"n\":7,\"ex\":\"https://example-saas.jp/campaign/spring\"},{\"event_type\":\"clicked\",\"is_valid_click\":true,\"url_null\":false,\"is_late_arrival\":false,\"is_valid_contact_id\":false,\"n\":100,\"ex\":\"https://example-saas.jp/campaign/spring\"},{\"event_type\":\"clicked\",\"is_valid_click\":true,\"url_null\":false,\"is_late_arrival\":false,\"is_valid_contact_id\":true,\"n\":924,\"ex\":\"https://example-saas.jp/campaign/spring\"}]}]}"
+    },
+    {
+      "seq": 5,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select message_type,\n count(*) filter (where event_type='clicked') clicked_all,\n count(*) filter (where event_type='clicked' and click_url is not null) clicked_with_url,\n count(*) filter (where event_type='clicked' and click_url is null) clicked_no_url,\n count(*) filter (where event_type='CLICK') upper_click,\n count(*) filter (where event_type='delivered') delivered,\n min(dt), max(dt)\nfrom main_mart.fct_message_event group by 1 order by 2 desc"
+      },
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"results\":[{\"row_count\":5,\"truncated\":false,\"rows\":[{\"message_type\":\"imagemap\",\"clicked_all\":272,\"clicked_with_url\":243,\"clicked_no_url\":29,\"upper_click\":3,\"delivered\":2200,\"min(dt)\":\"2025-11-18\",\"max(dt)\":\"2026-04-12\"},{\"message_type\":\"video\",\"clicked_all\":251,\"clicked_with_url\":232,\"clicked_no_url\":19,\"upper_click\":6,\"delivered\":1904,\"min(dt)\":\"2025-11-19\",\"max(dt)\":\"2026-04-12\"},{\"message_type\":\"text\",\"clicked_all\":225,\"clicked_with_url\":204,\"clicked_no_url\":21,\"upper_click\":9,\"delivered\":1581,\"min(dt)\":\"2025-11-16\",\"max(dt)\":\"2026-04-12\"},{\"message_type\":\"image\",\"clicked_all\":215,\"clicked_with_url\":201,\"clicked_no_url\":14,\"upper_click\":4,\"delivered\":1540,\"min(dt)\":\"2025-11-16\",\"max(dt)\":\"2026-04-13\"},{\"message_type\":\"flex\",\"clicked_all\":168,\"clicked_with_url\":151,\"clicked_no_url\":17,\"upper_click\":7,\"delivered\":1203,\"min(dt)\":\"2025-11-16\",\"max(dt)\":\"2026-04-12\"}]}]}"
+    }
+  ],
+  "n_tool_use": 5,
+  "n_tool_result": 5,
+  "final_answer": "メッセージの種類ごとのクリック数です。集計期間はデータにある全期間（2025-11-16〜2026-04-13）で、`main_mart.fct_message_event` を使いました。\n\n| メッセージの種類 | クリック数 | うち URL ありのクリック | うち URL 欠損 |\n|---|---:|---:|---:|\n| imagemap | **272** | 243 | 29 |\n| video | **251** | 232 | 19 |\n| text | **225** | 204 | 21 |\n| image | **215** | 201 | 14 |\n| flex | **168** | 151 | 17 |\n| **合計** | **1,131** | **1,031** | **100** |\n\nクリック数がいちばん多いのは imagemap で、いちばん少ないのは flex です。どちらの数え方でも、種類の順位は同じです。\n\n**数え方について**\n- 「クリック数」は `event_type = 'clicked'` の件数です。`event_id` に重複はありませんでした。\n- 登録済みの指標「clicked_count」は説明が「クリック数」としか書かれておらず、細かい条件は確認できませんでした。そのため上の表は SQL で直接数えています。\n- **URL 欠損（100件）を含めるかどうかで、数字が変わります。** クリックとして記録されているのに `click_url` が空の行です。クリックとして確かなものだけ数えるなら「URL ありのクリック」の列（合計1,031件）を使ってください。\n- **表記の違う `CLICK`（大文字）29件は数えていません。** システムでは無効なイベントとされています（imagemap 3件、video 6件、text 9件、image 4件、flex 7件）。クリックとして数えても合計1,160件で、順位は変わりません。\n- `contact_id` の形式がおかしい行（109件）と、遅れて届いたイベント（8件）は、件数が小さいので含めたままにしています。\n\n月ごとの推移やクリック率（クリック数 ÷ 配信数）も必要でしたら、続けて出せます。",
+  "no_query": false,
+  "result_subtype": "success",
+  "is_error": false,
+  "num_turns": 6,
+  "duration_ms": 24105,
+  "total_cost_usd": 0.124861,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 10830,
+    "cache_read_input_tokens": 29405,
+    "output_tokens": 1615,
+    "output_tokens_details": {
+      "thinking_tokens": 312
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 10830,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 746,
+        "cache_read_input_tokens": 10919,
+        "cache_creation_input_tokens": 836,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 836
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "permission_denials": [],
+  "n_events": 24,
+  "problems": [],
+  "id": "A1",
+  "rep": 1
+}

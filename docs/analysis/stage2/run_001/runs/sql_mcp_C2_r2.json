@@ -1,0 +1,215 @@
+{
+  "side": "sl",
+  "group": "sql_mcp",
+  "question": "契約プラン別に売上を比べたい",
+  "started_at": "2026-11-02T16:38:51+09:00",
+  "ended_at": "2026-11-02T16:39:17+09:00",
+  "exit_code": 0,
+  "claude_version": "2.1.316 (Claude Code)",
+  "model_flag": "claude-opus-5-5",
+  "effort": "medium",
+  "init_model": "claude-opus-5-5",
+  "models_used": [
+    "claude-opus-5-5"
+  ],
+  "flags": [
+    "-p",
+    "<質問>",
+    "--system-prompt",
+    "あなたはデータアナリストです。今日は 2026-10-29 です。使える道具を使って、質問に答えてください。\n答えは、質問した人に向けて日本語で書いてください。道具を使わずに答える場合は、理由を書いてください。",
+    "--model",
+    "claude-opus-5-5",
+    "--effort",
+    "medium",
+    "--tools",
+    "",
+    "--mcp-config",
+    "~/stage2-venue/mcp_sql_mcp.json",
+    "--strict-mcp-config",
+    "--allowedTools",
+    "mcp__data__list_metrics",
+    "mcp__data__run_sql",
+    "--permission-mode",
+    "dontAsk",
+    "--permission-prompts",
+    "none",
+    "--restricted",
+    "--disable-slash-commands",
+    "--max-turns",
+    "20",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--no-session-persistence"
+  ],
+  "env_set": {
+    "CLAUDE_CODE_DISABLE_CLAUDE_MDS": "1",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+    "DISABLE_AUTOUPDATER": "1",
+    "ENABLE_TOOL_SEARCH": "false"
+  },
+  "env_stripped_names": [
+    "CLAUDECODE",
+    "CLAUDE_CODE_BRIDGE_SESSION_ID",
+    "CLAUDE_CODE_CHILD_SESSION",
+    "CLAUDE_CODE_ENTRYPOINT",
+    "CLAUDE_CODE_EXECPATH",
+    "CLAUDE_CODE_MESSAGING_SOCKET",
+    "CLAUDE_CODE_MESSAGING_TOKEN",
+    "CLAUDE_CODE_SESSION_ATTENDED",
+    "CLAUDE_CODE_SESSION_ID",
+    "CLAUDE_EFFORT",
+    "CLAUDE_PID"
+  ],
+  "init": {
+    "claude_code_version": "2.1.316",
+    "tools": [
+      "mcp__data__list_metrics",
+      "mcp__data__run_sql"
+    ],
+    "mcp_servers": [
+      {
+        "name": "data",
+        "status": "connected",
+        "source": "dynamic"
+      }
+    ],
+    "plugins": [
+      {
+        "name": "cc-plugin-agents-md",
+        "path": "builtin",
+        "source": "cc-plugin-agents-md@builtin"
+      },
+      {
+        "name": "cc-plugin-telemetry",
+        "path": "builtin",
+        "source": "cc-plugin-telemetry@builtin"
+      },
+      {
+        "name": "cc-plugin-plugin-authoring",
+        "path": "builtin",
+        "source": "cc-plugin-plugin-authoring@builtin"
+      },
+      {
+        "name": "cc-plugin-easel",
+        "path": "builtin",
+        "source": "cc-plugin-easel@builtin"
+      }
+    ],
+    "skills": [],
+    "slash_commands": [],
+    "output_style": "default",
+    "permissionMode": "dontAsk",
+    "apiKeySource": "none",
+    "agents": [
+      "claude",
+      "Explore",
+      "general-purpose",
+      "Plan",
+      "statusline-setup"
+    ],
+    "per_turn_effort_active": true,
+    "additional_directories": []
+  },
+  "stop_reason": "end_turn",
+  "terminal_reason": "completed",
+  "safety_stops": 0,
+  "calls": [
+    {
+      "seq": 1,
+      "tool": "mcp__data__list_metrics",
+      "input": {},
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"metrics\":[{\"name\":\"ctr\",\"description\":\"クリック率 = クリック数 ÷ 配信数\"},{\"name\":\"clicked_count\",\"description\":\"クリック数\"},{\"name\":\"delivered_count\",\"description\":\"配信数\"},{\"name\":\"revenue_amount\",\"description\":\"売上額（最新スナップショットの値。未確定の月を含む）。\\n★通貨混在：JPY と USD を無変換で合算しているため、\\ncurrency で絞らない全体値は意味を持たない。\\n\"},{\"name\":\"subscription_count\",\"description\":\"登録数（全量。U プレフィックスが欠けた contact_id を含む実データそのまま）\"}]}"
+    },
+    {
+      "seq": 2,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select table_schema, table_name, column_name, data_type from information_schema.columns order by 1,2"
+      },
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"results\":[{\"row_count\":83,\"truncated\":false,\"rows\":[{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"account_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"account_seq\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"handle\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"account_name\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"industry\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"plan_type\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"region\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"status\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"created_at\",\"data_type\":\"TIMESTAMP\"},{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\",\"column_name\":\"as_of_date\",\"data_type\":\"DATE\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"event_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"dt\",\"data_type\":\"DATE\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"message_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"account_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"contact_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"message_type\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"event_type\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"event_timestamp\",\"data_type\":\"TIMESTAMP\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"click_url\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"is_valid_event_type\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"is_valid_click\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"is_late_arrival\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\",\"column_name\":\"is_valid_contact_id\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"account_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"revenue_month\",\"data_type\":\"DATE\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"snapshot_date\",\"data_type\":\"DATE\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"revenue_amount\",\"data_type\":\"BIGINT\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"currency\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"message_count\",\"data_type\":\"BIGINT\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"is_finalized\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"is_zero_revenue\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\",\"column_name\":\"is_latest_snapshot\",\"data_type\":\"BOOLEAN\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_subscription\",\"column_name\":\"event_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_subscription\",\"column_name\":\"account_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_subscription\",\"column_name\":\"contact_id\",\"data_type\":\"VARCHAR\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_subscription\",\"column_name\":\"is_valid_contact_id\",\"data_type\":\"BOOLEAN\"},{…（切った）"
+    },
+    {
+      "seq": 3,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select plan_type, count(*), count(distinct account_id), min(as_of_date), max(as_of_date) from main_mart.dim_account group by 1;\nselect currency, is_finalized, is_latest_snapshot, count(*), min(revenue_month), max(revenue_month), sum(revenue_amount) from main_mart.fct_revenue group by all order by all;\nselect count(*) from main_mart.fct_revenue r left join main_mart.dim_account a using(account_id) where a.account_id is null;\nselect account_id, revenue_month, count(*) c from main_mart.fct_revenue where is_latest_snapshot group by all having c>1 limit 5;"
+      },
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"results\":[{\"row_count\":3,\"truncated\":false,\"rows\":[{\"plan_type\":\"free\",\"count_star()\":4,\"count(DISTINCT account_id)\":4,\"min(as_of_date)\":\"2026-04-15\",\"max(as_of_date)\":\"2026-04-15\"},{\"plan_type\":\"standard\",\"count_star()\":14,\"count(DISTINCT account_id)\":14,\"min(as_of_date)\":\"2026-04-15\",\"max(as_of_date)\":\"2026-04-15\"},{\"plan_type\":\"light\",\"count_star()\":2,\"count(DISTINCT account_id)\":2,\"min(as_of_date)\":\"2026-04-15\",\"max(as_of_date)\":\"2026-04-15\"}]},{\"row_count\":6,\"truncated\":false,\"rows\":[{\"currency\":\"JPY\",\"is_finalized\":false,\"is_latest_snapshot\":true,\"count_star()\":15,\"min(revenue_month)\":\"2026-04-01\",\"max(revenue_month)\":\"2026-04-01\",\"sum(revenue_amount)\":\"7958500\"},{\"currency\":\"JPY\",\"is_finalized\":true,\"is_latest_snapshot\":false,\"count_star()\":76,\"min(revenue_month)\":\"2025-11-01\",\"max(revenue_month)\":\"2026-03-01\",\"sum(revenue_amount)\":\"34628737\"},{\"currency\":\"JPY\",\"is_finalized\":true,\"is_latest_snapshot\":true,\"count_star()\":77,\"min(revenue_month)\":\"2025-11-01\",\"max(revenue_month)\":\"2026-03-01\",\"sum(revenue_amount)\":\"37481600\"},{\"currency\":\"USD\",\"is_finalized\":false,\"is_latest_snapshot\":true,\"count_star()\":1,\"min(revenue_month)\":\"2026-04-01\",\"max(revenue_month)\":\"2026-04-01\",\"sum(revenue_amount)\":\"851000\"},{\"currency\":\"USD\",\"is_finalized\":true,\"is_latest_snapshot\":false,\"count_star()\":7,\"min(revenue_month)\":\"2025-11-01\",\"max(revenue_month)\":\"2026-03-01\",\"sum(revenue_amount)\":\"3144468\"},{\"currency\":\"USD\",\"is_finalized\":true,\"is_latest_snapshot\":true,\"count_star()\":7,\"min(revenue_month)\":\"2025-11-01\",\"max(revenue_month)\":\"2026-03-01\",\"sum(revenue_amount)\":\"3330800\"}]},{\"row_count\":1,\"truncated\":false,\"rows\":[{\"count_star()\":1}]},{\"row_count\":0,\"truncated\":false,\"rows\":[]}]}"
+    },
+    {
+      "seq": 4,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select r.account_id, r.revenue_month, r.revenue_amount, r.currency, r.is_latest_snapshot from main_mart.fct_revenue r left join main_mart.dim_account a using(account_id) where a.account_id is null;\nselect coalesce(a.plan_type,'(マスタ未登録)') plan, r.currency, count(distinct r.account_id) accts, sum(case when r.is_finalized then r.revenue_amount end) fin_nov_mar, sum(case when not r.is_finalized then r.revenue_amount end) apr_unfinal, count(distinct r.revenue_month) months from main_mart.fct_revenue r left join main_mart.dim_account a using(account_id) where r.is_latest_snapshot group by all order by 2,1;\nselect a.plan_type, a.status, count(*) from main_mart.dim_account a group by all order by all;\nselect account_id, revenue_month, revenue_amount, is_zero_revenue from main_mart.fct_revenue where currency='USD' and is_latest_snapshot order by 1,2;"
+      },
+      "kind": "sql_error",
+      "is_error": false,
+      "response": "{\"kind\":\"sql_error\",\"message\":\"SQL がエラーになった。text は DuckDB の文。\",\"text\":\"Parser Error: syntax error at or near \\\"months\\\"\\n\\nLINE 1: ... then r.revenue_amount end) apr_unfinal, count(distinct r.revenue_month) months from main_mart.fct_revenue r left join...\\n                                                                        ^\"}"
+    },
+    {
+      "seq": 5,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select r.account_id, r.revenue_month, r.revenue_amount, r.currency, r.is_latest_snapshot from main_mart.fct_revenue r left join main_mart.dim_account a using(account_id) where a.account_id is null;\nselect coalesce(a.plan_type,'(マスタ未登録)') plan, r.currency, count(distinct r.account_id) accts, sum(case when r.is_finalized then r.revenue_amount end) fin_nov_mar, sum(case when not r.is_finalized then r.revenue_amount end) apr_unfinal, count(distinct r.revenue_month) n_months from main_mart.fct_revenue r left join main_mart.dim_account a using(account_id) where r.is_latest_snapshot group by all order by 2,1;\nselect a.plan_type, a.status, count(*) from main_mart.dim_account a group by all order by all;\nselect account_id, revenue_month, revenue_amount, is_zero_revenue from main_mart.fct_revenue where currency='USD' and is_latest_snapshot order by 1,2;"
+      },
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"results\":[{\"row_count\":1,\"truncated\":false,\"rows\":[{\"account_id\":\"Uffffffffffffffffffffffffffffffff\",\"revenue_month\":\"2026-02-01\",\"revenue_amount\":120000,\"currency\":\"JPY\",\"is_latest_snapshot\":true}]},{\"row_count\":6,\"truncated\":false,\"rows\":[{\"plan\":\"(マスタ未登録)\",\"currency\":\"JPY\",\"accts\":1,\"fin_nov_mar\":\"120000\",\"apr_unfinal\":null,\"n_months\":1},{\"plan\":\"free\",\"currency\":\"JPY\",\"accts\":3,\"fin_nov_mar\":\"6071100\",\"apr_unfinal\":\"569300\",\"n_months\":6},{\"plan\":\"light\",\"currency\":\"JPY\",\"accts\":1,\"fin_nov_mar\":\"2783900\",\"apr_unfinal\":\"949100\",\"n_months\":5},{\"plan\":\"standard\",\"currency\":\"JPY\",\"accts\":14,\"fin_nov_mar\":\"28506600\",\"apr_unfinal\":\"6440100\",\"n_months\":6},{\"plan\":\"free\",\"currency\":\"USD\",\"accts\":1,\"fin_nov_mar\":\"1597200\",\"apr_unfinal\":\"851000\",\"n_months\":4},{\"plan\":\"light\",\"currency\":\"USD\",\"accts\":1,\"fin_nov_mar\":\"1733600\",\"apr_unfinal\":null,\"n_months\":4}]},{\"row_count\":7,\"truncated\":false,\"rows\":[{\"plan_type\":\"free\",\"status\":\"closed\",\"count_star()\":2},{\"plan_type\":\"free\",\"status\":\"suspended\",\"count_star()\":2},{\"plan_type\":\"light\",\"status\":\"active\",\"count_star()\":1},{\"plan_type\":\"light\",\"status\":\"closed\",\"count_star()\":1},{\"plan_type\":\"standard\",\"status\":\"active\",\"count_star()\":11},{\"plan_type\":\"standard\",\"status\":\"closed\",\"count_star()\":2},{\"plan_type\":\"standard\",\"status\":\"suspended\",\"count_star()\":1}]},{\"row_count\":8,\"truncated\":false,\"rows\":[{\"account_id\":\"U7e808d11d6f9901a954a542a7ee09918\",\"revenue_month\":\"2025-11-01\",\"revenue_amount\":735800,\"is_zero_revenue\":false},{\"account_id\":\"U7e808d11d6f9901a954a542a7ee09918\",\"revenue_month\":\"2026-02-01\",\"revenue_amount\":69800,\"is_zero_revenue\":false},{\"account_id\":\"U7e808d11d6f9901a954a542a7ee09918\",\"revenue_month\":\"2026-03-01\",\"revenue_amount\":791600,\"is_zero_revenue\":false},{\"account_id\":\"U7e808d11d6f9901a954a542a7ee09918\",\"revenue_month\":\"2026-04-01\",\"revenue_amount\":851000,\"is_zero_revenue\":false},{\"account_id\":\"Ud7cd4c737b35e126236570d6cf0e97f4\",\"revenue_month\":\"2025-11-01\",\"revenue_amount\":573800,\"is_zero_revenue\":false},{\"account_id\":\"Ud7cd4c737b35e126236570d6cf0e97f4\",\"revenue_month\":\"2025-12-01\",\"revenue_amount\":674600,\"is_zero_revenue\":false},{\"account_id\":\"Ud7cd4c737b35e126236570d6cf0e97f4\",\"revenue_month\":\"2026-01-01\",\"revenue_amount\":116600,\"is_zero_revenue\":false},{\"account_id\":\"Ud7cd4c737b35e126236570d6cf0e97f4\",\"revenue_month\":\"2026-02-01\",\"revenue_amount\":368600,\"is_zero_revenue\":false}]}]}"
+    }
+  ],
+  "n_tool_use": 5,
+  "n_tool_result": 5,
+  "final_answer": "契約プラン別の売上を比べると、円建てでは standard が全体の約4分の3を占めます。ただし1アカウントあたりで見ると、プランによる差はほとんどありません。\n\n**集計の条件**\n- 売上は円とドルを換算せずに足し合わせてあるため、通貨ごとに分けて集計しました。\n- 確定済みの2025年11月〜2026年3月を中心にしています。2026年4月は未確定なので別の列にしました。\n- 同じ月に複数の版がある売上は、最新の版だけを使いました。\n- プランは、アカウント情報（2026-04-15 時点）に登録されているプランで分けています。\n\n**円建ての売上**\n\n| プラン | アカウント数 | 確定売上（2025年11月〜2026年3月） | 1アカウントあたり | 4月（未確定） |\n|---|---|---|---|---|\n| standard | 14 | 28,506,600 | 約2,036,000 | 6,440,100 |\n| free | 3 | 6,071,100 | 約2,024,000 | 569,300 |\n| light | 1 | 2,783,900 | 2,783,900 | 949,100 |\n| プラン不明 | 1 | 120,000 | – | – |\n\n**ドル建ての売上**（表示はデータの値のままです。単位がドルかセントかは確認できていません）\n\n| プラン | アカウント数 | 確定売上（2025年11月〜2026年3月） | 4月（未確定） |\n|---|---|---|---|\n| light | 1 | 1,733,600 | – |\n| free | 1 | 1,597,200 | 851,000 |\n\n**ポイント**\n- **standard は合計が大きいが、1アカウントあたりは free と同じくらい**：standard は円建て確定売上の約76%を占めますが、これはアカウント数が多いためです。\n- **light は件数が少なすぎる**：円建て・ドル建てとも1アカウントずつしかないため、プランの傾向として比べるのは難しいです。\n\n**注意点**\n1. **無料プランなのに売上が出ている**：free の4アカウントすべてに売上があり、状態はすべて「解約」または「停止中」です。プランは4月15日時点の値なので、以前は有料プランだったものが free に変わった可能性があります。正確に比べるには、各月時点のプランが必要です。\n2. **アカウント情報にない ID が1件ある**：`Uffffffffffffffffffffffffffffffff` に2026年2月の売上120,000円が付いていますが、アカウント情報に登録がありません。ダミーの ID の可能性があります。\n3. **月の数がアカウントごとに違う**：売上の記録がある月の数はアカウントによって異なるため、1アカウントあたりの値はおおよその目安です。\n\n各月時点のプランで分け直す、月ごとの推移を見る、といった集計が必要であれば教えてください。",
+  "no_query": false,
+  "result_subtype": "success",
+  "is_error": false,
+  "num_turns": 6,
+  "duration_ms": 25231,
+  "total_cost_usd": 0.1211566,
+  "usage": {
+    "input_tokens": 10,
+    "cache_creation_input_tokens": 8245,
+    "cache_read_input_tokens": 23683,
+    "output_tokens": 2521,
+    "output_tokens_details": {
+      "thinking_tokens": 332
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 8245,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1194,
+        "cache_read_input_tokens": 7805,
+        "cache_creation_input_tokens": 1626,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1626
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "permission_denials": [],
+  "n_events": 23,
+  "problems": [],
+  "id": "C2",
+  "rep": 2
+}

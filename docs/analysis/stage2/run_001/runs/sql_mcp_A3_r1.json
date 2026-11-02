@@ -1,0 +1,225 @@
+{
+  "side": "sl",
+  "group": "sql_mcp",
+  "question": "流入経路ごとの登録数は？",
+  "started_at": "2026-11-02T16:26:43+09:00",
+  "ended_at": "2026-11-02T16:27:12+09:00",
+  "exit_code": 0,
+  "claude_version": "2.1.316 (Claude Code)",
+  "model_flag": "claude-opus-5-5",
+  "effort": "medium",
+  "init_model": "claude-opus-5-5",
+  "models_used": [
+    "claude-opus-5-5"
+  ],
+  "flags": [
+    "-p",
+    "<質問>",
+    "--system-prompt",
+    "あなたはデータアナリストです。今日は 2026-10-29 です。使える道具を使って、質問に答えてください。\n答えは、質問した人に向けて日本語で書いてください。道具を使わずに答える場合は、理由を書いてください。",
+    "--model",
+    "claude-opus-5-5",
+    "--effort",
+    "medium",
+    "--tools",
+    "",
+    "--mcp-config",
+    "~/stage2-venue/mcp_sql_mcp.json",
+    "--strict-mcp-config",
+    "--allowedTools",
+    "mcp__data__list_metrics",
+    "mcp__data__run_sql",
+    "--permission-mode",
+    "dontAsk",
+    "--permission-prompts",
+    "none",
+    "--restricted",
+    "--disable-slash-commands",
+    "--max-turns",
+    "20",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--no-session-persistence"
+  ],
+  "env_set": {
+    "CLAUDE_CODE_DISABLE_CLAUDE_MDS": "1",
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+    "DISABLE_AUTOUPDATER": "1",
+    "ENABLE_TOOL_SEARCH": "false"
+  },
+  "env_stripped_names": [
+    "CLAUDECODE",
+    "CLAUDE_CODE_BRIDGE_SESSION_ID",
+    "CLAUDE_CODE_CHILD_SESSION",
+    "CLAUDE_CODE_ENTRYPOINT",
+    "CLAUDE_CODE_EXECPATH",
+    "CLAUDE_CODE_MESSAGING_SOCKET",
+    "CLAUDE_CODE_MESSAGING_TOKEN",
+    "CLAUDE_CODE_SESSION_ATTENDED",
+    "CLAUDE_CODE_SESSION_ID",
+    "CLAUDE_EFFORT",
+    "CLAUDE_PID"
+  ],
+  "init": {
+    "claude_code_version": "2.1.316",
+    "tools": [
+      "mcp__data__list_metrics",
+      "mcp__data__run_sql"
+    ],
+    "mcp_servers": [
+      {
+        "name": "data",
+        "status": "connected",
+        "source": "dynamic"
+      }
+    ],
+    "plugins": [
+      {
+        "name": "cc-plugin-agents-md",
+        "path": "builtin",
+        "source": "cc-plugin-agents-md@builtin"
+      },
+      {
+        "name": "cc-plugin-telemetry",
+        "path": "builtin",
+        "source": "cc-plugin-telemetry@builtin"
+      },
+      {
+        "name": "cc-plugin-plugin-authoring",
+        "path": "builtin",
+        "source": "cc-plugin-plugin-authoring@builtin"
+      },
+      {
+        "name": "cc-plugin-easel",
+        "path": "builtin",
+        "source": "cc-plugin-easel@builtin"
+      }
+    ],
+    "skills": [],
+    "slash_commands": [],
+    "output_style": "default",
+    "permissionMode": "dontAsk",
+    "apiKeySource": "none",
+    "agents": [
+      "claude",
+      "Explore",
+      "general-purpose",
+      "Plan",
+      "statusline-setup"
+    ],
+    "per_turn_effort_active": true,
+    "additional_directories": []
+  },
+  "stop_reason": "end_turn",
+  "terminal_reason": "completed",
+  "safety_stops": 0,
+  "calls": [
+    {
+      "seq": 1,
+      "tool": "mcp__data__list_metrics",
+      "input": {},
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"metrics\":[{\"name\":\"ctr\",\"description\":\"クリック率 = クリック数 ÷ 配信数\"},{\"name\":\"clicked_count\",\"description\":\"クリック数\"},{\"name\":\"delivered_count\",\"description\":\"配信数\"},{\"name\":\"revenue_amount\",\"description\":\"売上額（最新スナップショットの値。未確定の月を含む）。\\n★通貨混在：JPY と USD を無変換で合算しているため、\\ncurrency で絞らない全体値は意味を持たない。\\n\"},{\"name\":\"subscription_count\",\"description\":\"登録数（全量。U プレフィックスが欠けた contact_id を含む実データそのまま）\"}]}"
+    },
+    {
+      "seq": 2,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select table_schema, table_name from information_schema.tables"
+      },
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"results\":[{\"row_count\":9,\"truncated\":false,\"rows\":[{\"table_schema\":\"main_mart\",\"table_name\":\"dim_account\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_message_event\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_revenue\"},{\"table_schema\":\"main_mart\",\"table_name\":\"fct_subscription\"},{\"table_schema\":\"main_mart\",\"table_name\":\"metricflow_time_spine\"},{\"table_schema\":\"main_staging\",\"table_name\":\"stg_account_master\"},{\"table_schema\":\"main_staging\",\"table_name\":\"stg_message_event\"},{\"table_schema\":\"main_staging\",\"table_name\":\"stg_revenue_monthly\"},{\"table_schema\":\"main_staging\",\"table_name\":\"stg_subscription\"}]}]}"
+    },
+    {
+      "seq": 3,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select column_name, data_type from information_schema.columns where table_name='fct_subscription'"
+      },
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"results\":[{\"row_count\":9,\"truncated\":false,\"rows\":[{\"column_name\":\"event_id\",\"data_type\":\"VARCHAR\"},{\"column_name\":\"account_id\",\"data_type\":\"VARCHAR\"},{\"column_name\":\"contact_id\",\"data_type\":\"VARCHAR\"},{\"column_name\":\"is_valid_contact_id\",\"data_type\":\"BOOLEAN\"},{\"column_name\":\"added_at\",\"data_type\":\"TIMESTAMP\"},{\"column_name\":\"dt\",\"data_type\":\"DATE\"},{\"column_name\":\"route\",\"data_type\":\"VARCHAR\"},{\"column_name\":\"referrer\",\"data_type\":\"VARCHAR\"},{\"column_name\":\"is_valid_timestamp\",\"data_type\":\"BOOLEAN\"}]}]}"
+    },
+    {
+      "seq": 4,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select route, count(*) n, count(distinct event_id) ev, sum(case when is_valid_contact_id then 1 else 0 end) valid_c, sum(case when is_valid_timestamp then 1 else 0 end) valid_ts, min(dt), max(dt) from main_mart.fct_subscription group by 1 order by 2 desc;\nselect referrer, count(*) n from main_mart.fct_subscription group by 1 order by 2 desc limit 30;"
+      },
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"results\":[{\"row_count\":5,\"truncated\":false,\"rows\":[{\"route\":\"qr_code\",\"n\":796,\"ev\":796,\"valid_c\":\"708\",\"valid_ts\":\"793\",\"min(dt)\":\"2010-05-27\",\"max(dt)\":\"2030-10-20\"},{\"route\":\"search\",\"n\":641,\"ev\":641,\"valid_c\":\"566\",\"valid_ts\":\"640\",\"min(dt)\":\"2025-10-17\",\"max(dt)\":\"2030-08-01\"},{\"route\":\"ad\",\"n\":300,\"ev\":300,\"valid_c\":\"270\",\"valid_ts\":\"300\",\"min(dt)\":\"2025-10-17\",\"max(dt)\":\"2026-04-12\"},{\"route\":\"link_share\",\"n\":207,\"ev\":207,\"valid_c\":\"180\",\"valid_ts\":\"206\",\"min(dt)\":\"2025-10-17\",\"max(dt)\":\"2030-09-30\"},{\"route\":\"other\",\"n\":91,\"ev\":91,\"valid_c\":\"83\",\"valid_ts\":\"91\",\"min(dt)\":\"2025-10-18\",\"max(dt)\":\"2026-04-14\"}]},{\"row_count\":16,\"truncated\":false,\"rows\":[{\"referrer\":\"official_directory\",\"n\":325},{\"referrer\":\"line_app_search\",\"n\":316},{\"referrer\":\"receipt\",\"n\":181},{\"referrer\":\"poster\",\"n\":169},{\"referrer\":\"event_booth\",\"n\":160},{\"referrer\":\"store_front\",\"n\":145},{\"referrer\":\"business_card\",\"n\":141},{\"referrer\":\"line_ads\",\"n\":87},{\"referrer\":\"yahoo_ads\",\"n\":86},{\"referrer\":\"email_share\",\"n\":75},{\"referrer\":\"messaging_app\",\"n\":66},{\"referrer\":\"sns_share\",\"n\":66},{\"referrer\":\"google_ads\",\"n\":65},{\"referrer\":\"facebook_ads\",\"n\":62},{\"referrer\":\"import_bulk\",\"n\":50},{\"referrer\":\"unknown\",\"n\":41}]}]}"
+    },
+    {
+      "seq": 5,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select route, count(*) total,\n sum(case when is_valid_contact_id and is_valid_timestamp and dt<=date '2026-11-02' then 1 else 0 end) clean,\n sum(case when dt>date '2026-11-02' then 1 else 0 end) future,\n sum(case when dt<date '2025-01-01' then 1 else 0 end) old,\n sum(case when not is_valid_contact_id then 1 else 0 end) bad_cid,\n sum(case when not is_valid_timestamp then 1 else 0 end) bad_ts\nfrom main_mart.fct_subscription group by 1 order by 2 desc;\nselect route, referrer, count(*) from main_mart.fct_subscription group by all order by 1,3 desc;"
+      },
+      "kind": "sql_error",
+      "is_error": false,
+      "response": "{\"kind\":\"sql_error\",\"message\":\"SQL がエラーになった。text は DuckDB の文。\",\"text\":\"Parser Error: syntax error at or near \\\"old\\\"\\n\\nLINE 4:  sum(case when dt<date '2025-01-01' then 1 else 0 end) old,\\n                                                               ^\"}"
+    },
+    {
+      "seq": 6,
+      "tool": "mcp__data__run_sql",
+      "input": {
+        "sql": "select route, count(*) total,\n sum(case when is_valid_contact_id and is_valid_timestamp and dt<=date '2026-11-02' then 1 else 0 end) clean,\n sum(case when dt>date '2026-11-02' then 1 else 0 end) future_n,\n sum(case when dt<date '2025-01-01' then 1 else 0 end) old_n,\n sum(case when not is_valid_contact_id then 1 else 0 end) bad_cid,\n sum(case when not is_valid_timestamp then 1 else 0 end) bad_ts\nfrom main_mart.fct_subscription group by 1 order by 2 desc;\nselect route, referrer, count(*) n from main_mart.fct_subscription group by all order by 1,3 desc;"
+      },
+      "kind": "ok",
+      "is_error": false,
+      "response": "{\"kind\":\"ok\",\"message\":\"結果の行がある。\",\"results\":[{\"row_count\":5,\"truncated\":false,\"rows\":[{\"route\":\"qr_code\",\"total\":796,\"clean\":\"706\",\"future_n\":\"1\",\"old_n\":\"2\",\"bad_cid\":\"88\",\"bad_ts\":\"3\"},{\"route\":\"search\",\"total\":641,\"clean\":\"566\",\"future_n\":\"1\",\"old_n\":\"0\",\"bad_cid\":\"75\",\"bad_ts\":\"1\"},{\"route\":\"ad\",\"total\":300,\"clean\":\"270\",\"future_n\":\"0\",\"old_n\":\"0\",\"bad_cid\":\"30\",\"bad_ts\":\"0\"},{\"route\":\"link_share\",\"total\":207,\"clean\":\"180\",\"future_n\":\"1\",\"old_n\":\"0\",\"bad_cid\":\"27\",\"bad_ts\":\"1\"},{\"route\":\"other\",\"total\":91,\"clean\":\"83\",\"future_n\":\"0\",\"old_n\":\"0\",\"bad_cid\":\"8\",\"bad_ts\":\"0\"}]},{\"row_count\":16,\"truncated\":false,\"rows\":[{\"route\":\"ad\",\"referrer\":\"line_ads\",\"n\":87},{\"route\":\"ad\",\"referrer\":\"yahoo_ads\",\"n\":86},{\"route\":\"ad\",\"referrer\":\"google_ads\",\"n\":65},{\"route\":\"ad\",\"referrer\":\"facebook_ads\",\"n\":62},{\"route\":\"link_share\",\"referrer\":\"email_share\",\"n\":75},{\"route\":\"link_share\",\"referrer\":\"sns_share\",\"n\":66},{\"route\":\"link_share\",\"referrer\":\"messaging_app\",\"n\":66},{\"route\":\"other\",\"referrer\":\"import_bulk\",\"n\":50},{\"route\":\"other\",\"referrer\":\"unknown\",\"n\":41},{\"route\":\"qr_code\",\"referrer\":\"receipt\",\"n\":181},{\"route\":\"qr_code\",\"referrer\":\"poster\",\"n\":169},{\"route\":\"qr_code\",\"referrer\":\"event_booth\",\"n\":160},{\"route\":\"qr_code\",\"referrer\":\"store_front\",\"n\":145},{\"route\":\"qr_code\",\"referrer\":\"business_card\",\"n\":141},{\"route\":\"search\",\"referrer\":\"official_directory\",\"n\":325},{\"route\":\"search\",\"referrer\":\"line_app_search\",\"n\":316}]}]}"
+    }
+  ],
+  "n_tool_use": 6,
+  "n_tool_result": 6,
+  "final_answer": "データを確認できたので、結果をまとめます。\n\n## 流入経路別の登録数（全期間・全件）\n\n`fct_subscription` テーブルの `route` 列で集計しました。登録指標（subscription_count）の定義どおり、データは全件そのまま数えています。\n\n| 流入経路 (route) | 登録数 | 割合 |\n|---|---:|---:|\n| QRコード (qr_code) | 796 | 39.4% |\n| 検索 (search) | 641 | 31.7% |\n| 広告 (ad) | 300 | 14.9% |\n| リンク共有 (link_share) | 207 | 10.2% |\n| その他 (other) | 91 | 4.5% |\n| **合計** | **2,035** | 100% |\n\nQRコードと検索の2つで全体の約7割を占めます。\n\n**経路の内訳（referrer 列）**\n- QRコード：レシート 181、ポスター 169、イベントブース 160、店頭 145、名刺 141\n- 検索：公式ディレクトリ 325、LINEアプリ内検索 316\n- 広告：LINE広告 87、Yahoo広告 86、Google広告 65、Facebook広告 62\n- リンク共有：メール 75、SNS 66、メッセージアプリ 66\n- その他：一括インポート 50、不明 41\n\n## 数字に含まれている、問題のありそうなデータ\n- **contact_id の形式が正しくない行が 228 件あります**（先頭の「U」が欠けているもの）。指標の定義では実データとして数えることになっていますが、除くかどうかで数字が約1割変わります。\n- **日付がおかしい行が数件あります。** 2030年の未来日付が3件（qr_code・search・link_share に1件ずつ）、2010年の日付が2件（qr_code）です。タイムスタンプが無効と判定された行は合計5件です。\n- まともな行のデータ期間は、おおむね 2025-10-17〜2026-04 頃です。\n\ncontact_id と日付の両方が正しく、今日（2026-11-02）以前の行だけで数えると、次のとおりです。\n- qr_code 706、search 566、ad 270、link_share 180、other 83（合計 1,805）\n\n経路の順位はどちらの数え方でも変わりません。期間を絞った数字や月別の推移が必要でしたら、お知らせください。",
+  "no_query": false,
+  "result_subtype": "success",
+  "is_error": false,
+  "num_turns": 7,
+  "duration_ms": 27697,
+  "total_cost_usd": 0.0752188,
+  "usage": {
+    "input_tokens": 12,
+    "cache_creation_input_tokens": 4056,
+    "cache_read_input_tokens": 14614,
+    "output_tokens": 1990,
+    "output_tokens_details": {
+      "thinking_tokens": 184
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 4056,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "global",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 891,
+        "cache_read_input_tokens": 3942,
+        "cache_creation_input_tokens": 1039,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1039
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard",
+    "fallback_credit": null
+  },
+  "permission_denials": [],
+  "n_events": 23,
+  "problems": [],
+  "id": "A3",
+  "rep": 1
+}
