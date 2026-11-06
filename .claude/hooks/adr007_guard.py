@@ -150,8 +150,8 @@ def check_file_tool(tool, ti, cwd):
         log("pass", tool, rel)
         sys.exit(0)
     if kind == "memo":
-        emit("deny", f"R3：決定メモの場所 {rel} には、エージェントは書けません。"
-             "決定メモは人が GitHub の画面で書いてコミットし、Claude Code に git pull させます。", tool, rel)
+        # 2026-11-06 の人の判断で deny から ask に変えた（ADR-007「人の判断で変えた」）
+        emit("ask", f"R3：決定メモの書き込みです。人が中身を読んで承認します（{rel}）", tool, rel)
     if kind == "guard":
         emit("ask", f"R4：守りそのもの {rel} の書き換えです。人の確認が要ります。", tool, rel)
     log("pass", tool, rel)
