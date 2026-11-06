@@ -20,13 +20,20 @@ metrics:
     type_params:
       measure: clicked_count
 
-  - name: ctr
-    description: "クリック率 = クリック数 ÷ 配信数"
+  - name: opened_count
+    description: "開封数。event_type=opened の行数（docs/business/2026-11-06-ctr-opened.md）"
+    type: simple
+    label: "開封数"
+    type_params:
+      measure: opened_count
+
+  - name: ctr_per_open
+    description: "クリック率 = クリック数 ÷ 開封数（docs/business/2026-11-06-ctr-opened.md）"
     type: ratio
-    label: "CTR"
+    label: "クリック率"
     type_params:
       numerator: clicked_count
-      denominator: delivered_count
+      denominator: opened_count
 
   - name: revenue_amount
     description: |

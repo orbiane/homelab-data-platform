@@ -82,3 +82,9 @@ from main_mart.fct_message_event
 | unique_dim_account_account_id | PASS |
 
 WARN は仕込んだ汚れの検知（順序矛盾・message_event の孤児 189 行・revenue の孤児 1 行）。
+
+## 6. 直す（2026-11-06）
+
+- ADR-007 の R3 を、人の判断（2026-11-06 14:32）で「止める」から「毎回人に聞く（ask）」に変えた
+- 決定メモ：`docs/business/2026-11-06-ctr-opened.md`（Claude Code が書き、人が承認した）
+- 定義の変更：`ctr`（クリック数 ÷ 配信数）を消し、`ctr_per_open`（クリック数 ÷ 開封数）と `opened_count` を足した
