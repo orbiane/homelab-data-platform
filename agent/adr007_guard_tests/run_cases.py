@@ -22,6 +22,20 @@ GUARD_FILES = [".claude/hooks/adr007_guard.py", ".githooks/pre-commit", ".githoo
 METRICS = "dbt_project/models/mart/_metrics.yml"
 SEMANTIC = "dbt_project/models/mart/_semantic_models.yml"
 MEMO = "docs/business/2026-11-05-ctr.md"
+# 対照（--control）のコミットの入口は、関所を入れる前の版（個人情報の検査だけ）
+PRE_GUARD_COMMIT = "8939cbd"
+CTR_V2 = "dbt_project/models/mart/ctr_v2.yml"
+NOTES = "dbt_project/models/mart/notes.yml"
+EXTRA = "dbt_project/models/mart/extra.yml"
+MODELS = "dbt_project/models/mart/_models.yml"
+CTR_V2_BODY = ("version: 2\n\nmetrics:\n  - name: ctr_v2\n"
+               "    description: \"クリック率 = クリック数 ÷ 開封数\"\n"
+               "    type: ratio\n    label: \"CTR v2\"\n    type_params:\n"
+               "      numerator: clicked_count\n      denominator: opened_count\n")
+NOTES_BODY = "version: 2\n\nmodels:\n  - name: notes\n    description: \"説明だけのファイル\"\n"
+# T26 の土台。コミットの入口を通すため、決定メモのパスを書いておく
+EXTRA_BODY = (f"version: 2\n# {MEMO}\nmetrics:\n  - name: extra_ratio\n    type: derived\n"
+              "    type_params:\n      expr: a / b\n")
 
 WORK = os.path.realpath(tempfile.mkdtemp(prefix="adr007-cases-"))
 SCRATCH = os.path.join(WORK, "scratch")  # T20 の「使い捨ての場所」
@@ -44,7 +58,16 @@ def make_clone(name):
         dst = os.path.join(d, rel)
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         if CONTROL and rel == ".githooks/pre-commit":
-            # 関所なし：HEAD にある元の pre-commit（個人情報の検査だけ）
+            # 関所なし：関所を入れる前のコミットの pre-commit（個人情報の検査だけ）
+            old = sh(["git", "show", f"{PRE_GUARD_COMMIT}:.githooks/pre-commit"], REPO)
+            old.check_returncode()
+            with open(dst, "w") as f:
+                f.write(old.stdout)
+            continue
+        if CONTROL and rel == ".githooks/definition_guard.sh":
+            # 関所を入れる前には無かったファイル
+            if os.path.exists(dst):
+                os.remove(dst)
             continue
         if CONTROL and rel == ".claude/hooks/adr007_guard.py":
             with open(dst, "w") as f:
@@ -103,6 +126,12 @@ def t_cases(clone):
         ("T18", "Bash", {"command": 'git commit -m "fix: use the opened count"'}, "通す"),
         ("T19", "Bash", {"command": f"git add {METRICS}"}, "通す"),
         ("T20", "Bash", {"command": f"python3 {W_PY}"}, "通す"),
+        ("T21", "Write", {"file_path": p(CTR_V2), "content": CTR_V2_BODY}, "止める"),
+        ("T22", "Edit", edit(p(MODELS), "version: 2\n\n" + CTR_V2_BODY.split("\n\n", 1)[1], old="version: 2\n"), "止める"),
+        ("T23", "Edit", edit(p(MODELS), f"version: 2\n# {MEMO}\n" + CTR_V2_BODY.split("\n\n", 1)[1], old="version: 2\n"), "通す"),
+        ("T24", "Write", {"file_path": p(NOTES), "content": NOTES_BODY}, "通す"),
+        ("T25", "Bash", {"command": f"cat > {CTR_V2} <<'EOF'\n{CTR_V2_BODY}EOF"}, "止める"),
+        ("T26", "Edit", edit(p(EXTRA), "      expr: a / nullif(b, 0)", old="      expr: a / b"), "止める"),
     ]
 
 
@@ -139,17 +168,25 @@ def c04(cl):
     return ["docs/business/2026-11-07-new.md", METRICS]
 def c05(cl): append(cl, "docs/analysis/stage3/log.md", "\nguard test C05\n"); return ["docs/analysis/stage3/log.md"]
 def c06(cl): append(cl, METRICS, "# guard test C06 docs/business/no-such-memo.md\n"); return [METRICS]
+def c07(cl): append(cl, CTR_V2, CTR_V2_BODY); return [CTR_V2]
+def c08(cl): append(cl, CTR_V2, f"# {MEMO}\n" + CTR_V2_BODY); return [CTR_V2]
+def c09(cl): append(cl, NOTES, NOTES_BODY); return [NOTES]
 
 
 def main():
     print(f"mode={'control（関所なし）' if CONTROL else '関所あり'} work={WORK}")
     rows = []
     tclone = make_clone("T")
+    # T26 の土台：metrics: を持つ extra.yml を、試しの clone にコミットしておく
+    append(tclone, EXTRA, EXTRA_BODY)
+    sh(["git", "add", EXTRA], tclone).check_returncode()
+    sh(["git", "commit", "-q", "-m", "T26 base: extra.yml"], tclone).check_returncode()
     for cid, tool, ti, expect in t_cases(tclone):
         actual, reason = run_hook(tclone, tool, ti)
         rows.append((cid, expect, actual, reason))
     for cid, fn, expect in [("C01", c01, "止める"), ("C02", c02, "止める"), ("C03", c03, "通す"),
-                            ("C04", c04, "止める"), ("C05", c05, "通す"), ("C06", c06, "止める")]:
+                            ("C04", c04, "止める"), ("C05", c05, "通す"), ("C06", c06, "止める"),
+                            ("C07", c07, "止める"), ("C08", c08, "通す"), ("C09", c09, "通す")]:
         rows.append(c_case(cid, fn, expect))
     # T の clone が汚れていないこと（hook は読むだけ）
     tstatus = sh(["git", "status", "--short", "--untracked-files=no"], tclone).stdout.strip()
@@ -163,6 +200,12 @@ def main():
     c_n = sum(1 for r in rows if r[0].startswith("C"))
     print(f"件数: T {t_n} 件、C {c_n} 件、合計 {len(rows)} 件")
     print(f"期待と違う {bad} 件")
+    for grp in ("T", "C"):
+        for exp in ("止める", "聞く", "通す"):
+            sel = [r for r in rows if r[0].startswith(grp) and r[1] == exp]
+            if sel:
+                ng = [r[0] for r in sel if r[1] != r[2]]
+                print(f"  {grp} 期待={exp}: {len(sel)} 件中 外れ {len(ng)} 件 {ng}")
     print(f"T の clone の追跡中ファイルの変更: {tstatus or 'なし'}")
     shutil.rmtree(WORK)
     sys.exit(1 if bad else 0)

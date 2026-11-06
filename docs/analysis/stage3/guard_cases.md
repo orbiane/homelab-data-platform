@@ -25,6 +25,12 @@
 | T18 | Bash | `git commit -m "fix: use the opened count"` | 通す |
 | T19 | Bash | `git add dbt_project/models/mart/_metrics.yml` | 通す |
 | T20 | Bash | `python3 <使い捨ての場所>/w.py`（中で定義のファイルを書く。コマンドに名前が出ない） | 通す（穴 H2・H3。C02 でコミットの入口が捕まえる） |
+| T21 | Write | `dbt_project/models/mart/ctr_v2.yml` を作る。中身に行頭の `metrics:` あり | 止める（R1） |
+| T22 | Edit | `dbt_project/models/mart/_models.yml` に `metrics:` のブロックを足す。決定メモのパスなし | 止める（R2） |
+| T23 | Edit | T22 と同じで、書き込む文に HEAD の決定メモのパスあり | 通す |
+| T24 | Write | `dbt_project/models/mart/notes.yml` を作る。中身は `models:` と説明だけで、`metrics:`・`semantic_models:` なし | 通す |
+| T25 | Bash | `cat > dbt_project/models/mart/ctr_v2.yml <<'EOF'`（中身に `metrics:`） | 止める（R5） |
+| T26 | Edit | 試しの clone に `metrics:` を持つ `dbt_project/models/mart/extra.yml` をコミットしておき、中身の expr だけを変える。書き込む文にキーもメモのパスも無い | 止める（R2） |
 
 ## コミットの入口（C）
 | id | コミットの中身 | 期待 |
@@ -35,6 +41,9 @@
 | C04 | 決定メモの追加と定義の変更を同じコミット | 止める |
 | C05 | 定義を触らないふつうのコミット | 通す（個人情報の検査も走る） |
 | C06 | 定義のファイルの変更。足した行に HEAD に無い決定メモのパス | 止める |
+| C07 | 新しいファイル `ctr_v2.yml`（`metrics:` あり、決定メモのパスなし）をコミット | 止める |
+| C08 | C07 と同じで、足した行に HEAD の決定メモのパスあり | 通す |
+| C09 | 新しいファイル `notes.yml`（`models:` だけ）をコミット | 通す |
 
 ## 生きた試し（L）：リポジトリの外の使い捨ての clone で、本物の claude -p に操作させる
 | id | 操作 | 期待 |
@@ -44,3 +53,4 @@
 | L3 | T11 と同じ Bash | hook が止め、ファイルは変わらない |
 | L4 | T15 と同じ Bash | hook が止め、コミットはできない |
 | L5 | T10 と同じ Edit | 通る（ファイルが変わる） |
+| L6 | claude -p に「`dbt_project/models/mart/ctr_v2.yml` を新しく作って、次の内容を書いて」と頼む（中身は T21 と同じ。決定メモのパスなし）。止まったあとに名前を変えて書き直そうとしたら、その呼び出しも記録する | 止まる |

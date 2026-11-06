@@ -22,11 +22,15 @@ TAG = "[ADR-007 関所]"
 
 MEMO_RE = re.compile(r"docs/business/[A-Za-z0-9._-]+\.md")
 DEF_NAMES = ("_metrics.yml", "_semantic_models.yml")
+# 中身で定義と決めるキー（行頭。前の空白は許す）。dbt は models の下のどの名前の YAML でも受け付けるため
+DEF_KEY_RE = re.compile(r"^[ \t]*(?:metrics|semantic_models)[ \t]*:", re.MULTILINE)
 WRITE_TOOLS = ("Edit", "MultiEdit", "Write", "NotebookEdit")
 
 # R5：Bash で守る場所を指す名前
 PROTECTED_WORDS = ("_metrics.yml", "_semantic_models.yml", "docs/business",
                    ".claude/settings.json", ".claude/hooks", ".githooks")
+# R5：dbt_project/models の下の YAML のパス（名前の違う新しい定義のファイルも守る）
+MODELS_YAML_RE = re.compile(r"models/\S*\.ya?ml")
 # R5：書き換えの印
 WRITE_CMDS = ("tee", "sed", "perl", r"python[0-9.]*", "awk", "cp", "mv", "rm",
               "truncate", "dd", "ln", "patch")
@@ -46,16 +50,16 @@ def on_timeout(signum, frame):
     sys.exit(2)
 
 
-def log(decision, tool, detail):
+def log(decision, tool, detail, reason=""):
     path = os.environ.get("ADR007_GUARD_LOG")
     if path:
         with open(path, "a", encoding="utf-8") as f:
-            f.write(json.dumps({"decision": decision, "tool": tool, "detail": detail},
-                               ensure_ascii=False) + "\n")
+            f.write(json.dumps({"decision": decision, "tool": tool, "detail": detail,
+                                "reason": reason}, ensure_ascii=False) + "\n")
 
 
 def emit(decision, reason, tool, detail):
-    log(decision, tool, detail)
+    log(decision, tool, detail, f"{TAG} {reason}")
     print(json.dumps({"hookSpecificOutput": {
         "hookEventName": "PreToolUse",
         "permissionDecision": decision,
@@ -84,12 +88,27 @@ def rel_to_root(path, cwd, root):
     return None
 
 
-def kind_of(rel):
+def has_def_key(text):
+    return bool(text) and DEF_KEY_RE.search(text) is not None
+
+
+def current_text(abspath):
+    # まだ無いファイルは空として扱う。読めないなど、ほかのエラーは上に投げて止める側に倒す
+    try:
+        with open(abspath, encoding="utf-8", errors="replace") as f:
+            return f.read()
+    except FileNotFoundError:
+        return ""
+
+
+def kind_of(rel, abspath="", new_text=""):
     if rel is None:
         return None
     base = rel.rsplit("/", 1)[-1]
-    if rel.startswith("dbt_project/models/") and base in DEF_NAMES:
-        return "definition"
+    # 定義：名前が決まったものか、中身（書き込む文か今のファイル）に行頭の metrics:・semantic_models: があるもの
+    if rel.startswith("dbt_project/models/") and base.endswith((".yml", ".yaml")):
+        if base in DEF_NAMES or has_def_key(new_text) or has_def_key(current_text(abspath)):
+            return "definition"
     if rel.startswith("docs/business/"):
         return "memo"
     if rel == ".claude/settings.json" or rel.startswith(".claude/hooks/") or rel.startswith(".githooks/"):
@@ -108,6 +127,8 @@ def new_text_of(tool, ti):
         return ti.get("new_string", "")
     if tool == "MultiEdit":
         return "\n".join(e.get("new_string", "") for e in ti.get("edits", []))
+    if tool == "Write":
+        return ti.get("content", "")
     return ""
 
 
@@ -115,7 +136,8 @@ def check_file_tool(tool, ti, cwd):
     path = ti.get("file_path") or ti.get("notebook_path") or ""
     root = repo_root(cwd) or repo_root(os.path.dirname(os.path.abspath(path)) or cwd)
     rel = rel_to_root(path, cwd, root)
-    kind = kind_of(rel)
+    abspath = path if os.path.isabs(path) else os.path.join(cwd, path)
+    kind = kind_of(rel, abspath, new_text_of(tool, ti))
     if kind == "definition":
         if tool not in ("Edit", "MultiEdit"):
             emit("deny", f"R1：定義のファイル {rel} は Edit でだけ変えます（{tool} は止めます）。" + HOW_TO_PASS, tool, rel)
@@ -174,7 +196,7 @@ def check_bash(ti):
     if commit_skips_hook(cmd):
         emit("deny", "R5：git commit の -n（hook を飛ばす）は止めます。"
              "hook に止められたなら、飛ばさずに直すか、止まって人に聞く。", "Bash", cmd)
-    names = [w for w in PROTECTED_WORDS if w in cmd]
+    names = [w for w in PROTECTED_WORDS if w in cmd] + MODELS_YAML_RE.findall(cmd)
     if names:
         stripped = HARMLESS_REDIRECT_RE.sub(" ", cmd)
         marks = []

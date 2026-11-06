@@ -12,7 +12,19 @@ definition_guard() {
 
   git diff --cached --name-only --no-renames -z >"$dir/staged0" || return 1
   tr '\0' '\n' <"$dir/staged0" >"$dir/staged"
-  grep -E '^dbt_project/models/(.*/)?_(metrics|semantic_models)\.yml$' "$dir/staged" >"$dir/defs"
+  # 定義のファイル＝models の下の .yml・.yaml のうち、名前が決まったものか、
+  # ステージした中身か HEAD の中身に行頭の metrics:・semantic_models: があるもの（消す・移すときも捕まえる）
+  grep -E '^dbt_project/models/.*\.ya?ml$' "$dir/staged" >"$dir/ymls" || :
+  : >"$dir/defs"
+  while IFS= read -r f; do
+    case "${f##*/}" in
+      _metrics.yml|_semantic_models.yml) echo "$f" >>"$dir/defs"; continue ;;
+    esac
+    if { git show ":$f" 2>/dev/null; git show "HEAD:$f" 2>/dev/null; } |
+      grep -q -E '^[[:space:]]*(metrics|semantic_models)[[:space:]]*:'; then
+      echo "$f" >>"$dir/defs"
+    fi
+  done <"$dir/ymls"
   grep -E '^docs/business/' "$dir/staged" >"$dir/memos"
 
   if [ ! -s "$dir/defs" ]; then
