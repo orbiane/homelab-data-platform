@@ -129,6 +129,14 @@ docker compose up -d          # UI on 127.0.0.1:8081
 | `airflow/` | Airflow 3.3 on Docker Compose, LocalExecutor |
 | `docs/decisions/` | Architecture Decision Records |
 | `docs/analysis/` | Analysis reports |
+| `NEXT.md` | The owner-approved work list (one row per task) |
+| `docs/orders/` | Work orders for the rows in `NEXT.md` |
+| `docs/agent/` | The unattended loop's procedure and its reports |
+| `agent/` | The project's own MCP server for the semantic layer, and guard tests |
+
+### How work happens here
+
+Work is defined in `NEXT.md` and `docs/orders/`. An unattended Claude Code loop on the owner's machine picks one ready row at a time, works on an `auto/<ID>` branch, and opens a pull request. The owner approves by merging; the loop never merges. Decisions (metric definitions, correct answers, regenerating data) stay with the owner. See [ADR-008](docs/decisions/ADR-008-autonomous-loop.md) and [ADR-007](docs/decisions/ADR-007-definition-change-guard.md).
 
 ## Tech stack
 

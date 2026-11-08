@@ -9,5 +9,6 @@
 | [005](ADR-005-quality-flags-and-currency.md) | No quality-flag exclusion; currency mixing left unresolved | 2026-08-31 |
 | [006](ADR-006-generated-data-version.md) | Pin generated data by sha256; current CSVs are the baseline | 2026-10-28 |
 | [007](ADR-007-definition-change-guard.md) | Definition changes must cite a human decision memo | 2026-11-06 |
+| [008](ADR-008-autonomous-loop.md) | Work is defined in NEXT.md; an unattended loop opens PRs; the owner approves by merging | 2026-11-08 |
 
 ADR-005 is the one worth reading if you only read one.
