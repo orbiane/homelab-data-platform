@@ -129,6 +129,16 @@ docker compose up -d          # UI on 127.0.0.1:8081
 | `airflow/` | Airflow 3.3 on Docker Compose, LocalExecutor |
 | `docs/decisions/` | Architecture Decision Records |
 | `docs/analysis/` | Analysis reports |
+| `NEXT.md` | The owner-approved work list (one row per task) |
+| `docs/orders/` | Work orders for the rows in `NEXT.md` |
+| `docs/agent/` | The unattended loop's procedure and its reports |
+| `agent/` | The project's own MCP server for the semantic layer, and guard tests |
+
+### How work happens here
+
+Work is defined in `NEXT.md` and `docs/orders/`. An unattended Claude Code loop on the owner's machine picks one ready row at a time, works on an `auto/<ID>` branch, and opens a pull request. The owner approves by merging; the loop never merges. See [ADR-008](docs/decisions/ADR-008-autonomous-loop.md) and [ADR-007](docs/decisions/ADR-007-definition-change-guard.md).
+
+The project is in a build phase ([ADR-009](docs/decisions/ADR-009-build-then-analyze.md)): everything in `NEXT.md` is built first and evaluated afterwards. Metric definitions, decision memos, the handling of the planted data issues, regenerating the baseline data, and the guards themselves stay with the owner. Other design choices are made provisionally by the agent and recorded in `docs/agent/provisional/`, so they can be reviewed later. The agent may update the regression test's expected values, but each change is recorded.
 
 ## Tech stack
 
