@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "defaultMode": "dontAsk",
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Edit(./**)",
+      "mcp__sl__list_metrics",
+      "mcp__sl__get_dimensions",
+      "mcp__sl__query_metrics",
+      "mcp__sl__run_sql",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git fetch *)",
+      "Bash(git switch -c auto/*)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push -u origin auto/*)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr list *)",
+      "Bash(gh pr view *)",
+      "Bash(uv run python *)",
+      "Bash(shasum -a 256 -c *)",
+      "Bash(dbt parse --project-dir power/dbt_project --profiles-dir power/dbt_project *)",
+      "Bash(dbt build --project-dir power/dbt_project --profiles-dir power/dbt_project *)",
+      "Bash(dbt test --project-dir power/dbt_project --profiles-dir power/dbt_project *)"
+    ],
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git filter-repo *)",
+      "Bash(git rebase *)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean *)",
+      "Bash(rm -rf *)",
+      "Bash(rm -fr *)",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(docker volume rm *)",
+      "Bash(docker system prune *)",
+      "Bash(mf *)",
+      "Bash(duckdb *)",
+      "Bash(git commit --no-verify *)",
+      "Bash(git commit -n *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh api *)",
+      "Bash(git push --force-with-lease *)",
+      "Bash(git push --mirror *)",
+      "Bash(git push --all *)",
+      "Bash(git push --tags *)",
+      "Bash(git push --delete *)",
+      "Bash(git push * --force *)",
+      "Bash(git push * -f *)",
+      "Bash(git push * --mirror *)",
+      "Bash(git push * --all *)",
+      "Bash(git push * --tags *)",
+      "Bash(git push * --delete *)",
+      "Bash(launchctl *)",
+      "Edit(.claude/**)",
+      "Edit(.githooks/**)",
+      "Edit(agent/loop/**)",
+      "Edit(./.mcp.json)",
+      "Edit(./NEXT.md)",
+      "Edit(./docs/decisions/README.md)",
+      "Read(~/.ssh/**)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.git-credentials)",
+      "Read(~/.netrc)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/adr007_guard.py\" || exit 2",
+            "timeout": 10,
+            "onFailure": "block"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOMELAB_LOOP_ROOT/.claude/hooks/loop_guard.py\" || exit 2",
+            "timeout": 10,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  }
+}
