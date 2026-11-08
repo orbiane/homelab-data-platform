@@ -3,47 +3,63 @@
 
 このファイルは、持ち主が承認した作業の一覧で、自律ループ（[ADR-008](docs/decisions/ADR-008-autonomous-loop.md)）の入口。ループは毎回ここを読み、[docs/agent/loop.md](docs/agent/loop.md) の手順で、上から1件だけ進める。
 
-- 作業の中身は、各行の「指示書」にある。指示書が無い行は、この表の「終わりの条件」が指示になる
-- この表を書き換えてよいのは、持ち主と、持ち主の承認を受けたチャットのセッション。ループが書き換えてよいのは、自分が進めた行の「状態」と「PR」の欄だけ（作業の PR の中で）
+**今はビルドの段**（[ADR-009](docs/decisions/ADR-009-build-then-analyze.md)）。この表の作業をすべて実装まで進める。指示書に無い設計判断は、止まる類でなければ仮決めして進め、記録に残す。評価はビルドの段が終わってからする。
+
+- 作業の中身は、各行の「指示書」にある。指示書が無い行は、下の「小さな作業」が指示になる
+- この表を書き換えてよいのは、持ち主と、持ち主の承認を受けたチャットのセッション。**作業の PR は、この表を書き換えない**（ADR-009 の決定6）
 - マージが持ち主の承認になる。ループはマージしない
 
-## 状態の意味
+## 種類と状態
 
-| 状態 | 意味 | 誰が動く |
+| 種類 | 意味 | 誰が動く |
 |---|---|---|
-| `ready` | ループが着手してよい（依存がすべて `done`） | ループ |
+| `loop` | ループが着手してよい（依存がすべて済みのとき） | ループ |
 | `attended` | 持ち主が見ている Claude Code のセッションでやる（承認の画面が要る） | 持ち主が1行を送る |
 | `owner` | 持ち主が決める。決まったらチャットが表と ADR を直す | 持ち主 |
-| `in-pr` | PR が開いている。持ち主のマージ待ち（表には書かない。GitHub の PR の状態で決まる） | 持ち主 |
-| `done` | main に入った（作業の PR が、この欄を `done` にする。マージで main に入る） | — |
-| `blocked` | 止まる条件に当たった。報告に理由がある | 持ち主 |
+
+状態は GitHub の PR で決まる（ADR-009 の決定6）。作業ブランチ `auto/<ID>`・`owner/<ID>`（後ろに `-` で始まる名前を付けてよい）の PR が、開いていれば進行中、マージされていれば済み、閉じられていれば断られた（やり直さない）。
 
 ## 作業の一覧（上から順に優先）
 
-| ID | 作業 | 状態 | 依存 | 指示書 | PR |
-|---|---|---|---|---|---|
-| L0 | 自律ループを据え付ける（権限の表、作業ブランチだけに push、main の保護、定時の起動） | `attended` | — | [L0](docs/orders/L0-loop-setup.md) | |
-| R1 | 回帰の試験 第1段：13問の数字と、文書の指標の名前 | `ready` | L0 | [R1](docs/orders/R1-regression-numbers-docs.md) | |
-| G1 | 関所の試しを、今の定義（ctr_per_open）に合わせる | `ready` | L0 | [G1](docs/orders/G1-guard-tests-ctr-per-open.md) | |
-| R2 | 回帰の試験 第2段：過去の間違いの検出器を作り、段階2の78本の人の判定と突き合わせる | `ready` | R1 | [R2](docs/orders/R2-regression-detectors.md) | |
-| S3 | 段階3のまとめの文書（腐らせる→見つける→直す→確かめる） | `ready` | R1, G1 | [S3](docs/orders/S3-governance-design.md) | |
-| R3a | 回帰の試験 第3段の条件を書く（本物のエージェントで解き直す。回す前の承認） | `ready` | R2 | [R3](docs/orders/R3-regression-live.md) | |
-| R3b | 回帰の試験 第3段を回す（R3a のマージが、条件の承認） | `ready` | R3a | [R3](docs/orders/R3-regression-live.md) | |
-| W1 | 毎晩の見張りの案を出す（回帰の試験の数字の層を、毎晩の dbt build のあとに回す） | `ready` | R1 | [W1](docs/orders/W1-nightly-watch-proposal.md) | |
-| M1 | CLAUDE.md の「IP アドレスをコミットしない」を、家の LAN と Tailscale の IP に絞る（hook が見ている範囲と合わせる） | `ready` | L0 | 下の「小さな作業」 | |
-| M2 | `docs/analysis/sl-vs-t2s-comparison.md` のタイトルの「（下書き）」を外す | `ready` | L0 | 下の「小さな作業」 | |
-| M3 | README.md の Reproduce の「seeded, deterministic」を、ADR-006 の事実（`hash()` と uuid4 のため、作り直すと同じ CSV にならない）に合わせる | `ready` | R1 | 下の「小さな作業」 | |
-| Q1 | 回帰の試験の正解（期待値）を、エージェントが書き換えてよいか | `owner` | R1 | [R1 の8](docs/orders/R1-regression-numbers-docs.md) | |
-| Q2 | D1「開封率は？」の正解（opened_count が指標になった後） | `owner` | R1 | [R1 の8](docs/orders/R1-regression-numbers-docs.md) | |
-| Q3 | `query_metrics` の where の穴（自由な SQL が DuckDB に届く）を、塞ぐか見張るか | `owner` | — | [agent/sl_mcp/README.md](agent/sl_mcp/README.md) | |
-| Q4 | 次に入れる腐敗（スキーマの変更／再処理・二重ロード／generator の `hash()`・uuid4 の修正／referrer のブランド名）。どれもデータを作り直すので、持ち主が決める（CLAUDE.md 守ること7） | `owner` | S3 | — | |
+| ID | 作業 | 種類 | 依存 | 指示書 |
+|---|---|---|---|---|
+| L0 | 自律ループを据え付ける（権限の表、作業ブランチだけに push、main の保護、定時の起動） | `attended` | — | [L0](docs/orders/L0-loop-setup.md) |
+| M2 | `docs/analysis/sl-vs-t2s-comparison.md` のタイトルの「（下書き）」を外す（L0 の最初の1件） | `loop` | L0 | 下の「小さな作業」 |
+| M1 | CLAUDE.md の「IP アドレスをコミットしない」を、hook が見ている範囲に合わせる | `loop` | L0 | 下の「小さな作業」 |
+| R1 | 回帰の試験 第1段：13問の数字と、文書の指標の名前 | `loop` | L0 | [R1](docs/orders/R1-regression-numbers-docs.md) |
+| G1 | 関所の試しを、今の定義（ctr_per_open）に合わせる | `loop` | L0 | [G1](docs/orders/G1-guard-tests-ctr-per-open.md) |
+| P1 | 新しい題材（公開の電力データ）を一から作る：設計 | `loop` | L0 | [P1](docs/orders/P1-power-design.md) |
+| M4 | 同じ日付の snapshot が2つある組を数える（数えるだけで、直さない） | `loop` | L0 | 下の「小さな作業」 |
+| R2 | 回帰の試験 第2段：過去の間違いの検出器を作り、段階2の78本の人の判定と突き合わせる | `loop` | R1 | [R2](docs/orders/R2-regression-detectors.md) |
+| M3 | README.md の Reproduce の「seeded, deterministic」を、ADR-006 の事実に合わせる | `loop` | R1 | 下の「小さな作業」 |
+| S3 | 段階3のまとめの文書（腐らせる→見つける→直す→確かめる、書ける・書けない、影響の範囲） | `loop` | R1, G1 | [S3](docs/orders/S3-governance-design.md) |
+| G2 | 関所の知っている穴 H2（名前を出さないスクリプトで決定メモを書く）を、使い捨ての clone で実演する | `loop` | G1 | [G2](docs/orders/G2-guard-hole-demo.md) |
+| P2 | 新しい題材：取り込み（リポジトリの外に生のファイル、リポジトリに一覧と指紋） | `loop` | P1 | [P2](docs/orders/P2-power-ingest.md) |
+| W1 | 毎晩の見張りの案を出す（回帰の試験の数字の層を、毎晩の dbt build のあとに回す） | `loop` | R1 | [W1](docs/orders/W1-nightly-watch-proposal.md) |
+| R3a | 回帰の試験 第3段の条件を書く（本物のエージェントで解き直す。回す前の承認） | `loop` | R2 | [R3](docs/orders/R3-regression-live.md) |
+| R3b | 回帰の試験 第3段を回す（R3a のマージが、条件の承認） | `loop` | R3a | [R3](docs/orders/R3-regression-live.md) |
+| W2 | 毎晩の見張りを作る（W1 のマージで承認された案で） | `loop` | W1 | [W2](docs/orders/W2-nightly-watch-build.md) |
+| P3 | 新しい題材：モデル・試験・指標（別の dbt プロジェクト） | `loop` | P2, L0 | [P3](docs/orders/P3-power-models.md) |
+| B1 | `query_metrics` の where の穴を塞ぐ（R3b を段階2と同じ道具で回したあと） | `loop` | R3b | [B1](docs/orders/B1-where-hole.md) |
+| V1 | generator の揺れ（`hash()`・uuid4）と実在のブランド名を、コードだけ直す（基準データは作り直さない） | `loop` | R1 | [V1](docs/orders/V1-generator-fix.md) |
+| W3 | 毎晩の見張りを、持ち主の機械に据え付ける | `attended` | W2 | 下の「小さな作業」 |
+| V2 | 基準データを作り直し、新しい版にする | `attended` | V1, R3b, W3 | [V2](docs/orders/V2-regenerate-data.md) |
+| V3 | 作り直したデータで回帰の試験を回し、変わった数字を確かめて期待値を直す | `loop` | V2 | [V3](docs/orders/V3-regression-after-regen.md) |
+| P4 | 新しい題材：道具（sl の電力の形）と回帰の試験、改訂の検知 | `loop` | P3, B1 | [P4](docs/orders/P4-power-tools-regression.md) |
+| P5 | 新しい題材：関所を電力の定義に広げ、毎晩の取り込みを据え付ける | `attended` | P4 | [P5](docs/orders/P5-power-attended.md) |
+| X1 | 持ち主の機械の片づけ（試しの使い捨ての clone、リポジトリの外の写し、git の認証情報の置き場所） | `attended` | L0 | 下の「小さな作業」 |
+| Z1 | ビルドの段の記録を集める（事実だけ。解釈は書かない） | `loop` | ALL | [Z1](docs/orders/Z1-build-record.md) |
 
 ### 依存の読み方
 
-- 依存の ID がすべて `done` のときだけ着手できる。`attended` と `owner` の行は、ループは着手しない
-- R3b は、R3a の PR がマージされて `done` になってから
+- 依存の ID がすべて済み（PR がマージされた）のときだけ着手できる。`attended` と `owner` の行は、ループは着手しない
+- `ALL` は「この表のほかのすべての行が、済みか断られた」の意味（Z1 だけが使う）
+- R3b は、R3a の PR がマージされてから。W2 は、W1 の PR がマージされてから（マージが、その案の承認）
+- V2（基準データの作り直し）は、R3b のあと。R3 は段階2と同じデータの版で回すため。W3 のあとにしたのは、毎晩の見張りが、作り直しを次の朝に捕まえるかを見るため
 
 ## 小さな作業（指示書なし）
+
+どれも、報告は `docs/agent/reports/<ID>.md`（loop.md の「報告の形」）。
 
 ### M1
 
@@ -58,10 +74,49 @@
 
 ### M3
 
-- やること：README.md の Reproduce の節で、generator を「seeded, deterministic」と書いている所を、ADR-006 の事実（`revenue_monthly.py` の `hash()` と、`subscription.py`・`message_event.py` の uuid4 のため、作り直すと同じ CSV にならない。基準データは作り直さず `output.sha256` で照合する）に合わせる。英語のまま書く
+- やること：README.md の Reproduce の節で、generator を「seeded, deterministic」と書いている所を、ADR-006 の事実（`revenue_monthly.py` の `hash()` と、`subscription.py`・`message_event.py` の uuid4 のため、作り直すと同じ CSV にならない。基準データは作り直さず `output.sha256` で照合する）に合わせる。英語のまま書く。V1〜V3 で直す予定であることを1文添える
 - 終わりの条件：変わったのが README.md の Reproduce の節だけ。ADR-006 の該当の節の行番号を報告に添える
 - 理由：R1 の文書の層は指標の名前しか見ない。説明文の古さは、名前を見る検査では捕まらない（2026-11-08 にチャットが見つけた）
 
+### M4
+
+- やること：`stg_revenue_monthly.sql` は、同じ account_id × revenue_month の中で snapshot_date の新しい順に1行を選ぶ。同じ snapshot_date の行が2つ以上ある組では、どれが選ばれるかが決まっていない。その組がいくつあるかを、MCP の道具 `run_sql` で数える（staging と raw の両方）。数えた SQL と出力を `docs/analysis/stage3/snapshot_ties.md` に書く
+- 直さない。0件でなければ、どの組か（account_id は先頭8文字まで）と、選ばれる行で金額が変わりうるかを書く。直すかどうかは止まる類（既存の staging の数え方）なので、報告の10に書く
+- 終わりの条件：数えた件数が、調べた組の総数と一緒に出ている。変わったのが `docs/analysis/stage3/snapshot_ties.md` と報告だけ
+
+### W3（attended）
+
+- やること：W2 で作った毎晩の見張りを、持ち主の機械に据え付ける。W2 の PR の README の手順どおり。据え付けたあと、手で1回回し、結果がどこに残るかを示す
+- 終わりの条件：手で回した1回の結果の場所と中身。定時の仕組みに読み込まれていることを示す出力（持ち主の承認の上で）
+- ブランチ：`owner/W3`
+
+### X1（attended）
+
+- やること：持ち主の機械で、次を確かめて片づける。消すものは、持ち主の承認を1つずつ取る
+  - 段階1・2で作った、試しの使い捨ての clone（hook の試しで検査語を含む行が、コミットされていない形で中に残っている）
+  - リポジトリの外に残っている記録の写しと、照合のスクリプト（リポジトリに入れるべきものがあれば一覧にする）
+  - git の認証情報の置き場所（`git config --show-origin --get-all credential.helper`）。平文のファイルなら、その旨を報告する（直し方は推す案を書いて止まる）
+- 終わりの条件：見つけたもの・消したもの・残したものの一覧。リポジトリの中のファイルは、報告のほかは変えない
+- ブランチ：`owner/X1`（報告だけの PR）
+
+## やらないと決めたこと（2026-11-08、ADR-009 の Q4）
+
+ビルドの段では作らない。分析の段で「やらなかったこと」として扱う。
+
+| 候補 | やらない理由 |
+|---|---|
+| スキーマの変更を腐敗として入れる | 新しい題材（P）のデータに、本物の形式の切り替え（2022年4月の前と後で中身が違う）がある。作り物ではなく本物を1つ見る |
+| 再処理・部分ロード・二重ロードを腐敗として入れる | P2 の取り込みで「2回取り込んでも行が増えない」ことを試験にする。腐敗を入れるのではなく、防ぐ側を作る |
+| アクティブの定義（30日→90日） | 今の定義に、アクティブの指標が無い。作るところからになる |
+| 温存していた2つのテーブルを入れる | どの2つかを書いた記録が、このリポジトリに見当たらない（2026-11-08、`git grep -n 温存` で ADR-004 の1件だけ。テーブルの話ではない） |
+| 定義の変更と snapshot drift の交差 | V3 で、データの版が変わったあとも `ctr_per_open` の試験が合うかを見るところまでにする |
+| 電力の市場価格のデータ | 利用の条件を確かめられていない |
+| 家庭のスマートメーターの値 | 個人のデータで、公開リポジトリに入れられない |
+
 ## 済んだ作業
 
-（`done` になった行は、チャットがここに移す。ID・PR・マージした日）
+（マージのあとに、チャットがここに移す。ID・PR・マージした日）
+
+| ID | PR | マージ |
+|---|---|---|
+| 段階3の直す（ctr → ctr_per_open） | #1 | 2026-11-06 |

@@ -49,7 +49,7 @@
 - 人の判定（`final_scores.tsv`、5-4 の `scores.md`）を変えない。食い違いは食い違いのまま記録する
 - 記録（`runs/*.json`）を変えない
 - `claude -p` は回さない。warehouse を読む必要は無い（記録だけで判定する）。数字の照合で warehouse が要るときは、R1 の bank の期待値を使う
-- 変えるのは `docs/analysis/regression/` の下と、`NEXT.md` の R2 の行と、報告だけ
+- 変えるのは `docs/analysis/regression/` の下と、報告と、（仮決めがあれば）`docs/agent/provisional/R2.md` だけ。`NEXT.md` は変えない（ADR-009 の決定6）
 - push は `auto/R2` だけ。区切りごとに push する
 
 ## 止まる条件
