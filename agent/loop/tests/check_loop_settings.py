@@ -10,6 +10,7 @@
   3. プロジェクトの表の PreToolUse の hook（ADR-007 の関所）が、matcher と command が同じ形で入っている
   4. ループの表に ask が無い（dontAsk では ask は断られるのと同じなので、置かない）
   5. ループの表に、指示書が足すように言った deny が入っている
+  6. プロジェクトの表の ask のうち Edit の規則（定義のファイル）が、ループの表では deny に入っている
 """
 import json
 import pathlib
@@ -57,6 +58,14 @@ def main():
     print(f"5. 指示書が足すように言った deny {len(EXTRA_DENY)} 件のうち、入っている "
           f"{len(EXTRA_DENY) - len(e_missing)} 件、無い {len(e_missing)} 件 {e_missing}")
     bad += len(e_missing)
+
+    # ADR-007 は、メモのパスのある定義の Edit を通し、あとをプロジェクトの ask に任せる。
+    # ループはプロジェクトの表を読まず Edit(./**) が allow なので、その ask はループでは deny にする（仮決め L0-6）
+    p_ask_edit = [r for r in project["permissions"].get("ask", []) if r.startswith("Edit(")]
+    a_missing = [r for r in p_ask_edit if r not in l_deny]
+    print(f"6. プロジェクトの ask のうち Edit の規則 {len(p_ask_edit)} 件のうち、ループの deny に入っている "
+          f"{len(p_ask_edit) - len(a_missing)} 件、無い {len(a_missing)} 件 {a_missing}")
+    bad += len(a_missing)
 
     print(f"期待と違う {bad} 件")
     sys.exit(1 if bad else 0)
