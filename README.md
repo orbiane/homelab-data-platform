@@ -138,7 +138,7 @@ docker compose up -d          # UI on 127.0.0.1:8081
 
 Work is defined in `NEXT.md` and `docs/orders/`. An unattended Claude Code loop on the owner's machine picks one ready row at a time, works on an `auto/<ID>` branch, and opens a pull request. The owner approves by merging; the loop never merges. See [ADR-008](docs/decisions/ADR-008-autonomous-loop.md) and [ADR-007](docs/decisions/ADR-007-definition-change-guard.md).
 
-The project is in a build phase ([ADR-009](docs/decisions/ADR-009-build-then-analyze.md)): everything in `NEXT.md` is built first and evaluated afterwards. Metric definitions, decision memos, the handling of the planted data issues, regenerating the baseline data, and the guards themselves stay with the owner. Other design choices are made provisionally by the agent and recorded in `docs/agent/provisional/`, so they can be reviewed later. The agent may update the regression test's expected values, but each change is recorded.
+The project is in a build phase ([ADR-009](docs/decisions/ADR-009-build-then-analyze.md)): everything in `NEXT.md` is built first and evaluated afterwards. Metric definitions, decision memos, the handling of the planted data issues, regenerating the baseline data, and the guards themselves stay with the owner. Other design choices are made provisionally by the agent and recorded in `docs/agent/provisional/`, so they can be reviewed later. The agent may update the regression test's expected values, but each change is recorded. A separate read-only reviewer run comments on each loop pull request, and the owner answers a stopped pull request with a comment that starts with `決め:` (ADR-009, decision 8).
 
 ## Tech stack
 
