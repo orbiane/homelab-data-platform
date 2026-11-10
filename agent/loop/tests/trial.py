@@ -36,9 +36,16 @@ def short(x, n=160):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("name")
-    ap.add_argument("action")
+    ap.add_argument("action", nargs="?")
+    # 頼む文に守る場所の名前（_metrics.yml、docs/business など）が入ると、持ち主のセッションの ADR-007 の関所（R5）が
+    # python3 と名前の組み合わせで止める。そのときは文をファイルに置いて渡す（ADR-007 の H2 と同じ形。持ち主の求めで使った）
+    ap.add_argument("--action-file")
     ap.add_argument("--max-turns", default="4")
     a = ap.parse_args()
+    if a.action_file:
+        a.action = pathlib.Path(a.action_file).read_text(encoding="utf-8").strip()
+    if not a.action:
+        sys.exit("やることを、引数か --action-file で渡す")
 
     TRIALS.mkdir(parents=True, exist_ok=True)
     count_file = TRIALS / "count.txt"
