@@ -13,7 +13,7 @@
 ### 1. 始める前に
 
 1. 作業場所（ループ専用の git worktree）は、起動の台本（`agent/loop/run.py`）が、消えていない変更が無いことを確かめてから `git fetch` し、`origin/main` の最新に戻してある（detached HEAD）。前の回の変更が残っていれば、台本が Claude を起こさずに止まる。`git status` と `git log -1` で、そうなっていることだけを確かめる
-2. データの版を照合する（`cd data_generation/output && shasum -a 256 -c ../output.sha256`）。合わなければ止まる
+2. データの版を照合する（`cd data_generation/output && shasum -a 256 -c ../output.sha256`）。合わなければ止まる。照合のあとは、作業場所の根に `cd` で戻る（Bash の作業ディレクトリは次の呼び出しにも残り、戻らないと Edit・Write が権限の表に断られる。L0 の M2 で起きた）
 3. JST 02:50〜03:15 は毎晩の `dbt build` の時間。その時間にかかる作業は始めない
 4. `CLAUDE.md`、`NEXT.md`、この文書、ADR-009 を読む
 
