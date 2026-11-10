@@ -12,7 +12,7 @@
 これらを書き換えても、次の回の守りは変わらない（変えるには、持ち主が据え付け直す）。
 
 1回の流れ:
-  ロック（同時に1つ）→ JST 02:30〜03:30 は始めない → 1日に始めるのは8件まで →
+  ロック（同時に1つ）→ JST 01:20〜03:30 は始めない → 1日に始めるのは8件まで →
   作業場所が汚れていたら止まる → git fetch して origin/main に戻す（detached）→
   pick.py で ID を決める（開いた auto/ の PR が3つ以上、または選べる行が無ければ、Claude を起こさずに終わる）→
   claude -p を、ループの表・dontAsk・90分の時間切れで起こす → 記録を ~/homelab-loop/logs/ に残す
@@ -33,7 +33,9 @@ ROOT = pathlib.Path(__file__).resolve().parents[2]
 HOME = pathlib.Path.home()
 LOOP_HOME = HOME / "homelab-loop"
 JST = datetime.timezone(datetime.timedelta(hours=9))
-QUIET_START, QUIET_END = datetime.time(2, 30), datetime.time(3, 30)
+# 毎晩の dbt build（JST 03:00）に、上限90分の回が重ならないように。起動は毎時23分なので、01:23 と 02:23 も始めない
+# （指示書は 02:30〜03:30。持ち主の判断で 2026-11-10 に広げた）
+QUIET_START, QUIET_END = datetime.time(1, 20), datetime.time(3, 30)
 MAX_PER_DAY = 8
 MAX_OPEN = 3
 TIMEOUT_SEC = 90 * 60
@@ -243,7 +245,7 @@ def main():
 
     t = now().time()
     if QUIET_START <= t < QUIET_END:
-        log.event(kind="skip", mode=mode, reason="JST 02:30〜03:30 は始めない（毎晩の dbt build の前後）")
+        log.event(kind="skip", mode=mode, reason="JST 01:20〜03:30 は始めない（毎晩の dbt build に重ならないように）")
         return 0
     if not args.dry_run and log.started_today() >= MAX_PER_DAY:
         log.event(kind="skip", mode=mode, reason=f"今日はもう {MAX_PER_DAY} 件始めた")
