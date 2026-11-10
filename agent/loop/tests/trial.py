@@ -54,6 +54,8 @@ def main():
     stamp = datetime.datetime.now(loop_run.JST).strftime("%Y%m%d-%H%M%S")
     out = TRIALS / f"{stamp}-{a.name}.jsonl"
     err = TRIALS / f"{stamp}-{a.name}.stderr.log"
+    # 頼んだ文は stream-json に残らないので、横に置く（最初の20本には無い。l0_trials.md）
+    (TRIALS / f"{stamp}-{a.name}.prompt.txt").write_text(cmd[2] + "\n", encoding="utf-8")
     code, timed_out, wall = loop_run.run_claude(cmd, WT, loop_run.loop_env(claude), out, err)
 
     print(f"試し {n + 1}/{LIMIT}：{a.name}  exit={code} 時間切れ={timed_out} 壁時計={wall:.0f}秒")
