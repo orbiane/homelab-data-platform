@@ -12,12 +12,14 @@
 
 ### 1. 始める前に
 
-1. 作業場所（ループ専用の git worktree）で `git fetch origin` し、`main` の最新から始める。作業場所に、前の回の消えていない変更があれば、何もせずに止まる（報告だけ）
-2. データの版を照合する（`cd data_generation/output && shasum -a 256 -c ../output.sha256`）。合わなければ止まる
+1. 作業場所（ループ専用の git worktree）は、起動の台本（`agent/loop/run.py`）が、消えていない変更が無いことを確かめてから `git fetch` し、`origin/main` の最新に戻してある（detached HEAD）。前の回の変更が残っていれば、台本が Claude を起こさずに止まる。`git status` と `git log -1` で、そうなっていることだけを確かめる
+2. データの版を照合する（`cd data_generation/output && shasum -a 256 -c ../output.sha256`）。合わなければ止まる。照合のあとは、作業場所の根に `cd` で戻る（Bash の作業ディレクトリは次の呼び出しにも残り、戻らないと Edit・Write が権限の表に断られる。L0 の M2 で起きた）
 3. JST 02:50〜03:15 は毎晩の `dbt build` の時間。その時間にかかる作業は始めない
 4. `CLAUDE.md`、`NEXT.md`、この文書、ADR-009 を読む
 
 ### 2. 1件を選ぶ
+
+**選ぶのは起動の台本（`agent/loop/pick.py`）で、モデルは選び直さない。** 前置きに書かれた ID を進める。持ち主が手で `run.py --only <ID>` を打ったときは、依存が済んでいなくても、その ID を進める（L0 で決めた）。下は、`pick.py` が使う規則。
 
 作業の状態は、`NEXT.md` の表の「種類」と、GitHub の PR で決まる（ADR-009 の決定6）。
 
@@ -72,7 +74,8 @@
 - 作業の PR では、`NEXT.md` を書き換えない（ADR-009 の決定6）
 - ADR を新しく書いた PR だけ、`docs/decisions/README.md` の一覧に、その ADR の1行を足す（ほかの行は変えない）
 - PR の本文：報告の要約、終わりの条件ごとの合否、仮決めの件数、試験の期待値を変えた件数。止まったときは、持ち主に決めてほしいことを1つにまとめて書く
-- `gh pr create` で PR を作る。**マージはしない**
+- `gh pr create --base main --head auto/<ID> --title "<ID>: <一言>" --body-file docs/agent/reports/<ID>.md` で PR を作る（本文をコマンドの中に書くと、複数行や記号でコマンドとして読み切れず、権限の表に断られる）。**マージはしない**
+- push は `git push -u origin auto/<ID>` の形だけ（ループの関所がほかの形を止める）。Bash は1回に1つのコマンドで打つ
 
 ## 持ち主の決めを受ける（ADR-009 の決定8）
 
