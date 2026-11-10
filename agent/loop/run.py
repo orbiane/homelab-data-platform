@@ -124,7 +124,12 @@ def loop_env(claude):
 
 def claude_cmd(claude, wt, task_id):
     prompt = (ROOT / "agent/loop/prompt.md").read_text(encoding="utf-8").replace("<ID>", task_id)
+    # data_generation/output は、ふだんの作業場所への symlink。実体が作業場所の外なので、そのままでは
+    # `cd data_generation/output && shasum ...`（loop.md の 1 の 2）の cd が承認の要る cd になり、dontAsk で断られる。
+    # 実体を追加の作業場所にすると、cd は読むだけの扱いになる。Edit の allow は ./** だけなので、そこへの書き込みは断られたまま
+    data_dir = os.path.realpath(wt / "data_generation/output")
     return [claude, "-p", prompt,
+            "--add-dir", data_dir,
             "--setting-sources", "user",
             "--settings", str(ROOT / ".claude/loop-settings.json"),
             "--mcp-config", str(wt / ".mcp.json"), "--strict-mcp-config",
