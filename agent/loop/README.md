@@ -32,7 +32,7 @@ claude -p "<prompt.md>" \
   --settings ~/homelab-loop/bin/.claude/loop-settings.json \
   --mcp-config ~/homelab-loop/wt/.mcp.json --strict-mcp-config \   # setting-sources から project を外すと .mcp.json も読まれないため
   --permission-mode dontAsk --permission-prompts none \
-  --model claude-opus-5-5 --effort medium --max-turns 80 \
+  --model claude-fable-5-2 --effort medium --max-turns 80 \   # 2026-11-10 から今週だけ（利用枠の都合。もとは claude-opus-5-5）
   --output-format stream-json --verbose
 ```
 

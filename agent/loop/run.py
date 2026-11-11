@@ -39,7 +39,9 @@ QUIET_START, QUIET_END = datetime.time(1, 20), datetime.time(3, 30)
 MAX_PER_DAY = 8
 MAX_OPEN = 3
 TIMEOUT_SEC = 90 * 60
-MODEL, EFFORT, MAX_TURNS = "claude-opus-5-5", "medium", "80"
+# モデル：指示書（L0）は claude-opus-5-5。2026-11-10 に持ち主が、利用枠の都合で今週だけ claude-fable-5-2 にした。
+# どの回がどのモデルかは、runs.jsonl の start・end の model で分ける（2026-11-10 13:24 までの回は、すべて Opus）
+MODEL, EFFORT, MAX_TURNS = "claude-fable-5-2", "medium", "80"
 # 作業場所に、ふだんの作業場所への symlink として置く、git の外のデータ（読むだけ）
 DATA_LINKS = ["dbt_project/warehouse.duckdb", "dbt_project/target", "data_generation/output"]
 # 据え付けた写しと origin/main を比べるファイル
@@ -276,11 +278,11 @@ def main():
     day_dir.mkdir(parents=True, exist_ok=True)
     out_path = day_dir / f"{stamp}-{task_id}.jsonl"
     err_path = day_dir / f"{stamp}-{task_id}.stderr.log"
-    log.event(kind="start", mode=mode, id=task_id, reason=why, claude_version=version,
+    log.event(kind="start", mode=mode, id=task_id, reason=why, claude_version=version, model=MODEL,
               guard_drift=drift, stream=str(out_path).replace(str(HOME), "~"))
     code, timed_out, wall = run_claude(cmd, wt, loop_env(claude), out_path, err_path)
     after_dirty = git(wt, "status", "--porcelain", check=False).strip()
-    log.event(kind="end", mode=mode, id=task_id, exit_code=code, timed_out=timed_out,
+    log.event(kind="end", mode=mode, id=task_id, exit_code=code, timed_out=timed_out, model=MODEL,
               wall_sec=round(wall), claude_version=version,
               worktree_dirty_after=len(after_dirty.splitlines()) if after_dirty else 0,
               **read_result(out_path))
