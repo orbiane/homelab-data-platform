@@ -112,7 +112,9 @@ generator の出力する列名が変わったため、改名の作業の中で�
 | subscription_count | 2035 |
 | delivered_count | 8428 |
 | clicked_count | 1131 |
-| ctr | 0.134196 |
+| ctr | 0.134196（2026-11-06 に廃止。docs/business/2026-11-06-ctr-opened.md） |
+| opened_count | 3835 |
+| ctr_per_open | 0.294915 |
 
 ### データの版の照合方法
 

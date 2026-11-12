@@ -4,7 +4,8 @@
 2. 今の manifest（dbt_project/target/semantic_manifest.json）に無い名前を「廃止した名前」とする
 3. 今を説明する文書（下の DOCS）に、廃止した名前が単語として出てくる行を外れとする。
    ただし同じ行に、その名前を廃止したコミットが指した決定メモのパス（docs/business/...md）がある行は、
-   履歴の記述として外れに数えない（一覧には出す）
+   履歴の記述として外れに数えない（一覧には出す）。名前が決定メモのパスの中（例 2026-11-06-ctr-opened.md）に
+   だけ出てくる行も外れに数えず、別の一覧に出す
 
 使い方（リポジトリの直下で）：uv run python docs/analysis/regression/check_docs.py [--out 結果のファイル]
 終了コード：0 外れ 0 件／1 外れが1件以上
@@ -87,18 +88,23 @@ def main():
     retired = sorted(past - current)
     memos = {n: removal_memos(hist, n) for n in retired}
 
-    hits, excused, n_lines = [], [], 0
+    hits, excused, in_path, n_lines = [], [], [], 0
     for path, section in DOCS:
         lines = doc_lines(path, section)
         n_lines += len(lines)
         for i, line in lines:
             for n in retired:
-                if re.search(r"(?<![A-Za-z0-9_])" + re.escape(n) + r"(?![A-Za-z0-9_])", line):
-                    entry = f"{path}:{i}: `{n}` — {line.strip()}"
-                    if any(m in line for m in memos[n]):
-                        excused.append(entry)
-                    else:
-                        hits.append(entry)
+                word = re.compile(r"(?<![A-Za-z0-9_])" + re.escape(n) + r"(?![A-Za-z0-9_])")
+                if not word.search(line):
+                    continue
+                entry = f"{path}:{i}: `{n}` — {line.strip()}"
+                if not word.search(MEMO.sub("", line)):
+                    # 決定メモのパスの中（例 2026-11-06-ctr-opened.md の -ctr-）にだけ出た。名前を使った行ではない
+                    in_path.append(entry)
+                elif any(m in line for m in memos[n]):
+                    excused.append(entry)
+                else:
+                    hits.append(entry)
 
     out = [
         f"- 履歴で見たコミット：{len(hist)} 件（{METRICS_GLOB}）",
@@ -111,6 +117,8 @@ def main():
     out += [f"  - {h}" for h in hits]
     out.append(f"- 決定メモのパスが同じ行にあるので数えなかった行：{len(excused)} 件")
     out += [f"  - {e}" for e in excused]
+    out.append(f"- 決定メモのパスの中にだけ出たので数えなかった行：{len(in_path)} 件")
+    out += [f"  - {e}" for e in in_path]
     text = "\n".join(out)
     print(text)
     if args.out:
