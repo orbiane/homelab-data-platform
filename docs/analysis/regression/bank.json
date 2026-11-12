@@ -65,14 +65,17 @@
       "id": "B3",
       "question": "クリック率はどのくらい？",
       "sl": [
-        {"tool": "query_metrics", "args": {"metrics": ["ctr"]},
-         "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"ctr": 0.134196}}}}
+        {"tool": "query_metrics", "args": {"metrics": ["ctr_per_open"]},
+         "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"ctr_per_open": 0.294915}}}}
       ],
       "sql": {"file": "sql/B3.sql",
-              "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"ctr": 0.134196}}}},
-      "expected": "0.134196（約 13.4%）",
-      "tolerance": {"abs": 0.0005, "why": "決めごと6と B3 の採点の注意：パーセントで小数第1位まで（13.4%）合えば○。一番近い罠は 13.55%"},
-      "source": "docs/analysis/5-4/questions.md の B3", "decided": "2026-10-28",
+              "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"ctr_per_open": 0.294915}}}},
+      "expected": "0.294915（約 29.5%。クリックした数 1,131 ÷ 開封した数 3,835）",
+      "tolerance": {"abs": 0.0005, "why": "段階2の時点の幅（パーセントで小数第1位）のまま。広げていない。決定メモに出てくるほかの数え方（30.0%・26.9%）との差より小さい"},
+      "source": "docs/business/2026-11-06-ctr-opened.md", "decided": "2026-11-06",
+      "history": [
+        "R1・2026-11-13：前の値 0.134196（questions.md の B3、ctr = clicked ÷ delivered、2026-10-28）。理由：決定メモ docs/business/2026-11-06-ctr-opened.md で、クリック率はクリックした数 ÷ 開封した数になり、ctr は ctr_per_open に替わった。2通りで出した値：(a) query_metrics の ctr_per_open = 0.294915、(b) run_sql で sql/B3.sql（新しく書いた。clicked の行数 ÷ opened の行数）= 0.294915。小数6桁で一致"
+      ],
       "status": "有効",
       "known_errors": [
         "5-4 run_002：t2s r1 その他（存在しない値 click・send）、r2・r3 縦持ち・品質フラグ／t2s_desc r1 品質フラグ、r2・r3 その他（存在しない値 click）／sl r2 その他（直近1日の率）",
@@ -197,14 +200,21 @@
       "id": "D1",
       "question": "開封率は？",
       "sl": [
-        {"tool": "query_metrics", "args": {"metrics": ["opened_count"]},
-         "expect": {"kind": "unknown_name"}}
+        {"tool": "list_metrics", "label": "開封率の指標が無いことを確かめる",
+         "expect": {"kind": "ok", "absent_metrics": ["open_rate", "opened_rate", "open_ratio", "開封率"]}},
+        {"tool": "query_metrics", "label": "opened_count ÷ delivered_count", "args": {"metrics": ["opened_count", "delivered_count"]},
+         "expect": {"kind": "ok", "key": [], "exact_keys": true,
+                    "derive": {"name": "opened_per_delivered", "num": "opened_count", "den": "delivered_count", "round": 6},
+                    "rows": {"": {"opened_per_delivered": 0.455031}}}}
       ],
       "sql": {"file": "sql/D1.sql",
-              "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"open_rate": 0.455}}}},
-      "expected": "SL は「定義にない」と断るのが正解。T2S の値は 0.455",
-      "tolerance": {"abs": 0.0005, "why": "決めごと6：小数第3位（0.455）まで。一番近い罠は不正 enum の open 込みの 0.4576"},
-      "source": "docs/analysis/5-4/questions.md の D1", "decided": "2026-10-28",
+              "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"open_rate": 0.455031}}}},
+      "expected": "「開封率」という指標は登録されていない、と言ったうえで、登録済みの opened_count ÷ delivered_count = 0.455031（3,835 ÷ 8,428）を添える",
+      "tolerance": {"abs": 0.0005, "why": "段階2の時点の幅のまま。広げていない。一番近い罠は不正 enum の open 込みの 0.4576"},
+      "source": "ADR-009 の「決めたこと」の Q2（2026-11-08）", "decided": "2026-11-08",
+      "history": [
+        "R1・2026-11-13：前の値 SL は unknown_name（opened_count は指標でなかった）、SQL は 0.455（questions.md の D1、2026-10-28）。理由：ADR-009 の Q2（2026-11-08）の決め。opened_count が指標になった（docs/business/2026-11-06-ctr-opened.md）ので、断るはずの呼び出しが通る。2通りで出した値：(a) query_metrics の opened_count 3835 ÷ delivered_count 8428 = 0.455031（list_metrics に開封率の指標は無い）、(b) run_sql で sql/D1.sql（answer_queries.sql の D1）= 0.455031。小数6桁で一致"
+      ],
       "status": "有効",
       "known_errors": [
         "5-4 run_002：t2s r1・r2・r3 enum（存在しない値 open で 0%。r2・r3 は分母も違う（縦持ち））／t2s_desc r1・r2 enum、r3 答えなし／sl 答えなし ×3（決めごとどおり）",
