@@ -137,7 +137,14 @@ def run_claude(clone, prompt, allowed, log, max_turns):
             continue
         if ev.get("type") == "result":
             final = ev.get("result") or ""
-        for c in (ev.get("message") or {}).get("content") or []:
+        msg = ev.get("message")
+        if not isinstance(msg, dict):
+            # 2026-11-13 G1：L2（hook が ask を返す件）で、message が文字列の行が出て読み取りが落ちた。
+            # 落とさずに、道具の結果の欄へ文字のまま残す
+            if msg:
+                results.append(f"message({ev.get('type')}) " + str(msg).replace("\n", " ")[:300])
+            continue
+        for c in msg.get("content") or []:
             if not isinstance(c, dict):
                 continue
             if c.get("type") == "tool_use":
@@ -231,6 +238,7 @@ def main():
         print(f"\n{verdict} {cid} 期待={expect} claude_exit={rc} {fact}")
         print(f"  道具の呼び出し: {[(n, scrub(t)[:120]) for n, t in calls]}")
         print(f"  hook の記録: {[(x['decision'], x['tool'], scrub(x['detail'])[:80]) for x in decisions]}")
+        print(f"  道具の結果: {[scrub(r)[:160] for r in results]}")
         print(f"  git status --short: {status or '（変更なし）'}")
         print(f"  git log -1: {log1}")
         md += [f"{'###' if ONLY else '##'} {cid}（期待：{expect}／結果：{verdict}）", "",
