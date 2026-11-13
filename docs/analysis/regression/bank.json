@@ -1,0 +1,286 @@
+{
+  "about": "回帰の試験の問の一覧（R1）。期待値の変え方は README.md。SQL の本文は sql/<ID>.sql。行の鍵は列の値を | でつないだ文字列で、空（NULL）は (空)",
+  "questions": [
+    {
+      "id": "A1",
+      "question": "メッセージの種類ごとのクリック数を出して",
+      "sl": [
+        {"tool": "query_metrics", "args": {"metrics": ["clicked_count"], "group_by": ["message_event__message_type"]},
+         "expect": {"kind": "ok", "key": ["message_event__message_type"], "exact_keys": true,
+                    "rows": {"flex": {"clicked_count": 168}, "image": {"clicked_count": 215}, "imagemap": {"clicked_count": 272},
+                             "text": {"clicked_count": 225}, "video": {"clicked_count": 251}}}}
+      ],
+      "sql": {"file": "sql/A1.sql",
+              "expect": {"kind": "ok", "key": ["message_type"], "exact_keys": true,
+                         "rows": {"flex": {"clicked": 168}, "image": {"clicked": 215}, "imagemap": {"clicked": 272},
+                                  "text": {"clicked": 225}, "video": {"clicked": 251}}}},
+      "expected": "flex 168 / image 215 / imagemap 272 / text 225 / video 251（計 1,131）",
+      "tolerance": {"abs": 0, "why": "件数。決めごと6：罠（CLICK 29行を混ぜる）との差より小さい幅なので、ぴったり"},
+      "source": "docs/analysis/5-4/questions.md の A1", "decided": "2026-10-28",
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r1・r2・r3 品質フラグ（is_valid_click）／t2s_desc r1・r3 品質フラグ、r2 品質フラグ・その他（存在しない値 click）"
+      ]
+    },
+    {
+      "id": "A3",
+      "question": "流入経路ごとの登録数は？",
+      "sl": [
+        {"tool": "query_metrics", "args": {"metrics": ["subscription_count"], "group_by": ["subscription_event__route"]},
+         "expect": {"kind": "ok", "key": ["subscription_event__route"], "exact_keys": true,
+                    "rows": {"qr_code": {"subscription_count": 796}, "search": {"subscription_count": 641}, "ad": {"subscription_count": 300},
+                             "link_share": {"subscription_count": 207}, "other": {"subscription_count": 91}}}}
+      ],
+      "sql": {"file": "sql/A3.sql",
+              "expect": {"kind": "ok", "key": ["route"], "exact_keys": true,
+                         "rows": {"qr_code": {"subscriptions": 796}, "search": {"subscriptions": 641}, "ad": {"subscriptions": 300},
+                                  "link_share": {"subscriptions": 207}, "other": {"subscriptions": 91}}}},
+      "expected": "route 別：qr_code 796 / search 641 / ad 300 / link_share 207 / other 91（計 2,035）",
+      "tolerance": {"abs": 0, "why": "件数"},
+      "source": "docs/analysis/5-4/questions.md の A3", "decided": "2026-10-28",
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r1 品質フラグ（計 1,807）、r2・r3 品質フラグ・その他（アカウント数）"
+      ]
+    },
+    {
+      "id": "B2",
+      "question": "配信数は全部でいくつ？",
+      "sl": [
+        {"tool": "query_metrics", "args": {"metrics": ["delivered_count"]},
+         "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"delivered_count": 8428}}}}
+      ],
+      "sql": {"file": "sql/B2.sql",
+              "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"delivered": 8428}}}},
+      "expected": "8,428（完全重複 82行を含む）",
+      "tolerance": {"abs": 0, "why": "件数。罠の 8,346（重複除去）との差より小さい幅"},
+      "source": "docs/analysis/5-4/questions.md の B2", "decided": "2026-10-28",
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r3 縦持ち（全行 13,871）",
+        "5-4 run_002 の印【値は合ったが定義と違う】：t2s_B2_r2、t2s_desc_B2_r1・r2（is_valid_event_type で絞った）、t2s_desc_B2_r3（同上と LOWER(event_type)）"
+      ]
+    },
+    {
+      "id": "B3",
+      "question": "クリック率はどのくらい？",
+      "sl": [
+        {"tool": "query_metrics", "args": {"metrics": ["ctr_per_open"]},
+         "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"ctr_per_open": 0.294915}}}}
+      ],
+      "sql": {"file": "sql/B3.sql",
+              "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"ctr_per_open": 0.294915}}}},
+      "expected": "0.294915（約 29.5%。クリックした数 1,131 ÷ 開封した数 3,835）",
+      "tolerance": {"abs": 0.0005, "why": "段階2の時点の幅（パーセントで小数第1位）のまま。広げていない。決定メモに出てくるほかの数え方（30.0%・26.9%）との差より小さい"},
+      "source": "docs/business/2026-11-06-ctr-opened.md", "decided": "2026-11-06",
+      "history": [
+        "R1・2026-11-13：前の値 0.134196（questions.md の B3、ctr = clicked ÷ delivered、2026-10-28）。理由：決定メモ docs/business/2026-11-06-ctr-opened.md で、クリック率はクリックした数 ÷ 開封した数になり、ctr は ctr_per_open に替わった。2通りで出した値：(a) query_metrics の ctr_per_open = 0.294915、(b) run_sql で sql/B3.sql（新しく書いた。clicked の行数 ÷ opened の行数）= 0.294915。小数6桁で一致"
+      ],
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r1 その他（存在しない値 click・send）、r2・r3 縦持ち・品質フラグ／t2s_desc r1 品質フラグ、r2・r3 その他（存在しない値 click）／sl r2 その他（直近1日の率）",
+        "段階2 run_001：sql_mcp_B3_r2 品質フラグ・enum・重複（規則C）"
+      ]
+    },
+    {
+      "id": "B4",
+      "question": "業種ごとの配信数",
+      "sl": [
+        {"tool": "query_metrics", "args": {"metrics": ["delivered_count"], "group_by": ["account__industry"]},
+         "expect": {"kind": "ok", "key": ["account__industry"], "exact_keys": true,
+                    "rows": {"(空)": {"delivered_count": 2565}, "entertainment": {"delivered_count": 1481}, "healthcare": {"delivered_count": 1463},
+                             "real_estate": {"delivered_count": 867}, "education": {"delivered_count": 745},
+                             "food_and_beverage": {"delivered_count": 588}, "retail": {"delivered_count": 492}, "beauty": {"delivered_count": 227}}}}
+      ],
+      "sql": {"file": "sql/B4.sql",
+              "expect": {"kind": "ok", "key": ["industry"], "exact_keys": true,
+                         "rows": {"(空)": {"delivered": 2565, "of_which_orphan": 119}, "entertainment": {"delivered": 1481}, "healthcare": {"delivered": 1463},
+                                  "real_estate": {"delivered": 867}, "education": {"delivered": 745},
+                                  "food_and_beverage": {"delivered": 588}, "retail": {"delivered": 492}, "beauty": {"delivered": 227}}}},
+      "expected": "業種が空 2,565（うち孤児 119）/ entertainment 1,481 / healthcare 1,463 / real_estate 867 / education 745 / food_and_beverage 588 / retail 492 / beauty 227（計 8,428）",
+      "tolerance": {"abs": 0, "why": "件数。罠（内部結合で 2,446）との差より小さい幅"},
+      "source": "docs/analysis/5-4/questions.md の B4", "decided": "2026-10-28",
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r1・r2・r3 孤児（r2 は配信本数、r3 は縦持ちも）／t2s_desc r1・r2・r3 孤児（内部結合で 2,446）"
+      ]
+    },
+    {
+      "id": "B5",
+      "question": "2月の確定した売上（円）はいくら？",
+      "sl": [
+        {"tool": "query_metrics",
+         "args": {"metrics": ["revenue_amount"], "group_by": ["revenue_record__currency", "revenue_record__is_finalized"],
+                  "where": ["{{ TimeDimension('metric_time', 'month') }} = '2026-02-01'"]},
+         "expect": {"kind": "ok", "key": ["revenue_record__currency", "revenue_record__is_finalized"], "exact_keys": false,
+                    "rows": {"JPY|True": {"revenue_amount": 5476600}}}}
+      ],
+      "sql": {"file": "sql/B5.sql",
+              "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"revenue_jpy": 5476600, "of_which_orphan": 120000}}}},
+      "expected": "5,476,600（孤児1行 120,000 を含む）",
+      "tolerance": {"abs": 0, "why": "金額（100 の倍数）。罠の 5,356,600（孤児を除く）との差より小さい幅"},
+      "source": "docs/analysis/5-4/questions.md の B5", "decided": "2026-10-28",
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r1・r2・r3 snapshot（10,448,341）／sl r2・r3 その他（mf の書き方のエラーのまま。答えに例の数字）",
+        "5-4 run_002 の印【値は合ったが定義と違う】：t2s_desc_B5_r3（年を見ずに2月で絞った）",
+        "段階2 run_001 の印「年」：sql_mcp_B5_r1・r2・r3（年を見ずに month(revenue_month)=2）"
+      ]
+    },
+    {
+      "id": "C1",
+      "question": "売上の合計はいくら？",
+      "sl": [
+        {"tool": "query_metrics", "args": {"metrics": ["revenue_amount"], "group_by": ["revenue_record__currency"]},
+         "expect": {"kind": "ok", "key": ["revenue_record__currency"], "exact_keys": true,
+                    "rows": {"JPY": {"revenue_amount": 45440100}, "USD": {"revenue_amount": 4181800}}}}
+      ],
+      "sql": {"file": "sql/C1.sql",
+              "expect": {"kind": "ok", "key": ["currency"], "exact_keys": true,
+                         "rows": {"JPY": {"revenue": 45440100}, "USD": {"revenue": 4181800}}}},
+      "expected": "混在合計は意味がないと指摘する、または通貨別：JPY 45,440,100 / USD 4,181,800",
+      "tolerance": {"abs": 0, "why": "金額"},
+      "source": "docs/analysis/5-4/questions.md の C1", "decided": "2026-10-28",
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r1・r2・r3 通貨（49,621,900。r3 は snapshot も）／t2s_desc r1・r2・r3 通貨"
+      ]
+    },
+    {
+      "id": "C2",
+      "question": "契約プラン別に売上を比べたい",
+      "sl": [
+        {"tool": "query_metrics", "args": {"metrics": ["revenue_amount"], "group_by": ["account__plan_type", "revenue_record__currency"]},
+         "expect": {"kind": "ok", "key": ["account__plan_type", "revenue_record__currency"], "exact_keys": true,
+                    "rows": {"free|JPY": {"revenue_amount": 6640400}, "free|USD": {"revenue_amount": 2448200},
+                             "light|JPY": {"revenue_amount": 3733000}, "light|USD": {"revenue_amount": 1733600},
+                             "standard|JPY": {"revenue_amount": 34946700}, "(空)|JPY": {"revenue_amount": 120000}}}}
+      ],
+      "sql": {"file": "sql/C2.sql",
+              "expect": {"kind": "ok", "key": ["plan_type", "currency"], "exact_keys": true,
+                         "rows": {"free|JPY": {"revenue": 6640400}, "free|USD": {"revenue": 2448200},
+                                  "light|JPY": {"revenue": 3733000}, "light|USD": {"revenue": 1733600},
+                                  "standard|JPY": {"revenue": 34946700}, "(空)|JPY": {"revenue": 120000}}}},
+      "expected": "通貨別：free JPY 6,640,400・USD 2,448,200 / light JPY 3,733,000・USD 1,733,600 / standard JPY 34,946,700 / プランが空（孤児）JPY 120,000",
+      "tolerance": {"abs": 0, "why": "金額"},
+      "source": "docs/analysis/5-4/questions.md の C2", "decided": "2026-10-28",
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r1・r2・r3 孤児・通貨（r1 はその他も）／t2s_desc r1・r2・r3 孤児・通貨／sl r1・r2 通貨、r3 その他（時刻の書き方のエラーのまま）",
+        "段階2 run_001：sql_mcp_C2_r1 孤児・その他（確定の月だけ）、r2・r3 その他（確定の月だけ）（規則C）"
+      ]
+    },
+    {
+      "id": "C3",
+      "question": "4月の確定した売上（円）はいくら？",
+      "sl": [
+        {"tool": "query_metrics", "label": "確定で絞らない",
+         "args": {"metrics": ["revenue_amount"], "group_by": ["revenue_record__currency", "revenue_record__is_finalized"],
+                  "where": ["{{ TimeDimension('metric_time', 'month') }} = '2026-04-01'"]},
+         "expect": {"kind": "ok", "key": ["revenue_record__currency", "revenue_record__is_finalized"], "exact_keys": false,
+                    "rows": {"JPY|False": {"revenue_amount": 7958500}}}},
+        {"tool": "query_metrics", "label": "is_finalized = true で絞る",
+         "args": {"metrics": ["revenue_amount"], "group_by": ["revenue_record__currency", "revenue_record__is_finalized"],
+                  "where": ["{{ TimeDimension('metric_time', 'month') }} = '2026-04-01'",
+                            "{{ Dimension('revenue_record__is_finalized') }} = true"]},
+         "expect": {"kind": "empty"}}
+      ],
+      "sql": {"file": "sql/C3.sql",
+              "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"finalized_rows": 0, "provisional_jpy": 7958500}}}},
+      "expected": "4月はまだ確定していない（暫定値は 7,958,500）",
+      "tolerance": {"abs": 0, "why": "金額と行数"},
+      "source": "docs/analysis/5-4/questions.md の C3", "decided": "2026-10-28",
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r1 その他（可能性どまり）、r2・r3 空の結果／t2s_desc r1 空の結果、r2 その他、r3 空の結果／sl r1・r2 空の結果、r3 その他（日付の書き方のエラーのまま。答えに例の数字）",
+        "段階2 run_001 の印「年」：sql_mcp_C3_r2・r3"
+      ]
+    },
+    {
+      "id": "D1",
+      "question": "開封率は？",
+      "sl": [
+        {"tool": "list_metrics", "label": "開封率の指標が無いことを確かめる",
+         "expect": {"kind": "ok", "absent_metrics": ["open_rate", "opened_rate", "open_ratio", "開封率"]}},
+        {"tool": "query_metrics", "label": "opened_count ÷ delivered_count", "args": {"metrics": ["opened_count", "delivered_count"]},
+         "expect": {"kind": "ok", "key": [], "exact_keys": true,
+                    "derive": {"name": "opened_per_delivered", "num": "opened_count", "den": "delivered_count", "round": 6},
+                    "rows": {"": {"opened_per_delivered": 0.455031}}}}
+      ],
+      "sql": {"file": "sql/D1.sql",
+              "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"open_rate": 0.455031}}}},
+      "expected": "「開封率」という指標は登録されていない、と言ったうえで、登録済みの opened_count ÷ delivered_count = 0.455031（3,835 ÷ 8,428）を添える",
+      "tolerance": {"abs": 0.0005, "why": "段階2の時点の幅のまま。広げていない。一番近い罠は不正 enum の open 込みの 0.4576"},
+      "source": "ADR-009 の「決めたこと」の Q2（2026-11-08）", "decided": "2026-11-08",
+      "history": [
+        "R1・2026-11-13：前の値 SL は unknown_name（opened_count は指標でなかった）、SQL は 0.455（questions.md の D1、2026-10-28）。理由：ADR-009 の Q2（2026-11-08）の決め。opened_count が指標になった（docs/business/2026-11-06-ctr-opened.md）ので、断るはずの呼び出しが通る。2通りで出した値：(a) query_metrics の opened_count 3835 ÷ delivered_count 8428 = 0.455031（list_metrics に開封率の指標は無い）、(b) run_sql で sql/D1.sql（answer_queries.sql の D1）= 0.455031。小数6桁で一致"
+      ],
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r1・r2・r3 enum（存在しない値 open で 0%。r2・r3 は分母も違う（縦持ち））／t2s_desc r1・r2 enum、r3 答えなし／sl 答えなし ×3（決めごとどおり）",
+        "段階2 run_001 の印「品質フラグ」：sl_mcp_D1_r1（is_valid_event_type で絞った）"
+      ]
+    },
+    {
+      "id": "D2",
+      "question": "登録した人は何人？（重複なし）",
+      "sl": [
+        {"tool": "query_metrics", "args": {"metrics": ["subscription_count"], "group_by": ["subscription_event__contact_id"]},
+         "expect": {"kind": "unknown_name"}}
+      ],
+      "sql": {"file": "sql/D2.sql",
+              "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"contacts": 2000, "subscription_events": 2035}}}},
+      "expected": "2,000 人（イベント 2,035 との差 35 は、再登録 30件と異常な日付の複製 5件）。SL は人数の指標が無いので断る",
+      "tolerance": {"abs": 0, "why": "件数。罠の 2,035 との差より小さい幅"},
+      "source": "docs/analysis/5-4/questions.md の D2", "decided": "2026-10-28",
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r1・r2・r3 その他（アカウント数 20）／sl 答えなし ×3（決めごとどおり）",
+        "5-4 run_002 の印【値は合ったが定義と違う】：t2s_desc_D2_r1・r2・r3（U プレフィックスをそろえずに数えた）"
+      ]
+    },
+    {
+      "id": "D5",
+      "question": "売上の最初の見積もりと確定値は、どれくらい違った？",
+      "sl": [
+        {"tool": "query_metrics", "args": {"metrics": ["revenue_amount"], "group_by": ["revenue_record__snapshot_date"]},
+         "expect": {"kind": "unknown_name"}}
+      ],
+      "sql": {"file": "sql/D5.sql",
+              "expect": {"kind": "ok", "key": ["revenue_month"], "exact_keys": true,
+                         "rows": {"2025-11-01": {"first_estimate": 8249016, "final_value": 8887700, "diff": 638684},
+                                  "2025-12-01": {"first_estimate": 7712884, "final_value": 8307800, "diff": 594916},
+                                  "2026-01-01": {"first_estimate": 7376621, "final_value": 7951800, "diff": 575179},
+                                  "2026-02-01": {"first_estimate": 4971741, "final_value": 5356600, "diff": 384859},
+                                  "2026-03-01": {"first_estimate": 6318475, "final_value": 6857700, "diff": 539225}}}},
+      "expected": "円、2版ある 76 組：2025-11 +638,684 / 2025-12 +594,916 / 2026-01 +575,179 / 2026-02 +384,859 / 2026-03 +539,225（2026-04 は1版だけ）。SL は snapshot_date を切り口に持たないので断る",
+      "tolerance": {"abs": 0, "why": "金額"},
+      "source": "docs/analysis/5-4/questions.md の D5", "decided": "2026-10-28",
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r1 その他（NULL）、r2・r3 snapshot・通貨／t2s_desc r1・r2・r3 snapshot・通貨／sl r1・r2・r3 代用（r1・r2 は通貨も）",
+        "段階2 run_001：sl_mcp_D5_r2・r3 その他（確定値にだけある行を差に入れた）（規則A）、sql_mcp_D5_r1 同じ（規則A）。印「版の取り方」：sl_mcp_D5_r1（規則A）"
+      ]
+    },
+    {
+      "id": "D6",
+      "question": "今月の売上は？",
+      "sl": [
+        {"tool": "query_metrics",
+         "args": {"metrics": ["revenue_amount"], "group_by": ["revenue_record__currency"],
+                  "where": ["{{ TimeDimension('metric_time', 'month') }} = '2026-10-01'"]},
+         "expect": {"kind": "empty"}}
+      ],
+      "sql": {"file": "sql/D6.sql",
+              "expect": {"kind": "ok", "key": [], "exact_keys": true, "rows": {"": {"rows_2026_10": 0, "last_month": "2026-04-01"}}}},
+      "expected": "データがない（売上は 2026-04 まで）",
+      "tolerance": {"abs": 0, "why": "行数と月"},
+      "source": "docs/analysis/5-4/questions.md の D6", "decided": "2026-10-28",
+      "status": "有効",
+      "known_errors": [
+        "5-4 run_002：t2s r2 空の結果の読み方で×（札の記載なし）／sl r1 空の結果の読み方で×、r2 答えなし（軸2 も×）、r3 空の結果（「0」）",
+        "5-4 run_002 の印【値は合ったが定義と違う】：t2s_D6_r3（is_finalized = TRUE で絞った）"
+      ]
+    }
+  ]
+}

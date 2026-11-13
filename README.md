@@ -96,7 +96,7 @@ dbt build
 # 5. Query metrics
 export DBT_PROFILES_DIR=~/.dbt
 mf list metrics
-mf query --metrics ctr --group-by account__industry
+mf query --metrics ctr_per_open --group-by account__industry
 mf query --metrics revenue_amount --group-by revenue_record__currency
 ```
 
@@ -117,7 +117,8 @@ docker compose up -d          # UI on 127.0.0.1:8081
 | `subscription_count` | simple | All rows, including orphaned account ids |
 | `delivered_count` | simple | Long-format table: filtered by event type |
 | `clicked_count` | simple | Same |
-| `ctr` | ratio | clicked / delivered |
+| `opened_count` | simple | Same (event type `opened`) |
+| `ctr_per_open` | ratio | clicked / opened (`docs/business/2026-11-06-ctr-opened.md`) |
 | `revenue_amount` | simple | Latest snapshot only; currency NOT converted |
 
 ## Project structure
