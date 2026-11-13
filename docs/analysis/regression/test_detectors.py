@@ -27,7 +27,7 @@ CASES = [
     (d.year_less_month, sql_rec("C3", "select sum(x) filter (where month(revenue_month) = 4) from main_mart.fct_revenue where revenue_month >= '2026-01-01'"), d.MISS),
     (d.year_less_month, sl_rec("B5", ["revenue_amount"], where=["{{ TimeDimension('metric_time', 'month') }} = '2026-02-01'"]), d.MISS),
     (d.quality_flag, sql_rec("A1", "select message_type, count(*) from main_mart.fct_message_event where is_valid_click group by 1"), d.HIT),
-    (d.quality_flag, sql_rec("A1", "select message_type, count(*) filter (where is_valid_click) from main_mart.fct_message_event group by 1"), d.HIT),
+    (d.quality_flag, sql_rec("A1", "select message_type, count(*) filter (where is_valid_click) from main_mart.fct_message_event group by 1"), d.MISS),  # v2：分けて数えるのは当てない
     (d.quality_flag, sql_rec("A1", "select is_valid_click, count(*) from main_mart.fct_message_event where event_type = 'clicked' group by 1"), d.MISS),
     (d.quality_flag, sql_rec("D2", "select * from main_mart.fct_subscription where not is_valid_contact_id limit 10"), None),  # D2 は対象外
     (d.quality_flag, sql_rec("A3", "select * from main_mart.fct_subscription where not is_valid_contact_id limit 10"), d.NA),  # 下調べは見ない（見る呼び出しが残らない）
@@ -49,14 +49,19 @@ CASES = [
     (d.empty_as_zero, sql_rec("D6", "select 1", answer="今月の売上は 0 円です。"), d.HIT),
     (d.empty_as_zero, sql_rec("D6", "select 1", answer="今月のデータはまだ入っていません（売上は 2026-04 まで）。行は0件でした。"), d.MISS),
     (d.enum_mixed, sql_rec("A1", "select message_type, count(*) from main_mart.fct_message_event where lower(event_type) = 'clicked' group by 1"), d.HIT),
-    (d.enum_mixed, sql_rec("D1", "select count(*) filter (where event_type = 'open') from main_mart.fct_message_event"), d.HIT),
+    (d.enum_mixed, sql_rec("D1", "select count(*) filter (where event_type = 'open') from main_mart.fct_message_event"), d.HIT),  # enum はクエリ全体を見る（v2 で狭めて戻した）
+    (d.enum_mixed, sql_rec("D1", "select count(*) from main_mart.fct_message_event where event_type = 'open'"), d.HIT),
     (d.enum_mixed, sql_rec("A1", "select message_type, count(*) from main_mart.fct_message_event where event_type = 'clicked' group by 1"), d.MISS),
     (d.dedupe, sql_rec("B2", "select count(*) from (select distinct * from main_mart.fct_message_event where event_type = 'delivered')"), d.HIT),
     (d.long_format, sql_rec("B2", "select count(*) from main_mart.fct_message_event"), d.HIT),
     (d.long_format, sql_rec("B2", "select count(*) from main_mart.fct_message_event where event_type = 'delivered'"), d.MISS),
     (d.u_prefix, sql_rec("D2", "select count(distinct contact_id) from main_mart.fct_subscription"), d.HIT),
     (d.u_prefix, sql_rec("D2", "select count(distinct case when contact_id like 'U%' then contact_id else 'U' || contact_id end) from main_mart.fct_subscription"), d.MISS),
-    (d.empty_rows_dropped, sql_rec("B4", "select industry, count(*) from x where industry is not null group by 1"), d.HIT),
+    (d.enum_mixed, sql_rec("D1", "select count(*) filter (where event_type in ('opened','open')) from main_mart.fct_message_event where event_type <> 'x'"), d.HIT),
+    (d.enum_mixed, sql_rec("D1", "select count(*) filter (where event_type in ('opened','open')), count(*) filter (where event_type = 'opened') from main_mart.fct_message_event"), d.HIT),
+    (d.unfinalized_excluded, sql_rec("C2", "select * from main_mart.dim_account a where a.account_id is null; select plan_type, sum(case when is_finalized then revenue_amount end) from main_mart.fct_revenue group by 1"), d.HIT),  # v3
+    (d.unfinalized_excluded, sql_rec("C2", "select * from main_mart.dim_account a where a.account_id is null; select plan_type, is_finalized, sum(revenue_amount) from main_mart.fct_revenue group by 1, 2"), d.MISS),  # 文をまたがない
+    (d.empty_rows_dropped,sql_rec("B4", "select industry, count(*) from x where industry is not null group by 1"), d.HIT),
 ]
 
 bad = 0

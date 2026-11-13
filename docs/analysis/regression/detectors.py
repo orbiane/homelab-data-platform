@@ -25,8 +25,63 @@ HIT, MISS, NA = "当たった", "当たらない", "判定できない"
 #   seq, tool（run_sql / query_metrics / mf_query / ほか）, sql（SQL の本文。SL は None）,
 #   metrics, group_by, where（SL の欄。リスト）, ok（結果が返ったか）, kind（段階2 の kind。5-4 は None）
 
+def split_statements(sql):
+    """`;` で文に分ける（文字列の中の `;` は分けない）。空の文は捨てる。
+    v2 で足した：段階2 の run_sql は1回の呼び出しに複数の文を入れられ、v1 は文をまたいで WHERE を切り出していた"""
+    out, cur, i = [], [], 0
+    while i < len(sql):
+        ch = sql[i]
+        if ch == "'":
+            j = sql.find("'", i + 1)
+            j = len(sql) - 1 if j < 0 else j
+            cur.append(sql[i:j + 1])
+            i = j + 1
+            continue
+        if ch == ";":
+            out.append("".join(cur))
+            cur = []
+        else:
+            cur.append(ch)
+        i += 1
+    out.append("".join(cur))
+    return [s for s in out if s.strip()]
+
+
 def normalize(rec):
-    """段階2 の記録（calls）と 5-4 の記録（attempts）を、同じ形の呼び出しのリストにする。"""
+    """段階2 の記録（calls）と 5-4 の記録（attempts）を、同じ形の呼び出しのリストにする。
+    run_sql は文ごとに1つにする（seq は「呼び出しの番号.文の番号」。文が1つなら呼び出しの番号だけ）"""
+    out = []
+    for q in _normalize(rec):
+        if q["sql"] is not None and SPLIT:
+            parts = split_statements(q["sql"])
+            if len(parts) > 1:
+                for k, p in enumerate(parts, 1):
+                    out.append(dict(q, sql=p, seq=f"{q['seq']}.{k}"))
+                continue
+        out.append(q)
+    return out
+
+
+# 版の切り替え（v1 の数を出し直せるように残す。apply_detectors.py の --v1 で v1 に戻す）
+SPLIT = True                 # v1 は False：run_sql を文に分けない
+COUNT_SIDE_BY_SIDE = False   # v1 は True：品質フラグ・enum を FILTER・CASE・SELECT でも当てる。v2 から品質フラグは WHERE・HAVING だけ
+ENUM_WHERE_ONLY = False      # v2 で試した（enum も WHERE・HAVING だけ）。sql_mcp_B3_r2 の一致が見落としになったので戻した
+FINALIZED_SPLIT_TOO = True   # v3 で広げた：未確定の月を外すに、確定だけを足す列も当てる。v1・v2 は False
+VERSION = "v3"
+
+
+def use_version(v):
+    global SPLIT, COUNT_SIDE_BY_SIDE, ENUM_WHERE_ONLY, FINALIZED_SPLIT_TOO, VERSION
+    VERSION = v
+    if v == "v1":
+        SPLIT, COUNT_SIDE_BY_SIDE, ENUM_WHERE_ONLY, FINALIZED_SPLIT_TOO = False, True, False, False
+    elif v == "v2":
+        SPLIT, COUNT_SIDE_BY_SIDE, ENUM_WHERE_ONLY, FINALIZED_SPLIT_TOO = True, False, True, False
+    elif v != "v3":
+        raise ValueError(v)
+
+
+def _normalize(rec):
     if "calls" in rec:
         out = []
         for c in rec.get("calls") or []:
@@ -122,11 +177,23 @@ def looked(queries):
 # SQL の小さな道具
 # ---------------------------------------------------------------------------
 
+def uncomment(sql):
+    sql = re.sub(r"--[^\n]*", " ", sql)
+    return re.sub(r"/\*.*?\*/", " ", sql, flags=re.S)
+
+
 def clean(sql):
     """コメントを外して小文字にする。文字列の中身は残す。"""
-    sql = re.sub(r"--[^\n]*", " ", sql)
-    sql = re.sub(r"/\*.*?\*/", " ", sql, flags=re.S)
-    return sql.lower()
+    return uncomment(sql).lower()
+
+
+def clauses_raw(sql, kw="where"):
+    """clauses() と同じ切り出しで、大文字・小文字を元のまま返す（event_type の値 'CLICK' などを見るため）"""
+    raw = uncomment(sql)
+    low = raw.lower()
+    if len(low) != len(raw):
+        return clauses(sql, kw)
+    return [raw[a:b] for a, b in _clause_spans(low, kw)]
 
 
 STOP = re.compile(r"\b(group\s+by|order\s+by|limit|having|qualify|window|union|except|intersect)\b|;")
@@ -136,6 +203,10 @@ def clauses(sql, kw="where"):
     """WHERE（または HAVING）の述語を、括弧の深さを見て切り出す。FILTER (WHERE …) の中は除く（別に filters() で取る）。
     段階2 の recount.py の正規表現は `)` で止まるので、`month(x) = 2 and year(x) = 2026` の year を落とす。ここでは深さを数える。"""
     s = clean(sql)
+    return [s[a:b] for a, b in _clause_spans(s, kw)]
+
+
+def _clause_spans(s, kw):
     out = []
     for m in re.finditer(rf"\b{kw}\b", s):
         before = s[:m.start()].rstrip()
@@ -156,10 +227,10 @@ def clauses(sql, kw="where"):
                 depth -= 1
             elif depth == 0:
                 st = STOP.match(s, i)
-                if st and (i == 0 or not (s[i - 1].isalnum() or s[i - 1] == "_")):
+                if st and ((st.group(0) == ";" and SPLIT) or i == 0 or not (s[i - 1].isalnum() or s[i - 1] == "_")):
                     break
             i += 1
-        out.append(s[start:i])
+        out.append((start, i))
     return out
 
 
@@ -254,6 +325,8 @@ def quality_flag(rec, queries):
                 m = FLAG.search(c)
                 if m:
                     return HIT, ev(q, f"{kw} で絞った（{m.group(0)}）: {c}")
+        if not COUNT_SIDE_BY_SIDE:
+            continue
         for c in filters(q["sql"]):
             m = FLAG.search(c)
             if m:
@@ -285,6 +358,17 @@ def unfinalized_excluded(rec, queries):
         for c in clauses(q["sql"], "where"):
             if FINALIZED.search(c):
                 return HIT, ev(q, f"where {c}")
+    if FINALIZED_SPLIT_TOO:
+        # v3 で広げた：確定だけを足す列（CASE WHEN is_finalized THEN 金額、FILTER (WHERE is_finalized)）も当てる。
+        # 段階2 の sql_mcp_C2_r1・r2 は、確定と4月を別の列にし、確定の列を勧めた（規則C の×）。WHERE だけでは拾えなかった
+        for q in sqls(queries):
+            s = clean(q["sql"])
+            m = re.search(r"\bwhen\s+(not\s+)?[\w.]*is_finalized\b[^,]*", s)
+            if m:
+                return HIT, ev(q, f"確定だけを足す列: {m.group(0)}")
+            for c in filters(q["sql"]):
+                if FINALIZED.search(c):
+                    return HIT, ev(q, f"確定だけを足す列: filter (where {c})")
     for q in sls(queries):
         for w in q["where"]:
             if "is_finalized" in w.lower():
@@ -431,17 +515,22 @@ def enum_mixed(rec, queries):
     if not sqls(queries):
         return NA, "SQL の呼び出しが無い（SL は定義が event_type の値を決めている）"
     for q in sqls(queries):
-        s = clean(q["sql"])
-        m = re.search(r"\b(lower|upper)\s*\(\s*[\w.]*event_type|event_type\s+(not\s+)?ilike", s)
-        if m:
-            return HIT, ev(q, m.group(0))
+        # v1：クエリ全体を見る。v2：WHERE・HAVING の述語だけを見る（FILTER・CASE・SELECT で分けて並べるのは当てない）
         raw = re.sub(r"--[^\n]*", " ", q["sql"])
-        for m in re.finditer(r"event_type\s*(=|<>|!=|\bin\b)\s*(\([^)]*\)|'[^']*')", raw, re.I):
-            vals = re.findall(r"'([^']*)'", m.group(2))
-            bad = [v for v in vals if v not in CANON]
-            if bad:
-                return HIT, ev(q, f"{m.group(0)}（正規でない値 {bad}）")
-    return MISS, "event_type を正規の値だけで比べている"
+        if COUNT_SIDE_BY_SIDE or not ENUM_WHERE_ONLY:
+            texts = [("", raw)]
+        else:
+            texts = [(kw + " ", c) for kw in ("where", "having") for c in clauses_raw(q["sql"], kw)]
+        for where, t in texts:
+            m = re.search(r"\b(lower|upper)\s*\(\s*[\w.]*event_type|event_type\s+(not\s+)?ilike", t, re.I)
+            if m:
+                return HIT, ev(q, where + m.group(0))
+            for m in re.finditer(r"event_type\s*(=|<>|!=|\bin\b)\s*(\([^)]*\)|'[^']*')", t, re.I):
+                vals = re.findall(r"'([^']*)'", m.group(2))
+                bad = [v for v in vals if v not in CANON]
+                if bad:
+                    return HIT, ev(q, f"{where}{m.group(0)}（正規でない値 {bad}）")
+    return MISS, "WHERE・HAVING で正規でない値を使っていない" if (ENUM_WHERE_ONLY and not COUNT_SIDE_BY_SIDE) else "event_type を正規の値だけで比べている"
 
 
 enum_mixed.TARGETS = ["A1", "B2", "B3", "D1"]

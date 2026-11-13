@@ -92,10 +92,14 @@ def positive(h):
 def main():
     which = sys.argv[1]
     out = sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else None
+    if "--version" in sys.argv:
+        d.use_version(sys.argv[sys.argv.index("--version") + 1])
     recs, human, auto = load_stage2() if which == "stage2" else load_54()
     n = len(recs)
     say(f"# R2 検出器の当て：{'段階2 run_001（作りの段）' if which == 'stage2' else '5-4 run_002（試しの段）'}")
     say()
+    say(f"- 検出器の版：{d.VERSION}（文に分ける {d.SPLIT}、品質フラグ・enum を FILTER・CASE・SELECT でも当てる {d.COUNT_SIDE_BY_SIDE}、"
+        f"enum を WHERE・HAVING だけ {d.ENUM_WHERE_ONLY}、未確定に確定だけを足す列も当てる {d.FINALIZED_SPLIT_TOO}）")
     say(f"- 記録 {n} 本。人の判定 {len(human)} 本。記録と人の判定の本の名前が同じか：{sorted(recs) == sorted(human)}")
     if sorted(recs) != sorted(human):
         bad.append(f"記録と人の判定の本が合わない：記録だけ {sorted(set(recs) - set(human))}、人だけ {sorted(set(human) - set(recs))}")
@@ -209,7 +213,11 @@ def main():
     for b in bad:
         say(f"  × {b}")
     text = "\n".join(lines) + "\n"
-    print(text)
+    if out:   # ファイルには全部、画面には本ごとの表の前までと、確かめの結果
+        cut = next((i for i, l in enumerate(lines) if l.startswith("| 本 |")), len(lines))
+        print("\n".join(lines[:cut] + ["（本ごとの表と根拠は " + out + "）"] + lines[-1 - len(bad):]))
+    else:
+        print(text)
     if out:
         p = HERE / out
         p.parent.mkdir(parents=True, exist_ok=True)
