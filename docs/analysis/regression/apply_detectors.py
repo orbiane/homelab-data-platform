@@ -148,7 +148,8 @@ def main():
     say(f"# R2 検出器の当て：{'段階2 run_001（作りの段）' if which == 'stage2' else '5-4 run_002（試しの段）'}")
     say()
     say(f"- 検出器の版：{d.VERSION}（文に分ける {d.SPLIT}、品質フラグ・enum を FILTER・CASE・SELECT でも当てる {d.COUNT_SIDE_BY_SIDE}、"
-        f"enum を WHERE・HAVING だけ {d.ENUM_WHERE_ONLY}、未確定に確定だけを足す列も当てる {d.FINALIZED_SPLIT_TOO}）")
+        f"enum を WHERE・HAVING だけ {d.ENUM_WHERE_ONLY}、未確定に確定だけを足す列も当てる {d.FINALIZED_SPLIT_TOO}、"
+        f"sum(case … then 金額) も売上を足すに数える {d.SUM_CASE_TOO}）")
     say(f"- 記録 {n} 本。人の判定 {len(human)} 本。記録と人の判定の本の名前が同じか：{sorted(recs) == sorted(human)}")
     if which != "stage2":
         k = check_54_human(human)

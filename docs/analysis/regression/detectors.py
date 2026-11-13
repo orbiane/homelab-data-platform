@@ -67,17 +67,20 @@ SPLIT = True                 # v1 は False：run_sql を文に分けない
 COUNT_SIDE_BY_SIDE = False   # v1 は True：品質フラグ・enum を FILTER・CASE・SELECT でも当てる。v2 から品質フラグは WHERE・HAVING だけ
 ENUM_WHERE_ONLY = False      # v2 で試した（enum も WHERE・HAVING だけ）。sql_mcp_B3_r2 の一致が見落としになったので戻した
 FINALIZED_SPLIT_TOO = True   # v3 で広げた：未確定の月を外すに、確定だけを足す列も当てる。v1・v2 は False
-VERSION = "v3"
+SUM_CASE_TOO = True          # v4 で広げた：sum(case when … then revenue_amount) も売上を足すに数える。v1〜v3 は False
+VERSION = "v4"
 
 
 def use_version(v):
-    global SPLIT, COUNT_SIDE_BY_SIDE, ENUM_WHERE_ONLY, FINALIZED_SPLIT_TOO, VERSION
+    global SPLIT, COUNT_SIDE_BY_SIDE, ENUM_WHERE_ONLY, FINALIZED_SPLIT_TOO, SUM_CASE_TOO, VERSION
     VERSION = v
     if v == "v1":
-        SPLIT, COUNT_SIDE_BY_SIDE, ENUM_WHERE_ONLY, FINALIZED_SPLIT_TOO = False, True, False, False
+        SPLIT, COUNT_SIDE_BY_SIDE, ENUM_WHERE_ONLY, FINALIZED_SPLIT_TOO, SUM_CASE_TOO = False, True, False, False, False
     elif v == "v2":
-        SPLIT, COUNT_SIDE_BY_SIDE, ENUM_WHERE_ONLY, FINALIZED_SPLIT_TOO = True, False, True, False
-    elif v != "v3":
+        SPLIT, COUNT_SIDE_BY_SIDE, ENUM_WHERE_ONLY, FINALIZED_SPLIT_TOO, SUM_CASE_TOO = True, False, True, False, False
+    elif v == "v3":
+        SPLIT, COUNT_SIDE_BY_SIDE, ENUM_WHERE_ONLY, FINALIZED_SPLIT_TOO, SUM_CASE_TOO = True, False, False, True, False
+    elif v != "v4":
         raise ValueError(v)
 
 
@@ -263,7 +266,17 @@ def ev(q, what):
 
 
 REVENUE = re.compile(r"fct_revenue|revenue_monthly|stg_revenue|\brevenue\b", re.I)
-SUM_AMOUNT = re.compile(r"sum\s*\(\s*(cast\s*\(\s*)?[\w.]*\b(revenue_amount|amount)\b", re.I)
+SUM_AMOUNT_V1 = re.compile(r"sum\s*\(\s*(cast\s*\(\s*)?[\w.]*\b(revenue_amount|amount)\b", re.I)
+# v4 で広げた：sum(case when … then revenue_amount …) も「売上を足す」に数える（段階2 の sl_mcp_D5_r1 の見落とし）
+SUM_AMOUNT_V4 = re.compile(r"sum\s*\(\s*(cast\s*\(\s*)?([\w.]*\b(revenue_amount|amount)\b|case\b[^()]*?\bthen\s+[\w.]*\b(revenue_amount|amount)\b)", re.I)
+
+
+class _SumAmount:
+    def search(self, s):
+        return (SUM_AMOUNT_V4 if SUM_CASE_TOO else SUM_AMOUNT_V1).search(s)
+
+
+SUM_AMOUNT = _SumAmount()
 EVENT_TABLE = re.compile(r"fct_message_event|message_event", re.I)
 ACCOUNT_TABLE = r"[\w.\"]*(dim_account|account_master|stg_account\w*)"
 
