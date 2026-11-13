@@ -4,7 +4,7 @@
 答えの数字ではなく、道具の呼び出し（`run_sql` の SQL、`query_metrics` の引数、5-4 の `mf query` の文字）から、知られた間違いを見つける検出器を作った。人が確定した判定（段階2 の `final_scores.tsv`、5-4 の `scores.md`）を物差しにして、どこまで当たるかを測った。指示書は `docs/orders/R2-regression-detectors.md`。
 
 - 検出器：[detectors.py](detectors.py)（1つの間違いに1つの関数）。自己試験：[test_detectors.py](test_detectors.py)（手で書いた例 41 件。記録は使わない）
-- 当てる台本：[apply_detectors.py](apply_detectors.py)（`stage2` か `54`。`--version v1〜v4` で前の版の数を出し直せる）
+- 当てる台本：[apply_detectors.py](apply_detectors.py)（`stage2` か `54`。`--version v1〜v4` で前の版の数を出し直せる。2026-11-14 に `--version v1`・`v3` が、コミット済みの v1・v3 の結果と同じ数になることを確かめた。`R2_stage2_v1_rerun.md` は、作り替える前の切り替え `--v1` で作ったもの）
 - 5-4 の人の判定の写し：[human_54.tsv](human_54.tsv)（台本が 5-4 の scores.md と 157 件突き合わせ、合わない所 0）
 - 結果：`results/R2_stage2_v1.md`〜`v4.md`、`results/R2_54_v3.md`・`v4.md`（本ごとの表と、当たった根拠）
 
@@ -140,7 +140,7 @@ uv run python docs/analysis/regression/apply_detectors.py 54 [--out results/<名
 
 ## 人の目（チャット）が見落とした5本
 
-段階2 の印のうち、2026-11-03 のチャットの読みで挙がっていなかった「年を見ずに月だけで絞った」5本（sql_mcp_B5_r1・r2・r3、sql_mcp_C3_r2・r3）は、**`year_less_month` が v1（記録を読む前の版）から5本とも当て、誤検出は0本**。根拠は5本とも `where month(revenue_month)=2`（C3 は `=4`）。5-4 の同じ形の t2s_desc_B5_r3 も当てた。
+段階2 の印のうち、2026-11-03 のチャットの読みで挙がっていなかった「年を見ずに月だけで絞った」5本（sql_mcp_B5_r1・r2・r3、sql_mcp_C3_r2・r3）は、**`year_less_month` が v1（記録を読む前の版）から5本とも当て、誤検出は0本**。根拠は5本とも `where month(revenue_month)=2`（C3 は `=4`）。5-4 の同じ形の t2s_desc_B5_r3 も当てた。ただし、この形は v1 の材料（段階2 の scores.md・final_scores.tsv）に SQL の断片のまま書いてあった。人が見つけたあとの形を写した規則で、人より先に見つけたのではない（下の「言えないこと」）。
 
 ## 拾えなかった間違いの種類
 
@@ -151,6 +151,7 @@ uv run python docs/analysis/regression/apply_detectors.py 54 [--out results/<名
 
 ## この検出器で言えないこと
 
+- **チャットが見落とした5本を v1 から当てたことは、「人が見つけて書いた形を規則に写せた」ことしか示さない。** v1 の材料の段階2 の scores.md と final_scores.tsv に、この5本の形が `month(revenue_month)=2`（C3 は `=4`）と SQL の断片のまま書いてあった。人の知らない間違いを検出器が見つけた、とは言えない。5-4 の t2s_desc_B5_r3 も、5-4 の scores.md に同じ形が書いてあった
 - **検出器も、当てる台本も、対応づけの言葉も、Claude が書いた。** 独立した物差しは人の判定（final_scores.tsv と 5-4 の scores.md）だけ。5-4 の人の判定は Claude が手で写した（scores.md との機械の突き合わせ 157 件は合ったが、札の言葉の写しは軸1・印ほど機械で確かめていない）
 - **段階2 の数は、作りに使った記録の数。** v2〜v4 は段階2 の結果を見て直したので、段階2 の一致の数は当てはめの結果。作りに使っていないのは 5-4 だけ
 - **記録の数が少ない。** 段階2 で人が×か印の本は14本、5-4 で81本。問は13問だけで、同じ問の3回はよく似た呼び出しになる
