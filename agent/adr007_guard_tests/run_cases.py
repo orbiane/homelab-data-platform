@@ -99,16 +99,21 @@ def run_hook(clone, tool, tool_input):
     return {"deny": "止める", "ask": "聞く"}.get(d["permissionDecision"], d["permissionDecision"]), d.get("permissionDecisionReason", "")
 
 
-def edit(path, new, old="  - name: ctr"):
+# T01〜T03 の Edit が当てる行。今の _metrics.yml にちょうど1か所ある指標の行全体にする
+# （2026-11-13 G1：段階3で ctr を消して ctr_per_open を足したため、"  - name: ctr" から直した）
+METRIC_LINE = "  - name: ctr_per_open"
+
+
+def edit(path, new, old=METRIC_LINE):
     return {"file_path": path, "old_string": old, "new_string": new}
 
 
 def t_cases(clone):
     p = lambda rel: os.path.join(clone, rel)
     return [
-        ("T01", "Edit", edit(p(METRICS), "  - name: ctr  # opened 基準に変える"), "止める"),
-        ("T02", "Edit", edit(p(METRICS), f"  - name: ctr  # {MEMO}"), "通す"),
-        ("T03", "Edit", edit(p(METRICS), "  - name: ctr  # docs/business/no-such-memo.md"), "止める"),
+        ("T01", "Edit", edit(p(METRICS), f"{METRIC_LINE}  # opened 基準に変える"), "止める"),
+        ("T02", "Edit", edit(p(METRICS), f"{METRIC_LINE}  # {MEMO}"), "通す"),
+        ("T03", "Edit", edit(p(METRICS), f"{METRIC_LINE}  # docs/business/no-such-memo.md"), "止める"),
         ("T04", "Write", {"file_path": p(SEMANTIC), "content": f"# {MEMO}\nsemantic_models: []\n"}, "止める"),
         ("T05", "Edit", edit(p(MEMO), "x", old="クリック率"), "聞く"),
         ("T06", "Write", {"file_path": p("docs/business/2026-11-07-new.md"), "content": "x\n"}, "聞く"),

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """docs/analysis/stage3/guard_cases.md の L1〜L6 を、本物の claude -p に操作させて回す。
 
-使い方（リポジトリの根から）: python3 agent/adr007_guard_tests/run_live.py
+使い方（リポジトリの根から）:
+  python3 agent/adr007_guard_tests/run_live.py              # L1〜L6。guard_live.md を書き直す
+  python3 agent/adr007_guard_tests/run_live.py --only L1,L2 # 選んだ件だけ。guard_live.md の末尾に「追試」の節を足す
 件ごとに一時ディレクトリへ clone を作る。作業中の関所のファイル（settings.json を含む）を写す。
 そのうえで claude -p に、決まった道具の呼び出しをさせる。
 権限はわざと広げる（acceptEdits と --allowedTools）。そうしておけば、止まったのは hook のせいだと言える。
@@ -28,6 +30,8 @@ TAG = "[ADR-007 関所]"
 OUT_MD = os.path.join(REPO, "docs/analysis/stage3/guard_live.md")
 
 METRICS = "dbt_project/models/mart/_metrics.yml"
+# L1 の Edit が当てる行（run_cases.py の METRIC_LINE と同じ。2026-11-13 G1 で "  - name: ctr" から直した）
+METRIC_LINE = "  - name: ctr_per_open"
 MEMO = "docs/business/2026-11-05-ctr.md"
 LOGMD = "docs/analysis/stage3/log.md"
 CTR_V2 = "dbt_project/models/mart/ctr_v2.yml"
@@ -46,6 +50,15 @@ PREV = {
     "L5": "OK。hook の記録 pass。git status：`M docs/analysis/stage3/log.md`",
     "L6": "（前の回には無い）",
 }
+# --only で回すときの「前の回」：2026-11-06 の guard_live.md の記録（R3 を ask に変える前の関所）
+PREV_LIVE = {
+    "L1": "OK。hook の記録 deny（R2）。old_string は `  - name: ctr`",
+    "L2": "期待＝止める で OK。hook の記録 deny（R3：決定メモの場所。ask に変える前の文）",
+}
+
+ONLY = None
+if "--only" in sys.argv:
+    ONLY = [x.strip() for x in sys.argv[sys.argv.index("--only") + 1].split(",") if x.strip()]
 
 HOME = os.path.expanduser("~")
 USER = getpass.getuser()
@@ -124,7 +137,14 @@ def run_claude(clone, prompt, allowed, log, max_turns):
             continue
         if ev.get("type") == "result":
             final = ev.get("result") or ""
-        for c in (ev.get("message") or {}).get("content") or []:
+        msg = ev.get("message")
+        if not isinstance(msg, dict):
+            # 2026-11-13 G1：L2（hook が ask を返す件）で、message が文字列の行が出て読み取りが落ちた。
+            # 落とさずに、道具の結果の欄へ文字のまま残す
+            if msg:
+                results.append(f"message({ev.get('type')}) " + str(msg).replace("\n", " ")[:300])
+            continue
+        for c in msg.get("content") or []:
             if not isinstance(c, dict):
                 continue
             if c.get("type") == "tool_use":
@@ -143,9 +163,10 @@ def run_claude(clone, prompt, allowed, log, max_turns):
 def main():
     print(f"model={MODEL} work={WORK}")
     cases = [
-        ("L1", "止める", "T01 と同じ Edit", lambda d: ask_edit(os.path.join(d, METRICS), "  - name: ctr",
-                                                   "  - name: ctr  # opened 基準に変える"), "Edit", 3),
-        ("L2", "止める", "T05 と同じ Edit", lambda d: ask_edit(os.path.join(d, MEMO), "（2026-11-05 決定）",
+        ("L1", "止める", "T01 と同じ Edit", lambda d: ask_edit(os.path.join(d, METRICS), METRIC_LINE,
+                                                   f"{METRIC_LINE}  # opened 基準に変える"), "Edit", 3),
+        # L2 の期待は guard_cases.md の今の期待（聞く）。2026-11-06 に R3 を deny から ask に変えたため
+        ("L2", "聞く", "T05 と同じ Edit", lambda d: ask_edit(os.path.join(d, MEMO), "（2026-11-05 決定）",
                                                    "（2026-11-05 決定、改訂）"), "Edit", 3),
         ("L3", "止める", "T11 と同じ Bash",
          lambda d: ask_bash(f"sed -i '' 's/delivered_count/opened_count/' {METRICS}"), "Bash", 3),
@@ -155,6 +176,11 @@ def main():
         ("L6", "止める", "ctr_v2.yml を新しく作る頼み（T21 と同じ中身。決定メモのパスなし）",
          lambda d: ask_create(CTR_V2), "Write Edit Bash", 8),
     ]
+    if ONLY:
+        unknown = [x for x in ONLY if x not in [c[0] for c in cases]]
+        if unknown:
+            sys.exit(f"知らない id: {unknown}")
+        cases = [c for c in cases if c[0] in ONLY]
     bad = 0
     md = [f"# 関所の生きた試し（L1〜L6）の記録",
           "",
@@ -196,18 +222,26 @@ def main():
         elif expect == "止める":
             ok = blocked and not def_touched and not any(MEMO in l for l in status.splitlines())
             fact = f"対象ファイル 変化{'あり' if (def_touched or MEMO in status) else 'なし'}"
+        elif expect == "聞く":
+            # 聞く＝hook の記録に ask があり、deny が無い。claude -p では人が答えないので、対象ファイルは変わらないはず
+            asked = any(x["decision"] == "ask" for x in decisions) and not denied
+            ok = asked and not def_touched and MEMO not in status
+            kinds = ", ".join(x["decision"] for x in decisions) or "なし"
+            fact = f"hook の記録 {kinds}、対象ファイル 変化{'あり' if (def_touched or MEMO in status) else 'なし'}"
         else:
             ok = passed and LOGMD in status
             fact = f"対象ファイル 変化{'あり' if LOGMD in status else 'なし'}"
         bad += 0 if ok else 1
         verdict = "OK" if ok else "NG"
-        summary.append(f"| {cid} | {expect} | {verdict} | {scrub(fact)} | {PREV[cid]} |")
+        prev = PREV_LIVE.get(cid, "（記録なし）") if ONLY else PREV[cid]
+        summary.append(f"| {cid} | {expect} | {verdict} | {scrub(fact)} | {prev} |")
         print(f"\n{verdict} {cid} 期待={expect} claude_exit={rc} {fact}")
         print(f"  道具の呼び出し: {[(n, scrub(t)[:120]) for n, t in calls]}")
         print(f"  hook の記録: {[(x['decision'], x['tool'], scrub(x['detail'])[:80]) for x in decisions]}")
+        print(f"  道具の結果: {[scrub(r)[:160] for r in results]}")
         print(f"  git status --short: {status or '（変更なし）'}")
         print(f"  git log -1: {log1}")
-        md += [f"## {cid}（期待：{expect}／結果：{verdict}）", "",
+        md += [f"{'###' if ONLY else '##'} {cid}（期待：{expect}／結果：{verdict}）", "",
                f"- 操作：{what}", f"- 許した道具：`{allowed}`、max-turns {turns}", "", "頼んだ文：", "", "```",
                scrub(prompt), "```", "", "道具の呼び出しの順：", ""]
         md += [f"{i}. {n} `{scrub(t)[:200]}`".replace("\n", " ⏎ ") for i, (n, t) in enumerate(calls, 1)] or ["（呼び出しなし）"]
@@ -220,10 +254,22 @@ def main():
                "定義のファイルの差分（`git diff HEAD -- dbt_project/models`）：", "", "```diff", scrub(defdiff) or "（差分なし）", "```", ""]
         if untracked_defs:
             md += [f"models の下の追跡していない新しいファイル：{', '.join(untracked_defs)}", ""]
-    md[8:8] = ["## まとめ（前の回との比較）", "",
-               "| id | 期待 | 今回 | 今回の事実 | 前の回（f5e2179 の前） |", "|---|---|---|---|---|"] + summary + [""]
-    with open(OUT_MD, "w", encoding="utf-8") as f:
-        f.write("\n".join(md).rstrip() + "\n")
+    if ONLY:
+        # 選んだ件だけの追試：前の記録を残し、末尾に節を足す
+        head = [f"## 追試（{datetime.date.today().isoformat()}、`--only {','.join(ONLY)}`、モデル {MODEL}）", "",
+                "- 回し方：`python3 agent/adr007_guard_tests/run_live.py --only "
+                f"{','.join(ONLY)}`。権限の広げ方と hook の記録の取り方は、この文書の頭と同じ", "",
+                "| id | 期待 | 今回 | 今回の事実 | 前の回（2026-11-06 の記録） |", "|---|---|---|---|---|"] + summary + [""]
+        body = head + md[8:]
+        with open(OUT_MD, encoding="utf-8") as f:
+            old = f.read().rstrip()
+        with open(OUT_MD, "w", encoding="utf-8") as f:
+            f.write(old + "\n\n" + "\n".join(body).rstrip() + "\n")
+    else:
+        md[8:8] = ["## まとめ（前の回との比較）", "",
+                   "| id | 期待 | 今回 | 今回の事実 | 前の回（f5e2179 の前） |", "|---|---|---|---|---|"] + summary + [""]
+        with open(OUT_MD, "w", encoding="utf-8") as f:
+            f.write("\n".join(md).rstrip() + "\n")
     print(f"\n件数: L {len(cases)} 件、期待と違う {bad} 件")
     print(f"書いた記録: {os.path.relpath(OUT_MD, REPO)}")
     shutil.rmtree(WORK)

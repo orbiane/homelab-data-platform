@@ -32,6 +32,8 @@
 | T25 | Bash | `cat > dbt_project/models/mart/ctr_v2.yml <<'EOF'`（中身に `metrics:`） | 止める（R5） |
 | T26 | Edit | 試しの clone に `metrics:` を持つ `dbt_project/models/mart/extra.yml` をコミットしておき、中身の expr だけを変える。書き込む文にキーもメモのパスも無い | 止める（R2） |
 
+- T01〜T03（と L1）の直し（2026-11-13、G1）：Edit の `old_string` を `  - name: ctr` から `  - name: ctr_per_open`（今の `_metrics.yml` にちょうど1か所ある指標の行全体）に直した。段階3で `ctr` を消したので、前の文字は `ctr_per_open` の行の頭に当たっていた。期待は変えていない
+
 ## コミットの入口（C）
 | id | コミットの中身 | 期待 |
 |---|---|---|
