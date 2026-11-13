@@ -85,6 +85,55 @@ def load_54():
     return recs, human, auto
 
 
+def check_54_human(human):
+    """human_54.tsv（手で写した）を、5-4 の scores.md と機械で突き合わせる：
+    1. 「問ごと」の表の軸1 の列（r1 r2 r3 の順）と、本ごとに同じか
+    2. 「集計」の表の○の数と答えなしの数と、問×組ごとに同じか
+    3. 印の本が、「印」の節の9本と同じか"""
+    import re
+    md = (ANALYSIS / "5-4/run_002/scores.md").read_text()
+
+    def section(title):
+        m = re.search(rf"^#+ {re.escape(title)}\s*$", md, re.M)
+        rest = md[m.end():]
+        nxt = re.search(r"^#+ ", rest, re.M)
+        return rest[: nxt.start()] if nxt else rest
+
+    def table(text):
+        rows = [[c.strip() for c in l.strip().strip("|").split("|")] for l in text.splitlines()
+                if l.startswith("|") and not re.match(r"^\|[-|\s]+\|$", l)]
+        return rows[1:]
+
+    n_checked = 0
+    q = None
+    for row in table(section("問ごと（r1 / r2 / r3）")):
+        q = row[0] or q
+        g = row[1]
+        m = re.fullmatch(r"(\S+) ×3", row[2])
+        marks = [m.group(1)] * 3 if m else row[2].split()
+        got = [human.get(f"{g}_{q}_r{i}", {}).get("axis1") for i in (1, 2, 3)]
+        n_checked += 3
+        if got != marks:
+            bad.append(f"human_54.tsv の軸1 が scores.md の問ごとの表と違う：{g} {q} 写し {got} / 表 {marks}")
+    for row in table(section("集計：3回のうち軸1 が○の回数")):
+        if row[0] not in QIDS:
+            continue
+        for g, cell in zip(["t2s", "t2s_desc", "sl"], row[1:4]):
+            ok_n = int(re.match(r"(\d+)/3", cell).group(1))
+            none_n = int((re.search(r"答えなし (\d+)", cell) or [0, 0])[1])
+            got = [human[f"{g}_{row[0]}_r{i}"]["axis1"] for i in (1, 2, 3)]
+            n_checked += 1
+            if (got.count("○"), got.count("答えなし")) != (ok_n, none_n):
+                bad.append(f"human_54.tsv の数が集計と違う：{g} {row[0]} 写し {got} / 集計 {cell}")
+    want_marks = {"t2s_B2_r2", "t2s_desc_B2_r1", "t2s_desc_B2_r2", "t2s_desc_B2_r3", "t2s_desc_B5_r3", "t2s_D6_r3",
+                  "t2s_desc_D2_r1", "t2s_desc_D2_r2", "t2s_desc_D2_r3"}
+    got_marks = {s for s, h in human.items() if h["mark"]}
+    n_checked += 1
+    if got_marks != want_marks:
+        bad.append(f"human_54.tsv の印の本が「印」の節の9本と違う：写しだけ {sorted(got_marks - want_marks)}、節だけ {sorted(want_marks - got_marks)}")
+    return n_checked
+
+
 def positive(h):
     return h["axis1"] == "×" or bool(h["mark"])
 
@@ -101,6 +150,9 @@ def main():
     say(f"- 検出器の版：{d.VERSION}（文に分ける {d.SPLIT}、品質フラグ・enum を FILTER・CASE・SELECT でも当てる {d.COUNT_SIDE_BY_SIDE}、"
         f"enum を WHERE・HAVING だけ {d.ENUM_WHERE_ONLY}、未確定に確定だけを足す列も当てる {d.FINALIZED_SPLIT_TOO}）")
     say(f"- 記録 {n} 本。人の判定 {len(human)} 本。記録と人の判定の本の名前が同じか：{sorted(recs) == sorted(human)}")
+    if which != "stage2":
+        k = check_54_human(human)
+        say(f"- human_54.tsv（手で写した人の判定）を 5-4 の scores.md と突き合わせた：{k} 件（本ごとの軸1 117、問×組の集計 39、印の9本 1）")
     if sorted(recs) != sorted(human):
         bad.append(f"記録と人の判定の本が合わない：記録だけ {sorted(set(recs) - set(human))}、人だけ {sorted(set(human) - set(recs))}")
 
