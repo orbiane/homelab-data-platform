@@ -8,9 +8,9 @@
 検出器ごとに：一致／誤検出／別の札／見落とし／当たらず／判定できない／対象外 の件数と本の名前（合計は本の数）。
 
 使い方（リポジトリの直下で）:
-  uv run python docs/analysis/regression/apply_detectors.py stage2 [--out results/<名前>.md]
-  uv run python docs/analysis/regression/apply_detectors.py 54 [--out results/<名前>.md]
-合わない確かめがあれば終了コード 1。
+  uv run python docs/analysis/regression/apply_detectors.py stage2 [--version v1|v2|v3|v4] [--out results/<名前>.md]
+  uv run python docs/analysis/regression/apply_detectors.py 54 [--version v1|v2|v3|v4] [--out results/<名前>.md]
+合わない確かめがあれば終了コード 1。知らない引数（たとえば `--v1`）や値の無い `--out`・`--version` も、何も回さずに終了コード 1。
 """
 import collections
 import csv
@@ -138,11 +138,41 @@ def positive(h):
     return h["axis1"] == "×" or bool(h["mark"])
 
 
+USAGE = "使い方: apply_detectors.py stage2|54 [--version v1|v2|v3|v4] [--out results/<名前>.md]"
+
+
+def parse_args(argv):
+    """引数を読む。知らない引数、値の無い --out・--version、stage2・54 以外の対象、v1〜v4 以外の版は、
+    何も回さずに終了コード 1 で止める（前は知らない引数を黙って無視し、`--v1` でも v4 が回っていた）"""
+    def stop(msg):
+        print(f"{msg}\n{USAGE}", file=sys.stderr)
+        sys.exit(1)
+
+    if not argv or argv[0] not in ("stage2", "54"):
+        stop(f"1つ目の引数は stage2 か 54：{argv[0] if argv else '（無し）'}")
+    which, out, version = argv[0], None, None
+    i = 1
+    while i < len(argv):
+        a = argv[i]
+        if a in ("--out", "--version"):
+            if i + 1 >= len(argv) or argv[i + 1].startswith("--"):
+                stop(f"{a} の後ろに値が無い")
+            if a == "--out":
+                out = argv[i + 1]
+            else:
+                version = argv[i + 1]
+            i += 2
+        else:
+            stop(f"知らない引数：{a}")
+    if version is not None and version not in ("v1", "v2", "v3", "v4"):
+        stop(f"知らない版：{version}")
+    return which, out, version
+
+
 def main():
-    which = sys.argv[1]
-    out = sys.argv[sys.argv.index("--out") + 1] if "--out" in sys.argv else None
-    if "--version" in sys.argv:
-        d.use_version(sys.argv[sys.argv.index("--version") + 1])
+    which, out, version = parse_args(sys.argv[1:])
+    if version:
+        d.use_version(version)
     recs, human, auto = load_stage2() if which == "stage2" else load_54()
     n = len(recs)
     say(f"# R2 検出器の当て：{'段階2 run_001（作りの段）' if which == 'stage2' else '5-4 run_002（試しの段）'}")

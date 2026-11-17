@@ -11,7 +11,7 @@
   - 列の名前は、5-4 の context_t2s_desc.txt と dbt_project の staging の SQL で確かめた
 記録の形（欄の名前）は、記録を書いたコード（stage2/run_001/harness.py、5-4/run_001/harness.py）から取った。
 
-使い方：import して使う（当てる台本は apply_stage2.py と apply_54.py）。
+使い方：import して使う（当てる台本は apply_detectors.py）。
 """
 import re
 import shlex
@@ -62,7 +62,7 @@ def normalize(rec):
     return out
 
 
-# 版の切り替え（v1 の数を出し直せるように残す。apply_detectors.py の --v1 で v1 に戻す）
+# 版の切り替え（v1 の数を出し直せるように残す。apply_detectors.py の --version v1 で v1 に戻す）
 SPLIT = True                 # v1 は False：run_sql を文に分けない
 COUNT_SIDE_BY_SIDE = False   # v1 は True：品質フラグ・enum を FILTER・CASE・SELECT でも当てる。v2 から品質フラグは WHERE・HAVING だけ
 ENUM_WHERE_ONLY = False      # v2 で試した（enum も WHERE・HAVING だけ）。sql_mcp_B3_r2 の一致が見落としになったので戻した
