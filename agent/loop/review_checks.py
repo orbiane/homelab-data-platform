@@ -205,8 +205,24 @@ def build_comment(reply, res, home=None):
     if res["must_fix"] and verdict == "マージしてよい":
         verdict = "直しが要る"
         notes.append("機械の確かめで直しが要るので、レビュー役の「マージしてよい」を「直しが要る」にした")
-    fixed = []
+    # ユーザーの設定の出力の形（説明の枠 `★ Insight ───` 〜 `───`）は、コメントに載せない（L1 の試しで #13 に出た）
+    kept, in_box = [], False
     for line in body_lines:
+        s = line.strip().strip("`")
+        if not in_box and s.startswith("★"):
+            in_box = True
+            continue
+        if in_box:
+            if s and set(s) <= set("─-"):
+                in_box = False
+            continue
+        kept.append(line)
+    if in_box:  # 閉じていない枠は、取り除かずに元に戻す（中身を黙って消さない）
+        kept = body_lines
+    elif len(kept) != len(body_lines):
+        notes.append("レビュー役の返事にあった説明の枠を取り除いた")
+    fixed = []
+    for line in kept:
         if line.lstrip().startswith(pick.DECISION_PREFIXES):
             line = "（引用）" + line.lstrip()
         if home:
@@ -356,6 +372,15 @@ def selftest():
             and sha7 in text.splitlines()[0]
         bad += 0 if ok else 1
         print(f"{'OK ' if ok else 'NG '} コメント：本文の「決め:」の行は引用にし、ホームを ~ にする")
+        bar = "─" * 20
+        _, text, notes = build_comment(f"判定: 直しが要る\n\n- 直しが要る所：a\n\n`★ Insight {bar}`\n- 説明\n`{bar}`\n", clean)
+        ok = "★" not in text and "- 説明\n" not in text and "直しが要る所：a" in text and len(notes) == 1
+        bad += 0 if ok else 1
+        print(f"{'OK ' if ok else 'NG '} コメント：説明の枠を取り除き、台本の注に書く")
+        _, text, _ = build_comment("判定: 直しが要る\n\n★ 閉じていない枠\n- 中身", clean)
+        ok = "中身" in text
+        bad += 0 if ok else 1
+        print(f"{'OK ' if ok else 'NG '} コメント：閉じていない枠は消さない")
         # ブランチ名から ID
         for br, expect in [("auto/M1", "M1"), ("auto/R3a", "R3a"), ("auto/L1-trial", "L1-trial"), ("auto/X9", "X9")]:
             got = task_id_of(br, clone)
