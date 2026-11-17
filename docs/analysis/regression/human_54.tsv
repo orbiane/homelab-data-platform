@@ -1,0 +1,118 @@
+file	group	id	rep	axis1	tags	mark	source
+t2s_A1_r1	t2s	A1	1	×	品質フラグ		5-4/run_002/scores.md「問ごと」A1 t2s
+t2s_A1_r2	t2s	A1	2	×	品質フラグ		同上
+t2s_A1_r3	t2s	A1	3	×	品質フラグ		同上
+t2s_desc_A1_r1	t2s_desc	A1	1	×	品質フラグ		A1 t2s_desc
+t2s_desc_A1_r2	t2s_desc	A1	2	×	品質フラグ・その他（存在しない値 click）		同上
+t2s_desc_A1_r3	t2s_desc	A1	3	×	品質フラグ		同上
+sl_A1_r1	sl	A1	1	○			A1 sl
+sl_A1_r2	sl	A1	2	○			同上
+sl_A1_r3	sl	A1	3	○			同上
+t2s_A3_r1	t2s	A3	1	×	品質フラグ（品質フラグで行を除いて計 1,807）		A3 t2s
+t2s_A3_r2	t2s	A3	2	×	品質フラグ・その他（アカウント数）		同上
+t2s_A3_r3	t2s	A3	3	×	品質フラグ・その他（アカウント数）		同上
+t2s_desc_A3_r1	t2s_desc	A3	1	○			A3 t2s_desc（referrer を選んだ）
+t2s_desc_A3_r2	t2s_desc	A3	2	○			A3 t2s_desc（route）
+t2s_desc_A3_r3	t2s_desc	A3	3	○			同上
+sl_A3_r1	sl	A3	1	○			A3 sl（route）
+sl_A3_r2	sl	A3	2	○			A3 sl（referrer）
+sl_A3_r3	sl	A3	3	○			同上
+t2s_B2_r1	t2s	B2	1	○			B2 t2s
+t2s_B2_r2	t2s	B2	2	○		品質フラグ（is_valid_event_type で絞った）	B2 t2s と「印」の表
+t2s_B2_r3	t2s	B2	3	×	縦持ち（全行 13,871）		B2 t2s
+t2s_desc_B2_r1	t2s_desc	B2	1	○		品質フラグ（is_valid_event_type で絞った）	B2 t2s_desc と「印」の表
+t2s_desc_B2_r2	t2s_desc	B2	2	○		品質フラグ（is_valid_event_type で絞った）	同上
+t2s_desc_B2_r3	t2s_desc	B2	3	○		品質フラグ（is_valid_event_type で絞った）・LOWER(event_type)	同上
+sl_B2_r1	sl	B2	1	○			B2 sl
+sl_B2_r2	sl	B2	2	○			同上
+sl_B2_r3	sl	B2	3	○			同上
+t2s_B3_r1	t2s	B3	1	×	その他（存在しない値 click・send）		B3 t2s
+t2s_B3_r2	t2s	B3	2	×	縦持ち・品質フラグ		同上
+t2s_B3_r3	t2s	B3	3	×	縦持ち・品質フラグ		同上
+t2s_desc_B3_r1	t2s_desc	B3	1	×	品質フラグ（is_valid_click で 162%）		B3 t2s_desc
+t2s_desc_B3_r2	t2s_desc	B3	2	×	その他（存在しない値 click で 0%）		同上
+t2s_desc_B3_r3	t2s_desc	B3	3	×	その他（存在しない値 click で 0%）		同上
+sl_B3_r1	sl	B3	1	○			B3 sl
+sl_B3_r2	sl	B3	2	×	その他（直近1日だけの率）		同上
+sl_B3_r3	sl	B3	3	○			同上
+t2s_B4_r1	t2s	B4	1	×	孤児（内部結合）		B4 t2s
+t2s_B4_r2	t2s	B4	2	×	孤児・その他（配信本数）		同上
+t2s_B4_r3	t2s	B4	3	×	孤児・縦持ち（event_type で絞らず）		同上
+t2s_desc_B4_r1	t2s_desc	B4	1	×	孤児（内部結合で 2,446）		B4 t2s_desc
+t2s_desc_B4_r2	t2s_desc	B4	2	×	孤児（内部結合で 2,446）		同上
+t2s_desc_B4_r3	t2s_desc	B4	3	×	孤児（内部結合で 2,446）		同上
+sl_B4_r1	sl	B4	1	○			B4 sl
+sl_B4_r2	sl	B4	2	○			同上
+sl_B4_r3	sl	B4	3	○			同上
+t2s_B5_r1	t2s	B5	1	×	snapshot（10,448,341）		B5 t2s
+t2s_B5_r2	t2s	B5	2	×	snapshot（10,448,341）		同上
+t2s_B5_r3	t2s	B5	3	×	snapshot（10,448,341）		同上
+t2s_desc_B5_r1	t2s_desc	B5	1	○			B5 t2s_desc
+t2s_desc_B5_r2	t2s_desc	B5	2	○			同上
+t2s_desc_B5_r3	t2s_desc	B5	3	○		年（年を見ずに2月で絞った）	B5 t2s_desc と「印」の表
+sl_B5_r1	sl	B5	1	○			B5 sl
+sl_B5_r2	sl	B5	2	×	その他（mf の書き方のエラーのまま）		同上
+sl_B5_r3	sl	B5	3	×	その他（mf の書き方のエラーのまま）		同上
+t2s_C1_r1	t2s	C1	1	×	通貨（49,621,900）		C1 t2s
+t2s_C1_r2	t2s	C1	2	×	通貨（49,621,900）		同上
+t2s_C1_r3	t2s	C1	3	×	通貨・snapshot（78,585,605）		同上
+t2s_desc_C1_r1	t2s_desc	C1	1	×	通貨（49,621,900）		C1 t2s_desc
+t2s_desc_C1_r2	t2s_desc	C1	2	×	通貨（49,621,900）		同上
+t2s_desc_C1_r3	t2s_desc	C1	3	×	通貨（49,621,900）		同上
+sl_C1_r1	sl	C1	1	○			C1 sl（クエリを書かずに指摘）
+sl_C1_r2	sl	C1	2	○			同上
+sl_C1_r3	sl	C1	3	○			同上
+t2s_C2_r1	t2s	C2	1	×	孤児・通貨・その他（確定の月だけに絞った）		C2 t2s
+t2s_C2_r2	t2s	C2	2	×	孤児・通貨		同上
+t2s_C2_r3	t2s	C2	3	×	孤児・通貨		同上
+t2s_desc_C2_r1	t2s_desc	C2	1	×	孤児・通貨		C2 t2s_desc
+t2s_desc_C2_r2	t2s_desc	C2	2	×	孤児・通貨		同上
+t2s_desc_C2_r3	t2s_desc	C2	3	×	孤児・通貨		同上
+sl_C2_r1	sl	C2	1	×	通貨（混在のまま「売上金額（円）」）		C2 sl
+sl_C2_r2	sl	C2	2	×	通貨（通貨別の表のあとで円とドルを足した）		同上
+sl_C2_r3	sl	C2	3	×	その他（時刻の書き方のエラーのまま）		同上
+t2s_C3_r1	t2s	C3	1	×	その他（可能性どまり）		C3 t2s
+t2s_C3_r2	t2s	C3	2	×	空の結果（「0 円」）		同上
+t2s_C3_r3	t2s	C3	3	×	空の結果（「0 円」）		同上
+t2s_desc_C3_r1	t2s_desc	C3	1	×	空の結果（「0 円もしくはデータが存在しない」）		C3 t2s_desc
+t2s_desc_C3_r2	t2s_desc	C3	2	×	その他（「取得できません」）		同上
+t2s_desc_C3_r3	t2s_desc	C3	3	×	空の結果（「0円」）		同上
+sl_C3_r1	sl	C3	1	×	空の結果（「0 円」）		C3 sl
+sl_C3_r2	sl	C3	2	×	空の結果（「0 円」）		同上
+sl_C3_r3	sl	C3	3	×	その他（日付の書き方のエラーのまま）		同上
+t2s_D1_r1	t2s	D1	1	×	enum（存在しない値 open で 0%）		D1 t2s
+t2s_D1_r2	t2s	D1	2	×	enum（存在しない値 open で 0%）・縦持ち（分母）		同上
+t2s_D1_r3	t2s	D1	3	×	enum（存在しない値 open で 0%、send で NULL）・縦持ち（分母）		同上
+t2s_desc_D1_r1	t2s_desc	D1	1	×	enum（open で 0%）		D1 t2s_desc
+t2s_desc_D1_r2	t2s_desc	D1	2	×	enum（open で 0%）		同上
+t2s_desc_D1_r3	t2s_desc	D1	3	答えなし			同上（クエリを書かずに断った）
+sl_D1_r1	sl	D1	1	答えなし			D1 sl
+sl_D1_r2	sl	D1	2	答えなし			同上
+sl_D1_r3	sl	D1	3	答えなし			同上
+t2s_D2_r1	t2s	D2	1	×	その他（アカウント数 20）		D2 t2s
+t2s_D2_r2	t2s	D2	2	×	その他（アカウント数 20）		同上
+t2s_D2_r3	t2s	D2	3	×	その他（アカウント数 20）		同上
+t2s_desc_D2_r1	t2s_desc	D2	1	○		U プレフィックスをそろえずに数えた	D2 t2s_desc と「印」の表
+t2s_desc_D2_r2	t2s_desc	D2	2	○		U プレフィックスをそろえずに数えた	同上
+t2s_desc_D2_r3	t2s_desc	D2	3	○		U プレフィックスをそろえずに数えた	同上
+sl_D2_r1	sl	D2	1	答えなし			D2 sl
+sl_D2_r2	sl	D2	2	答えなし			同上
+sl_D2_r3	sl	D2	3	答えなし			同上
+t2s_D5_r1	t2s	D5	1	×	その他（NULL）		D5 t2s
+t2s_D5_r2	t2s	D5	2	×	snapshot・通貨		同上
+t2s_D5_r3	t2s	D5	3	×	snapshot・通貨		同上
+t2s_desc_D5_r1	t2s_desc	D5	1	×	snapshot・通貨		D5 t2s_desc
+t2s_desc_D5_r2	t2s_desc	D5	2	×	snapshot・通貨		同上
+t2s_desc_D5_r3	t2s_desc	D5	3	×	snapshot・通貨		同上
+sl_D5_r1	sl	D5	1	×	代用・通貨		D5 sl
+sl_D5_r2	sl	D5	2	×	代用・通貨		同上
+sl_D5_r3	sl	D5	3	×	代用		同上
+t2s_D6_r1	t2s	D6	1	○			D6 t2s
+t2s_D6_r2	t2s	D6	2	×	空の結果の読み方（札の記載なし）		同上
+t2s_D6_r3	t2s	D6	3	○		is_finalized = TRUE で絞った	D6 t2s と「印」の表
+t2s_desc_D6_r1	t2s_desc	D6	1	○			D6 t2s_desc
+t2s_desc_D6_r2	t2s_desc	D6	2	○			同上
+t2s_desc_D6_r3	t2s_desc	D6	3	○			同上
+sl_D6_r1	sl	D6	1	×	空の結果の読み方（札の記載なし。「全く売上がなかった可能性」）		D6 sl
+sl_D6_r2	sl	D6	2	答えなし			同上（「通貨の指定が無い」と断った）
+sl_D6_r3	sl	D6	3	×	空の結果（「0」）		同上
