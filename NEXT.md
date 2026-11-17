@@ -3,7 +3,9 @@
 
 このファイルは、持ち主が承認した作業の一覧で、自律ループ（[ADR-008](docs/decisions/ADR-008-autonomous-loop.md)）の入口。ループは毎回ここを読み、[docs/agent/loop.md](docs/agent/loop.md) の手順で、上から1件だけ進める。
 
-**今はビルドの段**（[ADR-009](docs/decisions/ADR-009-build-then-analyze.md)）。この表の作業をすべて実装まで進める。指示書に無い設計判断は、止まる類でなければ仮決めして進め、記録に残す。評価はビルドの段が終わってからする。
+**2026-11-17 に範囲を絞った（持ち主の判断）。** ビルドの段は S3（段階3のまとめの文書）で終える。そのあとは、作ったものを使って振り返る段に移る。S3 のほかに残っていた作業は、種類を `stop`（やらない）にした。理由は下の「範囲を絞った理由」。
+
+もとの方針（[ADR-009](docs/decisions/ADR-009-build-then-analyze.md)）：この表の作業を実装まで進め、指示書に無い設計判断は、止まる類でなければ仮決めして記録に残し、評価はあとでする。
 
 - 作業の中身は、各行の「指示書」にある。指示書が無い行は、下の「小さな作業」が指示になる
 - この表を書き換えてよいのは、持ち主と、持ち主が頼んだセッション（PR を通す）。**作業の PR は、この表を書き換えない**（ADR-009 の決定6）
@@ -17,6 +19,7 @@
 | `loop` | ループが着手してよい（依存がすべて済みのとき） | ループ |
 | `attended` | 持ち主が見ている Claude Code のセッションでやる（承認の画面が要る） | 持ち主が1行を送る |
 | `owner` | 持ち主が決める。決まったら、持ち主が頼んだセッションが表と ADR を直す | 持ち主 |
+| `stop` | やらない（2026-11-17 に範囲を絞った）。ループは着手しない | — |
 
 状態は GitHub の PR で決まる（ADR-009 の決定6）。作業ブランチ `auto/<ID>`・`owner/<ID>`（後ろに `-` で始まる名前を付けてよい）の PR が、開いていれば進行中、マージされていれば済み、閉じられていれば断られた（やり直さない）。
 
@@ -25,32 +28,39 @@
 | ID | 作業 | 種類 | 依存 | 指示書 |
 |---|---|---|---|---|
 | L0 | 自律ループを据え付ける（権限の表、作業ブランチだけに push、main の保護、定時の起動） | `attended` | — | [L0](docs/orders/L0-loop-setup.md) |
-| L1 | レビュー役と、PR のコメントで持ち主の決めを受ける仕組みを足す | `attended` | L0 | [L1](docs/orders/L1-review-and-decisions.md) |
+| L1 | レビュー役と、PR のコメントで持ち主の決めを受ける仕組みを足す | `stop` | L0 | [L1](docs/orders/L1-review-and-decisions.md) |
 | M2 | `docs/analysis/sl-vs-t2s-comparison.md` のタイトルの「（下書き）」を外す（L0 の最初の1件） | `loop` | L0 | 下の「小さな作業」 |
 | M1 | CLAUDE.md の「IP アドレスをコミットしない」を、hook が見ている範囲に合わせる | `loop` | L0 | 下の「小さな作業」 |
 | R1 | 回帰の試験 第1段：13問の数字と、文書の指標の名前 | `loop` | L0 | [R1](docs/orders/R1-regression-numbers-docs.md) |
 | G1 | 関所の試しを、今の定義（ctr_per_open）に合わせる | `loop` | L0 | [G1](docs/orders/G1-guard-tests-ctr-per-open.md) |
-| P1 | 新しい題材（公開の電力データ）を一から作る：設計 | `loop` | L0 | [P1](docs/orders/P1-power-design.md) |
+| P1 | 新しい題材（公開の電力データ）を一から作る：設計（東京電力のサイトの利用条件に当たって止まった。PR #11） | `stop` | L0 | [P1](docs/orders/P1-power-design.md) |
 | M4 | 同じ日付の snapshot が2つある組を数える（数えるだけで、直さない） | `loop` | L0 | 下の「小さな作業」 |
 | R2 | 回帰の試験 第2段：過去の間違いの検出器を作り、段階2の78本の人の判定と突き合わせる | `loop` | R1 | [R2](docs/orders/R2-regression-detectors.md) |
-| M3 | README.md の Reproduce の「seeded, deterministic」を、ADR-006 の事実に合わせる | `loop` | R1 | 下の「小さな作業」 |
-| S3 | 段階3のまとめの文書（腐らせる→見つける→直す→確かめる、書ける・書けない、影響の範囲） | `loop` | R1, G1 | [S3](docs/orders/S3-governance-design.md) |
-| G2 | 関所の知っている穴 H2（名前を出さないスクリプトで決定メモを書く）を、使い捨ての clone で実演する | `loop` | G1 | [G2](docs/orders/G2-guard-hole-demo.md) |
-| P2 | 新しい題材：取り込み（リポジトリの外に生のファイル、リポジトリに一覧と指紋） | `loop` | P1 | [P2](docs/orders/P2-power-ingest.md) |
-| W1 | 毎晩の見張りの案を出す（回帰の試験の数字の層を、毎晩の dbt build のあとに回す） | `loop` | R1 | [W1](docs/orders/W1-nightly-watch-proposal.md) |
-| R3a | 回帰の試験 第3段の条件を書く（本物のエージェントで解き直す。回す前の承認） | `loop` | R2 | [R3](docs/orders/R3-regression-live.md) |
-| R3b | 回帰の試験 第3段を回す（R3a のマージが、条件の承認） | `loop` | R3a | [R3](docs/orders/R3-regression-live.md) |
-| W2 | 毎晩の見張りを作る（W1 のマージで承認された案で） | `loop` | W1 | [W2](docs/orders/W2-nightly-watch-build.md) |
-| P3 | 新しい題材：モデル・試験・指標（別の dbt プロジェクト） | `loop` | P2, L0 | [P3](docs/orders/P3-power-models.md) |
-| B1 | `query_metrics` の where の穴を塞ぐ（R3b を段階2と同じ道具で回したあと） | `loop` | R3b | [B1](docs/orders/B1-where-hole.md) |
-| V1 | generator の揺れ（`hash()`・uuid4）と実在のブランド名を、コードだけ直す（基準データは作り直さない） | `loop` | R1 | [V1](docs/orders/V1-generator-fix.md) |
-| W3 | 毎晩の見張りを、持ち主の機械に据え付ける | `attended` | W2 | 下の「小さな作業」 |
-| V2 | 基準データを作り直し、新しい版にする | `attended` | V1, R3b, W3 | [V2](docs/orders/V2-regenerate-data.md) |
-| V3 | 作り直したデータで回帰の試験を回し、変わった数字を確かめて期待値を直す | `loop` | V2 | [V3](docs/orders/V3-regression-after-regen.md) |
-| P4 | 新しい題材：道具（sl の電力の形）と回帰の試験、改訂の検知 | `loop` | P3, B1 | [P4](docs/orders/P4-power-tools-regression.md) |
-| P5 | 新しい題材：関所を電力の定義に広げ、毎晩の取り込みを据え付ける | `attended` | P4 | [P5](docs/orders/P5-power-attended.md) |
-| X1 | 持ち主の機械の片づけ（試しの使い捨ての clone、リポジトリの外の写し、git の認証情報の置き場所） | `attended` | L0 | 下の「小さな作業」 |
-| Z1 | ビルドの段の記録を集める（事実だけ。解釈は書かない） | `loop` | ALL | [Z1](docs/orders/Z1-build-record.md) |
+| S3 | 段階3のまとめの文書（腐らせる→見つける→直す→確かめる、書ける・書けない、影響の範囲）。**ビルドの段の最後の作業** | `loop` | R1, G1 | [S3](docs/orders/S3-governance-design.md) |
+| M3 | README.md の Reproduce の「seeded, deterministic」を、ADR-006 の事実に合わせる | `stop` | R1 | 下の「小さな作業」 |
+| G2 | 関所の知っている穴 H2 を、使い捨ての clone で実演する | `stop` | G1 | [G2](docs/orders/G2-guard-hole-demo.md) |
+| P2 | 新しい題材：取り込み | `stop` | P1 | [P2](docs/orders/P2-power-ingest.md) |
+| W1 | 毎晩の見張りの案を出す | `stop` | R1 | [W1](docs/orders/W1-nightly-watch-proposal.md) |
+| R3a | 回帰の試験 第3段の条件を書く | `stop` | R2 | [R3](docs/orders/R3-regression-live.md) |
+| R3b | 回帰の試験 第3段を回す | `stop` | R3a | [R3](docs/orders/R3-regression-live.md) |
+| W2 | 毎晩の見張りを作る | `stop` | W1 | [W2](docs/orders/W2-nightly-watch-build.md) |
+| P3 | 新しい題材：モデル・試験・指標 | `stop` | P2, L0 | [P3](docs/orders/P3-power-models.md) |
+| B1 | `query_metrics` の where の穴を塞ぐ | `stop` | R3b | [B1](docs/orders/B1-where-hole.md) |
+| V1 | generator の揺れと実在のブランド名を、コードだけ直す | `stop` | R1 | [V1](docs/orders/V1-generator-fix.md) |
+| W3 | 毎晩の見張りを、持ち主の機械に据え付ける | `stop` | W2 | 下の「小さな作業」 |
+| V2 | 基準データを作り直し、新しい版にする | `stop` | V1, R3b, W3 | [V2](docs/orders/V2-regenerate-data.md) |
+| V3 | 作り直したデータで回帰の試験を回す | `stop` | V2 | [V3](docs/orders/V3-regression-after-regen.md) |
+| P4 | 新しい題材：道具と回帰の試験、改訂の検知 | `stop` | P3, B1 | [P4](docs/orders/P4-power-tools-regression.md) |
+| P5 | 新しい題材：関所を電力の定義に広げる | `stop` | P4 | [P5](docs/orders/P5-power-attended.md) |
+| X1 | 持ち主の機械の片づけ | `stop` | L0 | 下の「小さな作業」 |
+| Z1 | ビルドの段の記録を集める | `stop` | ALL | [Z1](docs/orders/Z1-build-record.md) |
+
+## 範囲を絞った理由（2026-11-17、持ち主の判断）
+
+- 持ち主の言葉（要約）：インフラばかり作っていて、何をしているか分からなくなった。知識がつながっていない。欲張りすぎた。プロジェクトの初めから計画していたこと（dbt → セマンティックレイヤー → エージェントに使わせる → 定義の腐敗と統治）をまず完遂し、学びを体系化したい。作ったものを無駄にせず、使って振り返りたい
+- 初めからの計画で、まだ済んでいないのは、段階3の完了の条件（`docs/analysis/governance-design.md`、S3）だけ。M4・R2 は、すでに PR になっている（記録として残す）
+- `stop` にした作業の指示書は消さない。また要るときは、種類を `loop` に戻せば回る
+- L1（レビュー役）も作らない。ループが回るのは S3 の1件だけになったため
 
 ### 依存の読み方
 
