@@ -72,7 +72,7 @@
 
 - 報告は `docs/agent/reports/<ID>.md`。形は下の「報告の形」
 - 作業の PR では、`NEXT.md` を書き換えない（ADR-009 の決定6）
-- ADR を新しく書いた PR だけ、`docs/decisions/README.md` の一覧に、その ADR の1行を足す（ほかの行は変えない）
+- `docs/decisions/README.md` の一覧は書き換えない（権限の表で Edit が止まる。2026-11-17 に、P1 の報告が見つけた食い違いを直した）。ADR を新しく書いたら、報告の9に「一覧に足す1行」を書いておく。一覧は Z1 か、持ち主が頼んだセッションがまとめて直す
 - PR の本文：報告の要約、終わりの条件ごとの合否、仮決めの件数、試験の期待値を変えた件数。止まったときは、持ち主に決めてほしいことを1つにまとめて書く
 - `gh pr create --base main --head auto/<ID> --title "<ID>: <一言>" --body-file docs/agent/reports/<ID>.md` で PR を作る（本文をコマンドの中に書くと、複数行や記号でコマンドとして読み切れず、権限の表に断られる）。**マージはしない**
 - push は `git push -u origin auto/<ID>` の形だけ（ループの関所がほかの形を止める）。Bash は1回に1つのコマンドで打つ

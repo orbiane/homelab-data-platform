@@ -17,13 +17,13 @@ P2 で取り込んだ電力と天気から、dbt のプロジェクト（`power/
 
 ## 1. 作る
 
-- `power/dbt_project/`：`dbt_project.yml`、`profiles.yml`（DuckDB のファイルは `power/dbt_project/` の中の git の外。パスは相対）、source（P2 の生のファイルを読む。場所は環境変数）、staging（2022年4月の前と後をそろえる）、mart（1時間ごとの需要と天気）、test、semantic model、最初の版の指標（ADR-011 の7）、時間の軸
+- `power/dbt_project/`：`dbt_project.yml`、`profiles.yml`（DuckDB のファイルは `power/dbt_project/` の中の git の外。パスは相対）、source（P2 の生のファイルを読む。場所は環境変数）、staging（ADR-011 に書いた形式の変化をそろえる）、mart（1時間ごとの需要と天気）、test、semantic model、最初の版の指標（ADR-011 の7）、時間の軸
 - 定義の説明文に、ADR-011 の該当の節を書く
 
 ## 2. 確かめる
 
 1. `dbt build --project-dir power/dbt_project --profiles-dir power/dbt_project` が ERROR 0
-2. 年ごとの行の数が、`power/raw_manifest.tsv` の行の数と合う（合わない分は、2022年4月の切り替えなどの理由で説明する）
+2. 年ごとの行の数が、`power/raw_manifest.tsv` の行の数と合う（合わない分は、ADR-011 に書いた形式の変化などの理由で説明する）
 3. mart の粒度（1時間・エリア）で重なりが0。抜けている時刻の一覧と数
 4. 最初の版の指標の値を、2通りで出す：(a) 指標の定義をなぞった SQL を Python の DuckDB で読むだけで流す、(b) `power/dbt_project/target/semantic_manifest.json` を読んで、指標が定義どおりの measure と式になっていることを示す。(a) の値を `power/docs/baseline.md` に書く（集計の値だけ。行ごとの値は書かない）。MetricFlow での問い合わせは P4 で道具を足してから
 5. 今の `dbt_project/` の warehouse と target に何も書いていないこと（変更の時刻か指紋で示す）
