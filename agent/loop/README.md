@@ -7,7 +7,7 @@
 
 | もの | 場所 | 中身 |
 |---|---|---|
-| 起動の台本 | `agent/loop/run.py` | ロック、時間帯、1日の上限、作業場所の確かめ、ID の決定、`claude -p` の起動、記録 |
+| 起動の台本 | `agent/loop/run.py` | ロック、時間帯、1日の上限、作業場所の確かめ、ID の決定、続きのブランチに乗せる、`claude -p` の起動、レビュー役、記録 |
 | 次の1件の決め方 | `agent/loop/pick.py` | `NEXT.md` の表と `gh pr list` から ID を決める。`selftest` 付き |
 | 前置き | `agent/loop/prompt.md` | `claude -p` に渡す文。`<ID>` を置き換える |
 | 権限の表 | `.claude/loop-settings.json` | ループだけに効く allow・deny・hook。ask は置かない |
@@ -65,6 +65,36 @@ claude -p "<prompt.md>" \
 2. `rm ~/Library/LaunchAgents/com.homelab-data-platform.loop.plist`
 3. `git worktree remove ~/homelab-loop/wt`（変更が残っていれば、先に中身を見る）
 4. `~/homelab-loop/bin` を消す。記録（`~/homelab-loop/logs`）は、要らなければ消す
+
+## レビュー役（L1）
+
+ループの毎回のあと、`run.py` が、開いた `auto/` の PR のうちまだ台本のレビューが無い先頭のコミットを、3つまでレビューする（手順は [docs/agent/review.md](../../docs/agent/review.md)）。
+
+| もの | 場所 |
+|---|---|
+| 機械の確かめ | `agent/loop/review_checks.py`（`selftest` 付き。`python3 agent/loop/review_checks.py <PR番号>` で表だけ出せる。読むだけ） |
+| モデルへの頼み | `agent/loop/review_prompt.md` |
+| 権限の表 | `.claude/review-settings.json`（読むだけ。書き込みは deny） |
+| 出したコメントの記録 | `~/homelab-loop/logs/reviews.jsonl`（`kind` が `posted`・`failed`）。`runs.jsonl` にも `kind: review` |
+| 権限の試し | `agent/loop/tests/review_trial.py` |
+
+手で回す：
+
+- 何をレビューするかだけ見る：`python3 ~/homelab-loop/bin/agent/loop/run.py --dry-run`（`review-plan` の行）
+- 1つの PR だけレビューする：`python3 ~/homelab-loop/bin/agent/loop/run.py --review-only --review-pr <番号>`
+- ループの1件だけ（レビューなし）：`--no-review`
+
+止め方：
+
+- 1回だけ止める：ループと同じ（`run.py` と子の `claude` を止める）。コメントは、モデルの返事のあとに台本が出すので、途中で止めればコメントは出ない
+- レビューだけを止める：plist の `ProgramArguments` に `--no-review` を足して、読み込み直す（`launchctl bootout` のあと `bootstrap`）
+- 同じ PR に二度と付けない：その PR の先頭のコミットに、`reviews.jsonl` の `posted` の行があれば、台本は付けない
+
+外し方：
+
+1. plist に `--no-review` を足して読み込み直す
+2. `~/homelab-loop/bin` から `.claude/review-settings.json`・`agent/loop/review_checks.py`・`agent/loop/review_prompt.md` を消す（消すと、レビューの段は失敗を記録して先に進む。ループの1件には効かない）
+3. 記録 `reviews.jsonl` は消さない。消すと、ループが台本のレビューを数えられなくなる（直しの続きが選ばれなくなる）
 
 ## 記録
 

@@ -26,7 +26,9 @@ LABEL = "com.homelab-data-platform.loop"
 PLIST = HOME / "Library" / "LaunchAgents" / f"{LABEL}.plist"
 DATA_LINKS = ["dbt_project/warehouse.duckdb", "dbt_project/target", "data_generation/output"]
 GUARD_FILES = [".claude/loop-settings.json", ".claude/hooks/loop_guard.py",
-               "agent/loop/run.py", "agent/loop/pick.py", "agent/loop/prompt.md"]
+               "agent/loop/run.py", "agent/loop/pick.py", "agent/loop/prompt.md",
+               # L1：レビュー役
+               ".claude/review-settings.json", "agent/loop/review_checks.py", "agent/loop/review_prompt.md"]
 
 
 def say(dry, msg):

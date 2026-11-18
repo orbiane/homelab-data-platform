@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "defaultMode": "dontAsk",
+    "allow": [
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(gh pr view *)",
+      "Bash(gh pr diff *)"
+    ],
+    "deny": [
+      "Edit",
+      "Write",
+      "MultiEdit",
+      "NotebookEdit",
+      "WebFetch",
+      "WebSearch",
+      "CronCreate",
+      "CronDelete",
+      "RemoteTrigger",
+      "EnterWorktree",
+      "ExitWorktree",
+      "Workflow",
+      "Task",
+      "Agent",
+      "SendMessage",
+      "PushNotification",
+      "ScheduleWakeup",
+      "Monitor",
+      "TaskStop",
+      "DesignSync",
+      "Bash(git *--output*)",
+      "Bash(gh pr comment *)",
+      "Bash(gh pr merge *)",
+      "Bash(gh pr edit *)",
+      "Bash(gh pr close *)",
+      "Bash(gh pr review *)",
+      "Bash(gh pr create *)",
+      "Bash(gh api *)",
+      "Bash(gh issue *)",
+      "Bash(git push *)",
+      "Bash(git commit *)",
+      "Bash(git add *)",
+      "Bash(git switch *)",
+      "Bash(git checkout *)",
+      "Bash(git reset *)",
+      "Bash(git rebase *)",
+      "Bash(rm *)",
+      "Bash(mv *)",
+      "Bash(cp *)",
+      "Bash(uv *)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(dbt *)",
+      "Bash(mf *)",
+      "Bash(duckdb *)",
+      "Bash(launchctl *)",
+      "Read(~/.ssh/**)",
+      "Read(~/.config/gh/**)",
+      "Read(~/.git-credentials)",
+      "Read(~/.netrc)",
+      "Read(~/secure/**)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write|NotebookEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/adr007_guard.py\" || exit 2",
+            "timeout": 10,
+            "onFailure": "block"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$HOMELAB_LOOP_ROOT/.claude/hooks/loop_guard.py\" || exit 2",
+            "timeout": 10,
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
+  }
+}
